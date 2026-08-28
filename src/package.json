@@ -24,9 +24,11 @@
         "@inertiajs/vue3": "^3.7.0",
         "@vitejs/plugin-vue": "^6.0.8",
         "axios": "^1.20.0",
+        "date-fns": "^4.4.0",
         "vue": "^3.5.42",
         "vue-multiselect": "^3.5.0",
         "vue-sonner": "^2.0.9",
+        "vue-tel-input": "^9.8.0",
         "ziggy-js": "^2.6.4"
     }
 }
