@@ -15,7 +15,7 @@ class UserFactory extends Factory
     /**
      * The current password being used by the factory.
      */
-    protected static ?string $password;
+    protected static ?string $password = null;
 
     /**
      * Define the model's default state.
@@ -24,17 +24,55 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $name = fake()->name();
+
         return [
-            'name' => fake()->name(),
+            'name' => $name,
+            'slug' => Str::slug($name) . '-' . Str::random(5),
+
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
+
             'password' => static::$password ??= Hash::make('password'),
+
             'remember_token' => Str::random(10),
+
+            'is_default' => false,
+            'is_super_admin' => false,
+
+            'birth_date' => fake()->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
+
+            'marital_status' => fake()->randomElement([
+                'Single',
+                'Married',
+                'Divorced',
+                'Separated',
+                'Other',
+            ]),
+
+            'religion' => fake()->randomElement([
+                'Islam',
+                'Hindu',
+                'Christian',
+                'Other',
+            ]),
+
+            'gender' => fake()->randomElement([
+                'Male',
+                'Female',
+                'Other',
+            ]),
+
+            'mobile' => fake()->numerify('01#########'),
+
+            'address' => fake()->address(),
+
+            'created_by_id' => null,
         ];
     }
 
     /**
-     * Indicate that the model's email address should be unverified.
+     * Indicate that the user's email address should be unverified.
      */
     public function unverified(): static
     {
