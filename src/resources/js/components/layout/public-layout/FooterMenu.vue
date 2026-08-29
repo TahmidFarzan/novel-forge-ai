@@ -1,7 +1,7 @@
 <script setup>
 import { reactive, computed, onMounted, watch } from 'vue'
 
-import FooterMenuItem from '@/components/common/layout/public-layout/FooterMenuItem.vue'
+import FooterMenuItem from '@/components/layout/public-layout/FooterMenuItem.vue'
 import { fetchFromApi } from '@/composables/useApiClient'
 import { apiCacheKey, apiCacheTTL } from '@/composables/useApiCache'
 

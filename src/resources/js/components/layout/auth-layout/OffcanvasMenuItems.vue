@@ -10,46 +10,21 @@ import {
     faUsers,
     faChevronDown,
     faChevronUp,
-    faRectangleList,
     faGauge,
     faPhotoFilm,
-    faNewspaper,
-    faLayerGroup,
-    faTags,
-    faStar,
-    faFan,
-    faGlobe,
-    faEllipsisVertical,
-    faGears,
-    faFile,
-    faBullhorn,
-    faSquarePollHorizontal,
-    faLanguage,
-    faQuestionCircle
+    faBrain,
+    faRobot
 } from '@fortawesome/free-solid-svg-icons'
-
 
 library.add(
     faUser,
     faUsers,
     faChevronDown,
     faChevronUp,
-    faRectangleList,
     faGauge,
     faPhotoFilm,
-    faNewspaper,
-    faLayerGroup,
-    faTags,
-    faStar,
-    faFan,
-    faGlobe,
-    faEllipsisVertical,
-    faGears,
-    faFile,
-    faBullhorn,
-    faSquarePollHorizontal,
-    faLanguage,
-    faQuestionCircle
+    faBrain,
+    faRobot
 )
 
 import {
@@ -127,74 +102,110 @@ const isSubMenuVisible = (key) => {
 <template>
     <div class="flex flex-col space-y-1 text-sm">
 
-        <a :href="route('auth-user.dashboard.index')"
+        <a
+            :href="route('auth-user.dashboard.index')"
             class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-            :class="isCurrentPage('/auth-user/dashboard/*') ? 'bg-gray-200 font-medium' : ''">
+            :class="isCurrentPage('/auth-user/dashboard/*') ? 'bg-gray-200 font-medium' : ''"
+        >
             <FontAwesomeIcon icon="gauge" />
             Dashboard
         </a>
 
-        <a href="" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-            :class="isCurrentPage('/medias/*') ? 'bg-gray-200 font-medium' : ''">
+        <a
+            :href="route('medias.index')"
+            class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
+            :class="isCurrentPage('/medias/*') ? 'bg-gray-200 font-medium' : ''"
+        >
             <FontAwesomeIcon icon="photo-film" />
             Media
         </a>
 
-        <button @click="toggleShowSubMenu('AiAttributes')"
-            class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-100">
+        <button
+            @click="toggleShowSubMenu('AiAttributes')"
+            class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-100"
+        >
             <span class="flex items-center gap-2">
-                <FontAwesomeIcon icon="layer-group" />
+                <FontAwesomeIcon icon="brain" />
                 Ai
             </span>
-            <FontAwesomeIcon :icon="isSubMenuVisible('AiAttributes') ? 'chevron-up' : 'chevron-down'" />
+
+            <FontAwesomeIcon
+                :icon="isSubMenuVisible('AiAttributes') ? 'chevron-up' : 'chevron-down'"
+            />
         </button>
 
-        <Transition enter-active-class="transition-all duration-300 ease-out" enter-from-class="opacity-0 max-h-0"
-            enter-to-class="opacity-100 max-h-40" leave-active-class="transition-all duration-200 ease-in"
-            leave-from-class="opacity-100 max-h-40" leave-to-class="opacity-0 max-h-0">
-            <div v-if="isSubMenuVisible('AiAttributes')"
-                class="ml-4 flex flex-col space-y-1 overflow-hidden">
+        <Transition
+            enter-active-class="transition-all duration-300 ease-out"
+            enter-from-class="opacity-0 max-h-0"
+            enter-to-class="opacity-100 max-h-40"
+            leave-active-class="transition-all duration-200 ease-in"
+            leave-from-class="opacity-100 max-h-40"
+            leave-to-class="opacity-0 max-h-0"
+        >
+            <div
+                v-if="isSubMenuVisible('AiAttributes')"
+                class="ml-4 flex flex-col space-y-1 overflow-hidden"
+            >
 
-                <a href=""
+                <a
+                    :href="route('ai-brain-runners.index')"
                     class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-                    :class="isCurrentPage('/ai-btain-runner/*') ? 'bg-gray-200 font-medium' : ''">
-                    <FontAwesomeIcon icon="layer-group" />
+                    :class="isCurrentPage('/ai-brain-runners/*') ? 'bg-gray-200 font-medium' : ''"
+                >
+                    <FontAwesomeIcon icon="robot" />
                     Ai Brain Runners
                 </a>
 
-                <a href=""
+                <a
+                    :href="route('ai-brains.index')"
                     class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-                    :class="isCurrentPage('/ai-btains/*') ? 'bg-gray-200 font-medium' : ''">
-                    <FontAwesomeIcon icon="tags" />
+                    :class="isCurrentPage('/ai-brains/*') ? 'bg-gray-200 font-medium' : ''"
+                >
+                    <FontAwesomeIcon icon="brain" />
                     Ai Brain
                 </a>
+
             </div>
         </Transition>
 
-
-        <button @click="toggleShowSubMenu('UserManagement')"
-            class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-100">
+        <button
+            @click="toggleShowSubMenu('UserManagement')"
+            class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-100"
+        >
             <span class="flex items-center gap-2">
                 <FontAwesomeIcon icon="users" />
                 User Management
             </span>
-            <FontAwesomeIcon :icon="isSubMenuVisible('UserManagement') ? 'chevron-up' : 'chevron-down'" />
+
+            <FontAwesomeIcon
+                :icon="isSubMenuVisible('UserManagement') ? 'chevron-up' : 'chevron-down'"
+            />
         </button>
 
-        <Transition enter-active-class="transition-all duration-300 ease-out" enter-from-class="opacity-0 max-h-0"
-            enter-to-class="opacity-100 max-h-40" leave-active-class="transition-all duration-200 ease-in"
-            leave-from-class="opacity-100 max-h-40" leave-to-class="opacity-0 max-h-0">
-            <div v-if="isSubMenuVisible('UserManagement') && canAccessUserComputed"
-                class="ml-4 flex flex-col space-y-1 overflow-hidden">
+        <Transition
+            enter-active-class="transition-all duration-300 ease-out"
+            enter-from-class="opacity-0 max-h-0"
+            enter-to-class="opacity-100 max-h-40"
+            leave-active-class="transition-all duration-200 ease-in"
+            leave-from-class="opacity-100 max-h-40"
+            leave-to-class="opacity-0 max-h-0"
+        >
+            <div
+                v-if="isSubMenuVisible('UserManagement') && canAccessUserComputed"
+                class="ml-4 flex flex-col space-y-1 overflow-hidden"
+            >
 
-                <a :href="route('users.index')"
+                <a
+                    :href="route('users.index')"
                     class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-                    :class="isAnyCurrentPage(routeMap.UserManagement) ? 'bg-gray-200 font-medium' : ''">
+                    :class="isAnyCurrentPage(routeMap.UserManagement) ? 'bg-gray-200 font-medium' : ''"
+                >
                     <FontAwesomeIcon icon="user" />
                     Users
                 </a>
 
             </div>
         </Transition>
+
     </div>
 </template>

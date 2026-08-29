@@ -4,9 +4,10 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthController;
 
 //
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use romanzipp\QueueMonitor\Controllers\ShowQueueMonitorController;
 
@@ -81,6 +82,15 @@ Route::prefix('search')->name('search.')->group(function () {
     });
 
     Route::middleware(['response.cache:60,private,300,etag'])->get('user/{slugOrId}', [SearchController::class, 'user'])->name('user');
+});
+
+Route::prefix('medias')->name('medias.')->group(function () {
+    Route::get('/', [MediaController::class, 'index'])->name('index');
+    Route::get('details/{slug}', [MediaController::class, 'details'])->name('details');
+    Route::delete('delete/{slug}', [MediaController::class, 'delete'])->name('delete');
+
+    Route::post('quick-save', [MediaController::class, 'quickSave'])->name('quick-save');
+    Route::patch('quick-update/{slug}', [MediaController::class, 'quickUpdate'])->name('quick-update');
 });
 
 Route::prefix('users')->name('users.')->middleware(['is.super.admin'])->group(function () {
