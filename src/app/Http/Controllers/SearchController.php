@@ -84,4 +84,11 @@ class SearchController extends Controller
             $this->searchService->userPermission($slugOrId)
         );
     }
+
+    public function userPermissionsByGroup(Request $request): JsonResponse
+    {
+        return response()->json(
+            $this->searchService->userPermissionsByGroup($request)
+        );
+    }
 }

@@ -104,7 +104,6 @@ export const canDeleteUser = async (authUser, user) => {
     )
 }
 
-
 export const canAccessActivityLog = async (authUser) => true
 export const canDeleteActivityLog = async (authUser) => authUser?.is_super_admin
 

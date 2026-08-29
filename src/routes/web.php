@@ -4,6 +4,7 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthController;
 
 //
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
@@ -68,6 +69,9 @@ Route::prefix('search')->name('search.')->group(function () {
         Route::get('activity-log-events', [SearchController::class, 'activityLogEvents'])->name('activity-log-events');
         Route::get('activity-log-subject-types', [SearchController::class, 'activityLogSubjectTypes'])->name('activity-log-subject-types');
 
+        Route::get('user-permissions', [SearchController::class, 'userPermissions'])->name('user-permissions');
+        Route::get('user-permissions-by-group', [SearchController::class, 'userPermissionsByGroup'])->name('user-permissions-by-group');
+
     });
 
     Route::middleware(['response.cache:60,public,30,etag'])->group(function () {
@@ -77,6 +81,19 @@ Route::prefix('search')->name('search.')->group(function () {
     });
 
     Route::middleware(['response.cache:60,private,300,etag'])->get('user/{slugOrId}', [SearchController::class, 'user'])->name('user');
+});
+
+Route::prefix('users')->name('users.')->middleware(['is.super.admin'])->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('index');
+    Route::get('create', [UserController::class, 'create'])->name('create');
+    Route::get('edit/{slug}', [UserController::class, 'edit'])->name('edit');
+    Route::get('details/{slug}', [UserController::class, 'details'])->name('details');
+
+    Route::post('save', [UserController::class, 'save'])->name('save');
+    Route::patch('update/{slug}', [UserController::class, 'update'])->name('update');
+    Route::delete('delete/{slug}', [UserController::class, 'delete'])->name('delete');
+    Route::patch('active/{slug}', [UserController::class, 'active'])->name('active');
+    Route::patch('inactive/{slug}', [UserController::class, 'inactive'])->name('inactive');
 });
 
 Route::prefix('queue-monitor')->name('queue-monitor.')->middleware(['is.super.admin'])->group(function () {
