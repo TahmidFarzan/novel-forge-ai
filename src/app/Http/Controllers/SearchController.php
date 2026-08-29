@@ -64,6 +64,13 @@ class SearchController extends Controller
         );
     }
 
+    public function genres(Request $request): JsonResponse
+    {
+        return response()->json(
+            $this->searchService->genres($request)
+        );
+    }
+
     public function user(string | int $slugOrId): JsonResponse
     {
         return response()->json(

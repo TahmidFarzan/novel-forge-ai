@@ -17,12 +17,13 @@ class UserPermissionHelper
 
 
     public const MODULE_USER            = 'User';
+    public const MODULE_GENRE            = 'GENRE';
 
 
     public static function modules(): Collection
     {
         return SystemHelper::toOptions([
-
+            self::MODULE_GENRE,
             self::MODULE_USER,
         ]);
     }
@@ -44,8 +45,6 @@ class UserPermissionHelper
                 self::ACCESS_FORCE_DELETE,
             ]);
         }
-
-
         return SystemHelper::toOptions([
             self::ACCESS_VIEW_ANY,
             self::ACCESS_VIEW,

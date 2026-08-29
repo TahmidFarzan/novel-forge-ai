@@ -6,6 +6,7 @@ const { clearByPrefix } = useApiCache()
 
 export const groups = {
     User: 'User',
+    Genre: 'Genre',
 }
 
 export const access = {
@@ -56,11 +57,11 @@ export const hasPermission = async (authUser, module, permissionAccess) => {
         return false
     }
 
-    if ( authUser.is_super_admin ) {
+    if (authUser.is_super_admin) {
         return true
     }
 
-    const permissions = await getPermissions( authUser )
+    const permissions = await getPermissions(authUser)
 
     return permissions.some(
         permission =>
@@ -103,6 +104,12 @@ export const canDeleteUser = async (authUser, user) => {
         access.ForceDelete
     )
 }
+
+export const canAccessGenre = async (authUser) => hasPermission(authUser, groups.Genre, access.ViewAny)
+export const canCreateGenre = async (authUser, genre) => hasPermission(authUser, groups.Genre, access.Create)
+export const canUpdateGenre = async (authUser, genre) => hasPermission(authUser, groups.Genre, access.Update)
+export const canDeleteGenre = async (authUser, genre) => hasPermission(authUser, groups.Genre, access.Delete)
+
 
 export const canAccessActivityLog = async (authUser) => true
 export const canDeleteActivityLog = async (authUser) => authUser?.is_super_admin

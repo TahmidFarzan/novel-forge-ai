@@ -5,6 +5,7 @@ use App\Helpers\ActivityLogHelper;
 use App\Helpers\DatatableHelper;
 use App\Helpers\UserHelper;
 use App\Models\User;
+use App\Models\Genre;
 use App\Models\UserPermission;
 use Illuminate\Http\Request;
 
@@ -163,6 +164,36 @@ class SearchService
             'total'        => 1,
             'current_page' => 1,
             'last_page'    => 1,
+        ];
+    }
+
+    public function genres(Request $request): array
+    {
+        $query = Genre::query()->whereNull('deleted_at');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('brief', 'like', "%{$search}%");
+            });
+        }
+
+        $records = $query
+            ->orderByDesc('id')
+            ->paginate($request->input('per_page', 25));
+
+        $items = $records->map(fn($genre) => [
+            'id'   => $genre->id,
+            'name' => $genre->name,
+            'slug' => $genre->slug,
+        ]);
+
+        return [
+            'items'        => $items,
+            'total'        => $records->total(),
+            'current_page' => $records->currentPage(),
+            'last_page'    => $records->lastPage(),
         ];
     }
 

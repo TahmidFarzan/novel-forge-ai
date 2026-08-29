@@ -4,6 +4,7 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthController;
 
 //
+use App\Http\Controllers\GenreController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
@@ -76,6 +77,7 @@ Route::prefix('search')->name('search.')->group(function () {
     });
 
     Route::middleware(['response.cache:60,public,30,etag'])->group(function () {
+        Route::get('genres', [SearchController::class, 'genres'])->name('genres');
         Route::get('users', [SearchController::class, 'users'])->name('users');
 
         Route::get('user-permission/{slugOrId}', [SearchController::class, 'userPermission'])->name('user-permission');
@@ -91,6 +93,17 @@ Route::prefix('medias')->name('medias.')->group(function () {
 
     Route::post('quick-save', [MediaController::class, 'quickSave'])->name('quick-save');
     Route::patch('quick-update/{slug}', [MediaController::class, 'quickUpdate'])->name('quick-update');
+});
+
+Route::prefix('genres')->name('genres.')->group(function () {
+    Route::get('/', [GenreController::class, 'index'])->name('index');
+    Route::get('create', [GenreController::class, 'create'])->name('create');
+    Route::get('edit/{slug}', [GenreController::class, 'edit'])->name('edit');
+    Route::get('details/{slug}', [GenreController::class, 'details'])->name('details');
+
+    Route::post('save', [GenreController::class, 'save'])->name('save');
+    Route::patch('update/{slug}', [GenreController::class, 'update'])->name('update');
+    Route::delete('delete/{slug}', [GenreController::class, 'delete'])->name('delete');
 });
 
 Route::prefix('users')->name('users.')->middleware(['is.super.admin'])->group(function () {
