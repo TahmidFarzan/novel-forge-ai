@@ -33,6 +33,7 @@ import {
     canAccessUser,
     canAccessGenre,
     canAccessAiBrain,
+    canAccessAiBrainRunner,
 } from "@/composables/useUserPermissions";
 
 const { authUser } = defineProps({
@@ -68,8 +69,12 @@ const canAccessAiBrainComputed = computed(() => {
     return canAccessAiBrain(authUser);
 });
 
+const canAccessAiBrainRunnerComputed = computed(() => {
+    return canAccessAiBrainRunner(authUser);
+});
+
 const canAccessGenreComputed = computed(() => {
-    return canAccesGenre(authUser);
+    return canAccessGenre(authUser);
 });
 
 const toggleShowSubMenu = (key) => {
@@ -213,7 +218,8 @@ const isSubMenuVisible = (key) => {
                 class="ml-4 flex flex-col space-y-1 overflow-hidden"
             >
                 <a
-                    :href="''"
+                    v-if="canAccessAiBrainRunnerComputed"
+                    :href="route('ai-brain-runners.index')"
                     class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
                     :class="
                         isCurrentPage('/ai-brain-runners/*')

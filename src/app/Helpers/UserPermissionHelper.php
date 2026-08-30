@@ -17,14 +17,16 @@ class UserPermissionHelper
 
     public const MODULE_USER  = 'User';
     public const MODULE_GENRE = 'Genre';
-    public const MODULE_AIBRAIN = 'Ai Brain';
+    public const MODULE_AI_BRAIN = 'Ai Brain';
+    public const MODULE_AI_BRAIN_RUUNNER = 'Ai Brain Runner';
 
     public static function modules(): Collection
     {
         return SystemHelper::toOptions([
             self::MODULE_GENRE,
             self::MODULE_USER,
-            self::MODULE_AIBRAIN,
+            self::MODULE_AI_BRAIN,
+            self::MODULE_AI_BRAIN_RUUNNER,
         ]);
     }
 
@@ -35,7 +37,8 @@ class UserPermissionHelper
         ];
 
         $aiModules = [
-            self::MODULE_AIBRAIN,
+            self::MODULE_AI_BRAIN,
+            self::MODULE_AI_BRAIN_RUUNNER
         ];
 
         if (in_array($moduleName, $fullPermissionModules, true)) {

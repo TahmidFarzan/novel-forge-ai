@@ -9,6 +9,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\AiBrainController;
+use App\Http\Controllers\AiBrainRunnerController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use romanzipp\QueueMonitor\Controllers\ShowQueueMonitorController;
@@ -80,6 +81,7 @@ Route::prefix('search')->name('search.')->group(function () {
     Route::middleware(['response.cache:60,public,30,etag'])->group(function () {
         Route::get('genres', [SearchController::class, 'genres'])->name('genres');
         Route::get('ai-brains', [SearchController::class, 'aiBrains'])->name('ai-brains');
+        Route::get('ai-brain-runners', [SearchController::class, 'aiBrainRunners'])->name('ai-brain-runners');
         Route::get('users', [SearchController::class, 'users'])->name('users');
 
         Route::get('user-permission/{slugOrId}', [SearchController::class, 'userPermission'])->name('user-permission');
@@ -111,6 +113,11 @@ Route::prefix('genres')->name('genres.')->group(function () {
 Route::prefix('ai-brains')->name('ai-brains.')->group(function () {
     Route::get('/', [AiBrainController::class, 'index'])->name('index');
     Route::get('details/{slug}', [AiBrainController::class, 'details'])->name('details');
+});
+
+Route::prefix('ai-brain-runners')->name('ai-brain-runners.')->group(function () {
+    Route::get('/', [AiBrainRunnerController::class, 'index'])->name('index');
+    Route::get('details/{slug}', [AiBrainRunnerController::class, 'details'])->name('details');
 });
 
 Route::prefix('users')->name('users.')->middleware(['is.super.admin'])->group(function () {

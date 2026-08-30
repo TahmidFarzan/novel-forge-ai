@@ -7,6 +7,7 @@ use App\Helpers\UserHelper;
 use App\Models\User;
 use App\Models\Genre;
 use App\Models\AiBrain;
+use App\Models\AiBrainRunner;
 use App\Models\UserPermission;
 use Illuminate\Http\Request;
 
@@ -201,6 +202,36 @@ class SearchService
     public function aiBrains(Request $request): array
     {
         $query = AiBrain::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('brief', 'like', "%{$search}%");
+            });
+        }
+
+        $records = $query
+            ->orderByDesc('id')
+            ->paginate($request->input('per_page', 25));
+
+        $items = $records->map(fn($aiBrain) => [
+            'id'   => $aiBrain->id,
+            'name' => $aiBrain->name,
+            'slug' => $aiBrain->slug,
+        ]);
+
+        return [
+            'items'        => $items,
+            'total'        => $records->total(),
+            'current_page' => $records->currentPage(),
+            'last_page'    => $records->lastPage(),
+        ];
+    }
+
+    public function aiBrainRunners(Request $request): array
+    {
+        $query = AiBrainRunner::query();
 
         if ($request->filled('search')) {
             $search = $request->input('search');

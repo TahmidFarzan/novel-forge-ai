@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
 
         $this->call(GenreSeeder::class);
+
         $this->call(AiBrainSeeder::class);
+        $this->call(AiBrainRunnerSeeder::class);
     }
 }
