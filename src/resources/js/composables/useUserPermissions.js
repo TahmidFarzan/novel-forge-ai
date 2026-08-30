@@ -7,6 +7,7 @@ const { clearByPrefix } = useApiCache()
 export const groups = {
     User: 'User',
     Genre: 'Genre',
+    AiBrain: 'Ai Brain',
 }
 
 export const access = {
@@ -73,6 +74,7 @@ export const hasPermission = async (authUser, module, permissionAccess) => {
 }
 
 export const canAccessUser = async (authUser) => hasPermission(authUser, groups.User, access.ViewAny)
+export const canViewUser = async (authUser, user) => hasPermission(authUser, groups.User, access.View)
 export const canCreateUser = async (authUser) => hasPermission(authUser, groups.User, access.Create)
 export const canUpdateUser = async (authUser, user) => hasPermission(authUser, groups.User, access.Update)
 export const canActiveInactiveUser = async (authUser, user) => {
@@ -105,11 +107,14 @@ export const canDeleteUser = async (authUser, user) => {
     )
 }
 
-export const canAccessGenre = async (authUser) => hasPermission(authUser, groups.Genre, access.ViewAny)
+export const canAccessGenre = async (authUser) => hasPermission(authUser, groups.Genre, access.View)
+export const canViewGenre = async (authUser, genre) => hasPermission(authUser, groups.Genre, access.ViewAny)
 export const canCreateGenre = async (authUser, genre) => hasPermission(authUser, groups.Genre, access.Create)
 export const canUpdateGenre = async (authUser, genre) => hasPermission(authUser, groups.Genre, access.Update)
 export const canDeleteGenre = async (authUser, genre) => hasPermission(authUser, groups.Genre, access.Delete)
 
+export const canAccessAiBrain = async (authUser) => hasPermission(authUser, groups.AiBrain, access.View)
+export const canViewAiBrain = async (authUser, aiBrain) => hasPermission(authUser, groups.AiBrain, access.ViewAny)
 
 export const canAccessActivityLog = async (authUser) => true
 export const canDeleteActivityLog = async (authUser) => authUser?.is_super_admin

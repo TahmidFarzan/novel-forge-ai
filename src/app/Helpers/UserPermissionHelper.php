@@ -15,16 +15,16 @@ class UserPermissionHelper
     public const ACCESS_RESTORE      = 'Restore';
     public const ACCESS_FORCE_DELETE = 'Force delete';
 
-
-    public const MODULE_USER            = 'User';
-    public const MODULE_GENRE            = 'GENRE';
-
+    public const MODULE_USER  = 'User';
+    public const MODULE_GENRE = 'Genre';
+    public const MODULE_AIBRAIN = 'Ai Brain';
 
     public static function modules(): Collection
     {
         return SystemHelper::toOptions([
             self::MODULE_GENRE,
             self::MODULE_USER,
+            self::MODULE_AIBRAIN,
         ]);
     }
 
@@ -32,6 +32,10 @@ class UserPermissionHelper
     {
         $fullPermissionModules = [
             self::MODULE_USER,
+        ];
+
+        $aiModules = [
+            self::MODULE_AIBRAIN,
         ];
 
         if (in_array($moduleName, $fullPermissionModules, true)) {
@@ -45,6 +49,14 @@ class UserPermissionHelper
                 self::ACCESS_FORCE_DELETE,
             ]);
         }
+
+        if (in_array($moduleName, $aiModules , true)) {
+            return SystemHelper::toOptions([
+                self::ACCESS_VIEW_ANY,
+                self::ACCESS_VIEW,
+            ]);
+        }
+
         return SystemHelper::toOptions([
             self::ACCESS_VIEW_ANY,
             self::ACCESS_VIEW,

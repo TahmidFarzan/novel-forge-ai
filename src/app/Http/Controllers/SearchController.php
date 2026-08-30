@@ -71,6 +71,14 @@ class SearchController extends Controller
         );
     }
 
+    public function aiBrains(Request $request): JsonResponse
+    {
+        return response()->json(
+            $this->searchService->aiBrains($request)
+        );
+    }
+
+
     public function user(string | int $slugOrId): JsonResponse
     {
         return response()->json(

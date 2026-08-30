@@ -1,8 +1,9 @@
 <?php
+
 namespace App\Models;
 
-use App\Observers\GenreObserver;
-use App\Policies\GenrePolicy;
+use App\Observers\AiBrainObserver;
+use App\Policies\AiBrainPolicy;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -10,8 +11,6 @@ use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
@@ -21,14 +20,14 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-#[Table('genres')]
+#[Table('ai_brains')]
 #[Fillable([
         'name', 'brief', 'slug',
         'created_by_id',
     ])]
-#[UsePolicy(GenrePolicy::class)]
-#[ObservedBy([GenreObserver::class])]
-class Genre extends Model
+#[UsePolicy(AiBrainPolicy::class)]
+#[ObservedBy([AiBrainObserver::class])]
+class AiBrain extends Model
 {
     use HasFactory, LogsActivity, HasSlug;
 
@@ -48,7 +47,7 @@ class Genre extends Model
             ->logOnly([
                 'name', 'brief', 'slug',
             ])
-            ->useLogName('Genre')
+            ->useLogName('Ai Brain')
             ->setDescriptionForEvent(fn(string $eventName) => "The record has been {$eventName}.")
             ->logOnlyDirty()
             ->logExcept([

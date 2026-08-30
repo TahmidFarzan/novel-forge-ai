@@ -29,7 +29,11 @@ library.add(
     faBookOpen,
 );
 
-import { canAccessUser } from "@/composables/useUserPermissions";
+import {
+    canAccessUser,
+    canAccessGenre,
+    canAccessAiBrain,
+} from "@/composables/useUserPermissions";
 
 const { authUser } = defineProps({
     authUser: {
@@ -58,6 +62,14 @@ const routeMap = {
 
 const canAccessUserComputed = computed(() => {
     return canAccessUser(authUser);
+});
+
+const canAccessAiBrainComputed = computed(() => {
+    return canAccessAiBrain(authUser);
+});
+
+const canAccessGenreComputed = computed(() => {
+    return canAccesGenre(authUser);
 });
 
 const toggleShowSubMenu = (key) => {
@@ -155,6 +167,7 @@ const isSubMenuVisible = (key) => {
                 class="ml-4 flex flex-col space-y-1 overflow-hidden"
             >
                 <a
+                    v-if="canAccessGenreComputed"
                     :href="route('genres.index')"
                     class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
                     :class="
@@ -213,7 +226,8 @@ const isSubMenuVisible = (key) => {
                 </a>
 
                 <a
-                    :href="''"
+                    v-if="canAccessAiBrainComputed"
+                    :href="route('ai-brains.index')"
                     class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
                     :class="
                         isCurrentPage('/ai-brains/*')
