@@ -84,6 +84,8 @@ Route::prefix('search')->name('search.')->group(function () {
         Route::get('ai-brain-runners', [SearchController::class, 'aiBrainRunners'])->name('ai-brain-runners');
         Route::get('users', [SearchController::class, 'users'])->name('users');
 
+        Route::get('ai-brain/{slugOrId}', [SearchController::class, 'aiBrain'])->name('ai-brain');
+        Route::get('ai-brain-runner/{slugOrId}', [SearchController::class, 'aiBrainRunner'])->name('ai-brain-runner');
         Route::get('user-permission/{slugOrId}', [SearchController::class, 'userPermission'])->name('user-permission');
     });
 

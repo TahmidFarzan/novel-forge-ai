@@ -99,6 +99,20 @@ class SearchController extends Controller
         );
     }
 
+    public function aiBrain(string | int $slugOrId): JsonResponse
+    {
+        return response()->json(
+            $this->searchService->aiBrain($slugOrId)
+        );
+    }
+
+    public function aiBrainRuner(string | int $slugOrId): JsonResponse
+    {
+        return response()->json(
+            $this->searchService->aiBrainRunner($slugOrId)
+        );
+    }
+
     public function userPermission(string | int $slugOrId): JsonResponse
     {
         return response()->json(

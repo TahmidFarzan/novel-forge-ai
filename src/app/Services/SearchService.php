@@ -359,8 +359,18 @@ class SearchService
         return User::with("userPermission")->where('id', $slugOrId)->orWhere('slug', $slugOrId)->firstOrFail();
     }
 
+    public function aiBrain(int | string $slugOrId): AiBrain
+    {
+        return AiBrain::where('id', $slugOrId)->orWhere('slug', $slugOrId)->firstOrFail();
+    }
+
+    public function aiBrainRunner(int | string $slugOrId): AiBrainRunner
+    {
+        return AiBrainRunner::where('id', $slugOrId)->orWhere('slug', $slugOrId)->firstOrFail();
+    }
+
     public function userPermission(int | string $slugOrId): UserPermission
     {
-        return UserPermission::where('id', $slugOrId)->firstOrFail();
+        return UserPermission::where('id', $slugOrId)->orWhere('slug', $slugOrId)->firstOrFail();
     }
 }
