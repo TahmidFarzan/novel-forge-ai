@@ -106,7 +106,7 @@ class SearchController extends Controller
         );
     }
 
-    public function aiBrainRuner(string | int $slugOrId): JsonResponse
+    public function aiBrainRunner(string | int $slugOrId): JsonResponse
     {
         return response()->json(
             $this->searchService->aiBrainRunner($slugOrId)

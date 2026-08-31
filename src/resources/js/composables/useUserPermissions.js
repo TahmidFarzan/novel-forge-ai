@@ -123,6 +123,8 @@ export const canViewAiBrainRunner = async (authUser, aiBrainRunner) => hasPermis
 export const canAccessActivityLog = async (authUser) => true
 export const canDeleteActivityLog = async (authUser) => authUser?.is_super_admin
 
+export const canUpdateSetting = async (authUser) => authUser?.is_super_admin
+
 export const canAccessQueueMonitor = (authUser) => authUser?.is_super_admin
 
 export const canAccessLogViewer = (authUser) => authUser?.is_super_admin
