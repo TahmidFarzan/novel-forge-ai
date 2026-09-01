@@ -42,7 +42,7 @@ class AiBrainRunnerSeeder extends Seeder
             (object) [
                 'name'  => 'Olama',
                 'brief' => "<strong>Olama</strong> is a lightweight yet powerful language model optimized for efficient inference and fine-tuning. It excels in general-purpose tasks including text generation, code completion, and reasoning.<br><br>📋 <strong>System Requirements:</strong><br>• <strong>CPU:</strong> Intel Core i7 or AMD Ryzen 7 (8+ cores recommended)<br>• <strong>RAM:</strong> 16GB - 32GB minimum<br>• <strong>GPU:</strong> NVIDIA RTX 3060/4060 (8GB VRAM) or higher<br>• <strong>Storage:</strong> Minimum 20GB free space<br>• <strong>OS:</strong> Windows 10/11, Ubuntu 20.04+, or macOS 12+<br>• <strong>CUDA:</strong> CUDA 11.8+ with cuDNN 8.9+ (for GPU acceleration)",
-                'url'   => "http://localhost:11434",
+                'url'   => "http://ollama:11434",
             ],
 
         ]);
