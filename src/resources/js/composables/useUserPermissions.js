@@ -115,6 +115,9 @@ export const canDeleteGenre = async (authUser, genre) => hasPermission(authUser,
 
 export const canAccessAiBrain = async (authUser) => hasPermission(authUser, groups.AiBrain, access.View)
 export const canViewAiBrain = async (authUser, aiBrain) => hasPermission(authUser, groups.AiBrain, access.ViewAny)
+export const canCreateAiBrain = async (authUser, aiBrain) => hasPermission(authUser, groups.AiBrain, access.Create)
+export const canUpdateAiBrain = async (authUser, aiBrain) => hasPermission(authUser, groups.AiBrain, access.Update)
+export const canDeleteAiBrain = async (authUser, aiBrain) => hasPermission(authUser, groups.AiBrain, access.Delete)
 
 export const canAccessActivityLog = async (authUser) => true
 export const canDeleteActivityLog = async (authUser) => authUser?.is_super_admin

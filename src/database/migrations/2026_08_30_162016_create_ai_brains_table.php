@@ -14,8 +14,17 @@ return new class extends Migration
         Schema::create('ai_brains', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
+            $table->string('api_url', 500);
+            $table->string('api_key', 500);
             $table->text('brief')->nullable();
+            $table->text('focus')->nullable();
             $table->string('slug')->unique();
+
+            $table->bigInteger('context_window');
+            $table->decimal('average_latency', 8, 2);
+            $table->integer('minimum_wait_time');
+            $table->integer('timeout_seconds');
+            $table->integer('max_output_tokens')->nullable();
 
             $table->foreignId('created_by_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();

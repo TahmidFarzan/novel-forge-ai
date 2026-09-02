@@ -28,8 +28,16 @@ class AiBrainSeeder extends Seeder
 
         foreach ($this->getAiBrainsFromStaticData() as $aiBrain) {
             AiBrain::factory()->state([
-                'name'  => $aiBrain->name,
-                'brief' => $aiBrain->brief ?? null,
+                'name'              => $aiBrain->name,
+                'api_url'           => $aiBrain->api_url,
+                'api_key'           => $aiBrain->api_key,
+                'brief'             => $aiBrain->brief ?? null,
+                'focus'             => $aiBrain->focus ?? null,
+                'context_window'    => $aiBrain->context_window,
+                'average_latency'   => $aiBrain->average_latency,
+                'minimum_wait_time' => $aiBrain->minimum_wait_time,
+                'timeout_seconds'   => $aiBrain->timeout_seconds,
+                'max_output_tokens' => $aiBrain->max_output_tokens ?? null,
             ])->create();
         }
     }
@@ -39,13 +47,17 @@ class AiBrainSeeder extends Seeder
         return collect([
 
             (object) [
-                'name'  => 'Qwen 8B',
-                'brief' => "<strong>Qwen 8B</strong> is a lightweight yet powerful language model with <strong>8 billion parameters</strong>, optimized for efficient inference and fine-tuning. It excels in general-purpose tasks including text generation, code completion, and reasoning.<br><br>📋 <strong>System Requirements:</strong><br>• <strong>CPU:</strong> Intel Core i7 or AMD Ryzen 7 (8+ cores recommended)<br>• <strong>RAM:</strong> 16GB - 32GB minimum<br>• <strong>GPU:</strong> NVIDIA RTX 3060/4060 (8GB VRAM) or higher<br>• <strong>Storage:</strong> Minimum 20GB free space<br>• <strong>OS:</strong> Windows 10/11, Ubuntu 20.04+, or macOS 12+<br>• <strong>CUDA:</strong> CUDA 11.8+ with cuDNN 8.9+ (for GPU acceleration)",
-            ],
-
-            (object) [
-                'name'  => 'Qwen 14B',
-                'brief' => "<strong>Qwen 14B</strong> is a more advanced language model with <strong>14 billion parameters</strong>, delivering superior performance in complex reasoning, creative writing, and multi-step problem-solving. It offers better contextual understanding and nuanced responses.<br><br>📋 <strong>System Requirements:</strong><br>• <strong>CPU:</strong> Intel Core i9 or AMD Ryzen 9 (12+ cores recommended)<br>• <strong>RAM:</strong> 32GB - 64GB minimum<br>• <strong>GPU:</strong> NVIDIA RTX 4080/4090 (16GB+ VRAM) or NVIDIA A100<br>• <strong>Storage:</strong> Minimum 35GB free space<br>• <strong>OS:</strong> Windows 10/11, Ubuntu 20.04+, or macOS 12+<br>• <strong>CUDA:</strong> CUDA 11.8+ with cuDNN 8.9+ (for GPU acceleration)",
+                'name'              => 'Google: Gemma 4 26B A4B',
+                "model"             => "google/gemma-4-26b-a4b-it:free",
+                'api_url'           => 'https://openrouter.ai/api/v1',
+                'api_key'           => 'sk-your-openrouter-api-key',
+                'brief'             => 'AI writing model for generating documents, workbooks, ebooks and structured educational content.',
+                'focus'             => 'Premium document generation, chapter writing, workbook creation, story generation, educational materials',
+                'context_window'    => 262000,
+                'average_latency'   => 0.90,
+                'minimum_wait_time' => 2,
+                'timeout_seconds'   => 60,
+                'max_output_tokens' => 5000,
             ],
 
         ]);

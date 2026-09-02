@@ -36,10 +36,6 @@ class UserPermissionHelper
             self::MODULE_USER,
         ];
 
-        $aiModules = [
-            self::MODULE_AI_BRAIN,
-        ];
-
         if (in_array($moduleName, $fullPermissionModules, true)) {
             return SystemHelper::toOptions([
                 self::ACCESS_VIEW_ANY,
@@ -49,13 +45,6 @@ class UserPermissionHelper
                 self::ACCESS_DELETE,
                 self::ACCESS_RESTORE,
                 self::ACCESS_FORCE_DELETE,
-            ]);
-        }
-
-        if (in_array($moduleName, $aiModules , true)) {
-            return SystemHelper::toOptions([
-                self::ACCESS_VIEW_ANY,
-                self::ACCESS_VIEW,
             ]);
         }
 

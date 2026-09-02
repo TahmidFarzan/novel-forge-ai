@@ -22,7 +22,9 @@ use Spatie\Sluggable\SlugOptions;
 
 #[Table('ai_brains')]
 #[Fillable([
-        'name', 'brief', 'slug',
+        'name', 'api_url', 'api_key', 'brief', 'focus', 'slug',
+        'context_window', 'average_latency', 'minimum_wait_time',
+        'timeout_seconds', 'max_output_tokens',
         'created_by_id',
     ])]
 #[UsePolicy(AiBrainPolicy::class)]
@@ -36,8 +38,13 @@ class AiBrain extends Model
     protected function casts(): array
     {
         return [
-            'created_at' => 'datetime',
-            'updated_at' => 'datetime',
+            'context_window'    => 'integer',
+            'average_latency'   => 'decimal:2',
+            'minimum_wait_time' => 'integer',
+            'timeout_seconds'   => 'integer',
+            'max_output_tokens' => 'integer',
+            'created_at'        => 'datetime',
+            'updated_at'        => 'datetime',
         ];
     }
 
@@ -45,7 +52,9 @@ class AiBrain extends Model
     {
         return LogOptions::defaults()
             ->logOnly([
-                'name', 'brief', 'slug',
+                'name', 'api_url', 'brief', 'focus', 'slug',
+                'context_window', 'average_latency', 'minimum_wait_time',
+                'timeout_seconds', 'max_output_tokens',
             ])
             ->useLogName('Ai Brain')
             ->setDescriptionForEvent(fn(string $eventName) => "The record has been {$eventName}.")

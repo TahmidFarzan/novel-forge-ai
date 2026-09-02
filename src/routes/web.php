@@ -111,6 +111,13 @@ Route::prefix('genres')->name('genres.')->group(function () {
 Route::prefix('ai-brains')->name('ai-brains.')->group(function () {
     Route::get('/', [AiBrainController::class, 'index'])->name('index');
     Route::get('details/{slug}', [AiBrainController::class, 'details'])->name('details');
+
+    Route::get('create', [AiBrainController::class, 'create'])->name('create');
+    Route::get('edit/{slug}', [AiBrainController::class, 'edit'])->name('edit');
+
+    Route::post('save', [AiBrainController::class, 'save'])->name('save');
+    Route::patch('update/{slug}', [AiBrainController::class, 'update'])->name('update');
+    Route::delete('delete/{slug}', [AiBrainController::class, 'delete'])->name('delete');
 });
 
 Route::prefix('users')->name('users.')->middleware(['is.super.admin'])->group(function () {
