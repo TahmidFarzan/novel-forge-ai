@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Genre;
 use App\Models\AiBrain;
 use App\Models\KdpLayout;
+use App\Models\DocumentStyle;
 use App\Models\UserPermission;
 use Illuminate\Http\Request;
 
@@ -250,6 +251,35 @@ class SearchService
             'id'   => $kdpLayout->id,
             'name' => $kdpLayout->name,
             'slug' => $kdpLayout->slug,
+        ]);
+
+        return [
+            'items'        => $items,
+            'total'        => $records->total(),
+            'current_page' => $records->currentPage(),
+            'last_page'    => $records->lastPage(),
+        ];
+    }
+
+    public function documentStyles(Request $request): array
+    {
+        $query = DocumentStyle::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('section_name', 'like', "%{$search}%")
+                    ->orWhereJsonContains('settings', $search);
+            });
+        }
+
+        $records = $query
+            ->orderBy('section_name')
+            ->paginate($request->input('per_page', 25));
+
+        $items = $records->map(fn($documentStyle) => [
+            'id'           => $documentStyle->id,
+            'section_name' => $documentStyle->section_name,
         ]);
 
         return [

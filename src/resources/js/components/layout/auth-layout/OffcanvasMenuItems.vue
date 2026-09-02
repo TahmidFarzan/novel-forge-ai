@@ -16,6 +16,7 @@ import {
     faBookOpen,
     faGears,
     faTableColumns,
+    faFileLines,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -29,6 +30,7 @@ library.add(
     faBookOpen,
     faGears,
     faTableColumns,
+    faFileLines,
 );
 
 import {
@@ -36,6 +38,7 @@ import {
     canAccessGenre,
     canAccessAiBrain,
     canAccessKdpLayout,
+    canAccessDocumentStyle,
 } from "@/composables/useUserPermissions";
 
 const { authUser } = defineProps({
@@ -54,12 +57,14 @@ const subMenus = ref({
     Reports: false,
     AiAttributes: false,
     NovelAttributes: false,
+    Configuration: false,
 });
 
 const routeMap = {
     UserManagement: ["/users/*"],
     AiAttributes: ["/ai-brains/*"],
     NovelAttributes: ["/genres/*", "/kdp-layouts/*"],
+    Configuration: ["/document-styles/*"],
     Reports: ["/reports/*"],
 };
 
@@ -77,6 +82,10 @@ const canAccessGenreComputed = computed(() => {
 
 const canAccessKdpLayoutComputed = computed(() => {
     return canAccessKdpLayout(authUser);
+});
+
+const canAccessDocumentStyleComputed = computed(() => {
+    return canAccessDocumentStyle(authUser);
 });
 
 const toggleShowSubMenu = (key) => {
@@ -292,6 +301,52 @@ const isSubMenuVisible = (key) => {
                 >
                     <FontAwesomeIcon icon="user" />
                     Users
+                </a>
+            </div>
+        </Transition>
+
+        <button
+            @click="toggleShowSubMenu('Configuration')"
+            class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-100"
+        >
+            <span class="flex items-center gap-2">
+                <FontAwesomeIcon icon="file-lines" />
+                Configuration
+            </span>
+
+            <FontAwesomeIcon
+                :icon="
+                    isSubMenuVisible('Configuration')
+                        ? 'chevron-up'
+                        : 'chevron-down'
+                "
+            />
+        </button>
+
+        <Transition
+            enter-active-class="transition-all duration-300 ease-out"
+            enter-from-class="opacity-0 max-h-0"
+            enter-to-class="opacity-100 max-h-40"
+            leave-active-class="transition-all duration-200 ease-in"
+            leave-from-class="opacity-100 max-h-40"
+            leave-to-class="opacity-0 max-h-0"
+        >
+            <div
+                v-if="isSubMenuVisible('Configuration')"
+                class="ml-4 flex flex-col space-y-1 overflow-hidden"
+            >
+                <a
+                    v-if="canAccessDocumentStyleComputed"
+                    :href="route('document-styles.index')"
+                    class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
+                    :class="
+                        isCurrentPage('/document-styles/*')
+                            ? 'bg-gray-200 font-medium'
+                            : ''
+                    "
+                >
+                    <FontAwesomeIcon icon="file-lines" />
+                    Document Style
                 </a>
             </div>
         </Transition>

@@ -85,6 +85,13 @@ class SearchController extends Controller
         );
     }
 
+    public function documentStyles(Request $request): JsonResponse
+    {
+        return response()->json(
+            $this->searchService->documentStyles($request)
+        );
+    }
+
     public function user(string | int $slugOrId): JsonResponse
     {
         return response()->json(

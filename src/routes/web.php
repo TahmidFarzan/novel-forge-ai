@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AiBrainController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DocumentStyleController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\KdpLayoutController;
 use App\Http\Controllers\MediaController;
@@ -81,6 +82,7 @@ Route::prefix('search')->name('search.')->group(function () {
         Route::get('genres', [SearchController::class, 'genres'])->name('genres');
         Route::get('ai-brains', [SearchController::class, 'aiBrains'])->name('ai-brains');
         Route::get('kdp-layouts', [SearchController::class, 'kdpLayouts'])->name('kdp-layouts');
+        Route::get('document-styles', [SearchController::class, 'documentStyles'])->name('document-styles');
         Route::get('users', [SearchController::class, 'users'])->name('users');
 
         Route::get('ai-brain/{slugOrId}', [SearchController::class, 'aiBrain'])->name('ai-brain');
@@ -125,6 +127,11 @@ Route::prefix('ai-brains')->name('ai-brains.')->group(function () {
 Route::prefix('kdp-layouts')->name('kdp-layouts.')->group(function () {
     Route::get('/', [KdpLayoutController::class, 'index'])->name('index');
     Route::get('details/{slug}', [KdpLayoutController::class, 'details'])->name('details');
+});
+
+Route::prefix('document-styles')->name('document-styles.')->group(function () {
+    Route::get('/', [DocumentStyleController::class, 'index'])->name('index');
+    Route::get('details/{slug}', [DocumentStyleController::class, 'details'])->name('details');
 });
 
 Route::prefix('users')->name('users.')->middleware(['is.super.admin'])->group(function () {
