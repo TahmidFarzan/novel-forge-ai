@@ -4,6 +4,7 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AiBrainController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\KdpLayoutController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
@@ -79,6 +80,7 @@ Route::prefix('search')->name('search.')->group(function () {
     Route::middleware(['response.cache:60,public,30,etag'])->group(function () {
         Route::get('genres', [SearchController::class, 'genres'])->name('genres');
         Route::get('ai-brains', [SearchController::class, 'aiBrains'])->name('ai-brains');
+        Route::get('kdp-layouts', [SearchController::class, 'kdpLayouts'])->name('kdp-layouts');
         Route::get('users', [SearchController::class, 'users'])->name('users');
 
         Route::get('ai-brain/{slugOrId}', [SearchController::class, 'aiBrain'])->name('ai-brain');
@@ -118,6 +120,11 @@ Route::prefix('ai-brains')->name('ai-brains.')->group(function () {
     Route::post('save', [AiBrainController::class, 'save'])->name('save');
     Route::patch('update/{slug}', [AiBrainController::class, 'update'])->name('update');
     Route::delete('delete/{slug}', [AiBrainController::class, 'delete'])->name('delete');
+});
+
+Route::prefix('kdp-layouts')->name('kdp-layouts.')->group(function () {
+    Route::get('/', [KdpLayoutController::class, 'index'])->name('index');
+    Route::get('details/{slug}', [KdpLayoutController::class, 'details'])->name('details');
 });
 
 Route::prefix('users')->name('users.')->middleware(['is.super.admin'])->group(function () {

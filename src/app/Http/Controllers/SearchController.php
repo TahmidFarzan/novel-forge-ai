@@ -78,6 +78,13 @@ class SearchController extends Controller
         );
     }
 
+    public function kdpLayouts(Request $request): JsonResponse
+    {
+        return response()->json(
+            $this->searchService->kdpLayouts($request)
+        );
+    }
+
     public function user(string | int $slugOrId): JsonResponse
     {
         return response()->json(

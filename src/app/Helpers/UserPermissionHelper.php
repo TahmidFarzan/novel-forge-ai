@@ -19,6 +19,7 @@ class UserPermissionHelper
     public const MODULE_GENRE = 'Genre';
     public const MODULE_SETTING = 'Setting';
     public const MODULE_AI_BRAIN = 'Ai Brain';
+    public const MODULE_KDP_LAYOUT = 'Kdp Layout';
 
     public static function modules(): Collection
     {
@@ -27,6 +28,7 @@ class UserPermissionHelper
             self::MODULE_GENRE,
             self::MODULE_USER,
             self::MODULE_AI_BRAIN,
+            self::MODULE_KDP_LAYOUT,
         ]);
     }
 
@@ -53,6 +55,13 @@ class UserPermissionHelper
                 self::ACCESS_VIEW_ANY,
                 self::ACCESS_VIEW,
                 self::ACCESS_UPDATE,
+            ]);
+        }
+
+        if ($moduleName == self::MODULE_KDP_LAYOUT) {
+            return SystemHelper::toOptions([
+                self::ACCESS_VIEW_ANY,
+                self::ACCESS_VIEW,
             ]);
         }
 

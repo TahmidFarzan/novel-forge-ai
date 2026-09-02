@@ -7,6 +7,7 @@ use App\Helpers\UserHelper;
 use App\Models\User;
 use App\Models\Genre;
 use App\Models\AiBrain;
+use App\Models\KdpLayout;
 use App\Models\UserPermission;
 use Illuminate\Http\Request;
 
@@ -228,10 +229,40 @@ class SearchService
         ];
     }
 
+    public function kdpLayouts(Request $request): array
+    {
+        $query = KdpLayout::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('page_size', 'like', "%{$search}%");
+            });
+        }
+
+        $records = $query
+            ->orderByDesc('id')
+            ->paginate($request->input('per_page', 25));
+
+        $items = $records->map(fn($kdpLayout) => [
+            'id'   => $kdpLayout->id,
+            'name' => $kdpLayout->name,
+            'slug' => $kdpLayout->slug,
+        ]);
+
+        return [
+            'items'        => $items,
+            'total'        => $records->total(),
+            'current_page' => $records->currentPage(),
+            'last_page'    => $records->lastPage(),
+        ];
+    }
+
     public function users(Request $request): array
     {
         $query = User::query()->whereNull('deleted_at');
-
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {

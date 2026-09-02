@@ -15,6 +15,7 @@ import {
     faBrain,
     faBookOpen,
     faGears,
+    faTableColumns,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -27,12 +28,14 @@ library.add(
     faBrain,
     faBookOpen,
     faGears,
+    faTableColumns,
 );
 
 import {
     canAccessUser,
     canAccessGenre,
     canAccessAiBrain,
+    canAccessKdpLayout,
 } from "@/composables/useUserPermissions";
 
 const { authUser } = defineProps({
@@ -56,7 +59,7 @@ const subMenus = ref({
 const routeMap = {
     UserManagement: ["/users/*"],
     AiAttributes: ["/ai-brains/*"],
-    NovelAttributes: ["/genres/*"],
+    NovelAttributes: ["/genres/*", "/kdp-layouts/*"],
     Reports: ["/reports/*"],
 };
 
@@ -70,6 +73,10 @@ const canAccessAiBrainComputed = computed(() => {
 
 const canAccessGenreComputed = computed(() => {
     return canAccessGenre(authUser);
+});
+
+const canAccessKdpLayoutComputed = computed(() => {
+    return canAccessKdpLayout(authUser);
 });
 
 const toggleShowSubMenu = (key) => {
@@ -157,9 +164,9 @@ const isSubMenuVisible = (key) => {
         <Transition
             enter-active-class="transition-all duration-300 ease-out"
             enter-from-class="opacity-0 max-h-0"
-            enter-to-class="opacity-100 max-h-40"
+            enter-to-class="opacity-100 max-h-60"
             leave-active-class="transition-all duration-200 ease-in"
-            leave-from-class="opacity-100 max-h-40"
+            leave-from-class="opacity-100 max-h-60"
             leave-to-class="opacity-0 max-h-0"
         >
             <div
@@ -178,6 +185,20 @@ const isSubMenuVisible = (key) => {
                 >
                     <FontAwesomeIcon icon="book-open" />
                     Genre
+                </a>
+
+                <a
+                    v-if="canAccessKdpLayoutComputed"
+                    :href="route('kdp-layouts.index')"
+                    class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
+                    :class="
+                        isCurrentPage('/kdp-layouts/*')
+                            ? 'bg-gray-200 font-medium'
+                            : ''
+                    "
+                >
+                    <FontAwesomeIcon icon="table-columns" />
+                    Layout
                 </a>
             </div>
         </Transition>
