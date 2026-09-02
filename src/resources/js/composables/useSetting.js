@@ -18,7 +18,6 @@ export const settingOptionValueTypes = Object.freeze({
 
 export const settingOptions = Object.freeze({
     OPTION_AI_BRAIN: 'ai-brain-id',
-    OPTION_AI_BRAIN_RUNNER: 'ai-brain-runner-id',
 })
 
 export const formatSettingValue = (value) => {

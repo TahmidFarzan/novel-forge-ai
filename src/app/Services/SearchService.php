@@ -7,7 +7,6 @@ use App\Helpers\UserHelper;
 use App\Models\User;
 use App\Models\Genre;
 use App\Models\AiBrain;
-use App\Models\AiBrainRunner;
 use App\Models\UserPermission;
 use Illuminate\Http\Request;
 
@@ -229,36 +228,6 @@ class SearchService
         ];
     }
 
-    public function aiBrainRunners(Request $request): array
-    {
-        $query = AiBrainRunner::query();
-
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('brief', 'like', "%{$search}%");
-            });
-        }
-
-        $records = $query
-            ->orderByDesc('id')
-            ->paginate($request->input('per_page', 25));
-
-        $items = $records->map(fn($aiBrain) => [
-            'id'   => $aiBrain->id,
-            'name' => $aiBrain->name,
-            'slug' => $aiBrain->slug,
-        ]);
-
-        return [
-            'items'        => $items,
-            'total'        => $records->total(),
-            'current_page' => $records->currentPage(),
-            'last_page'    => $records->lastPage(),
-        ];
-    }
-
     public function users(Request $request): array
     {
         $query = User::query()->whereNull('deleted_at');
@@ -362,11 +331,6 @@ class SearchService
     public function aiBrain(int | string $slugOrId): AiBrain
     {
         return AiBrain::where('id', $slugOrId)->orWhere('slug', $slugOrId)->firstOrFail();
-    }
-
-    public function aiBrainRunner(int | string $slugOrId): AiBrainRunner
-    {
-        return AiBrainRunner::where('id', $slugOrId)->orWhere('slug', $slugOrId)->firstOrFail();
     }
 
     public function userPermission(int | string $slugOrId): UserPermission

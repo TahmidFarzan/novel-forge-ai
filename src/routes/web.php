@@ -2,9 +2,6 @@
 
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AiBrainController;
-
-//
-use App\Http\Controllers\AiBrainRunnerController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\MediaController;
@@ -82,11 +79,9 @@ Route::prefix('search')->name('search.')->group(function () {
     Route::middleware(['response.cache:60,public,30,etag'])->group(function () {
         Route::get('genres', [SearchController::class, 'genres'])->name('genres');
         Route::get('ai-brains', [SearchController::class, 'aiBrains'])->name('ai-brains');
-        Route::get('ai-brain-runners', [SearchController::class, 'aiBrainRunners'])->name('ai-brain-runners');
         Route::get('users', [SearchController::class, 'users'])->name('users');
 
         Route::get('ai-brain/{slugOrId}', [SearchController::class, 'aiBrain'])->name('ai-brain');
-        Route::get('ai-brain-runner/{slugOrId}', [SearchController::class, 'aiBrainRunner'])->name('ai-brain-runner');
         Route::get('user-permission/{slugOrId}', [SearchController::class, 'userPermission'])->name('user-permission');
     });
 
@@ -116,11 +111,6 @@ Route::prefix('genres')->name('genres.')->group(function () {
 Route::prefix('ai-brains')->name('ai-brains.')->group(function () {
     Route::get('/', [AiBrainController::class, 'index'])->name('index');
     Route::get('details/{slug}', [AiBrainController::class, 'details'])->name('details');
-});
-
-Route::prefix('ai-brain-runners')->name('ai-brain-runners.')->group(function () {
-    Route::get('/', [AiBrainRunnerController::class, 'index'])->name('index');
-    Route::get('details/{slug}', [AiBrainRunnerController::class, 'details'])->name('details');
 });
 
 Route::prefix('users')->name('users.')->middleware(['is.super.admin'])->group(function () {

@@ -2,7 +2,6 @@
 namespace App\Http\Requests;
 
 use App\Helpers\SettingHelper;
-use App\Models\AiBrainRunner;
 use App\Models\AiBrain;
 use App\Models\Setting;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -112,15 +111,6 @@ class SettingRequest extends FormRequest
                         "options.{$key}.value",
                         'Invalid value type.'
                     );
-                }
-
-                if ($key === SettingHelper::OPTION_AI_BRAIN_RUNNER) {
-                    if (AiBrainRunner::where("id", $value)->exists() == 0) {
-                        $validator->errors()->add(
-                            "options.{$key}.value",
-                            'The selected AI Brain Runner is invalid.'
-                        );
-                    }
                 }
 
                 if ($key === SettingHelper::OPTION_AI_BRAIN) {

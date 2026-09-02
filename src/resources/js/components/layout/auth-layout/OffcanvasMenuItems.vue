@@ -13,7 +13,6 @@ import {
     faGauge,
     faPhotoFilm,
     faBrain,
-    faRobot,
     faBookOpen,
     faGears,
 } from "@fortawesome/free-solid-svg-icons";
@@ -26,7 +25,6 @@ library.add(
     faGauge,
     faPhotoFilm,
     faBrain,
-    faRobot,
     faBookOpen,
     faGears,
 );
@@ -35,7 +33,6 @@ import {
     canAccessUser,
     canAccessGenre,
     canAccessAiBrain,
-    canAccessAiBrainRunner,
 } from "@/composables/useUserPermissions";
 
 const { authUser } = defineProps({
@@ -58,7 +55,7 @@ const subMenus = ref({
 
 const routeMap = {
     UserManagement: ["/users/*"],
-    AiAttributes: ["/ai-brains/*", "/ai-brain-runners/*"],
+    AiAttributes: ["/ai-brains/*"],
     NovelAttributes: ["/genres/*"],
     Reports: ["/reports/*"],
 };
@@ -69,10 +66,6 @@ const canAccessUserComputed = computed(() => {
 
 const canAccessAiBrainComputed = computed(() => {
     return canAccessAiBrain(authUser);
-});
-
-const canAccessAiBrainRunnerComputed = computed(() => {
-    return canAccessAiBrainRunner(authUser);
 });
 
 const canAccessGenreComputed = computed(() => {
@@ -219,20 +212,6 @@ const isSubMenuVisible = (key) => {
                 v-if="isSubMenuVisible('AiAttributes')"
                 class="ml-4 flex flex-col space-y-1 overflow-hidden"
             >
-                <a
-                    v-if="canAccessAiBrainRunnerComputed"
-                    :href="route('ai-brain-runners.index')"
-                    class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-                    :class="
-                        isCurrentPage('/ai-brain-runners/*')
-                            ? 'bg-gray-200 font-medium'
-                            : ''
-                    "
-                >
-                    <FontAwesomeIcon icon="robot" />
-                    Ai Brain Runners
-                </a>
-
                 <a
                     v-if="canAccessAiBrainComputed"
                     :href="route('ai-brains.index')"

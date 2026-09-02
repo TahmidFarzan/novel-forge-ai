@@ -30,7 +30,6 @@ const authUser = inject("authUser");
 const { settingOptionValueTypes, isTruthyValue, formatSettingValue } =
     useSetting();
 
-const OPTION_AI_BRAIN_RUNNER = settingOptionsData.OPTION_AI_BRAIN_RUNNER;
 const OPTION_AI_BRAIN = settingOptionsData.OPTION_AI_BRAIN;
 
 const relatedOptionNames = ref({});
@@ -78,33 +77,12 @@ const isStringOrInteger = (option) => {
     );
 };
 
-const isAiBrainRunnerOption = (key, option) => {
-    return (
-        key === OPTION_AI_BRAIN_RUNNER &&
-        isStringOrInteger(option) &&
-        hasOptionValue(option?.value)
-    );
-};
-
 const isAiBrainOption = (key, option) => {
     return (
         key === OPTION_AI_BRAIN &&
         isStringOrInteger(option) &&
         hasOptionValue(option?.value)
     );
-};
-
-const loadAiBrainRunnerName = async (key, option) => {
-    relatedOptionLoading.value[key] = true;
-
-    const response = await fetchFromApi(
-        route("search.ai-brain-runner", {
-            slugOrId: option?.value,
-        }),
-    );
-
-    relatedOptionNames.value[key] = response?.name || option?.value;
-    relatedOptionLoading.value[key] = false;
 };
 
 const loadAiBrainName = async (key, option) => {
@@ -124,10 +102,6 @@ const loadRelatedOptionNames = async () => {
     const requests = [];
 
     Object.entries(settingOptions.value).forEach(([key, option]) => {
-        if (isAiBrainRunnerOption(key, option)) {
-            requests.push(loadAiBrainRunnerName(key, option));
-        }
-
         if (isAiBrainOption(key, option)) {
             requests.push(loadAiBrainName(key, option));
         }
@@ -251,22 +225,6 @@ onMounted(async () => {
                                     isTruthyValue(option?.value)
                                         ? "True"
                                         : "False"
-                                }}
-                            </span>
-
-                            <span
-                                v-else-if="
-                                    isStringOrInteger(option) &&
-                                    key === OPTION_AI_BRAIN_RUNNER &&
-                                    hasOptionValue(option?.value)
-                                "
-                                class="font-medium text-gray-900 break-all whitespace-pre-wrap"
-                            >
-                                {{
-                                    relatedOptionLoading[key]
-                                        ? "Loading..."
-                                        : relatedOptionNames[key] ||
-                                          option?.value
                                 }}
                             </span>
 

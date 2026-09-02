@@ -78,13 +78,6 @@ class SearchController extends Controller
         );
     }
 
-    public function aiBrainRunners(Request $request): JsonResponse
-    {
-        return response()->json(
-            $this->searchService->aiBrainRunners($request)
-        );
-    }
-
     public function user(string | int $slugOrId): JsonResponse
     {
         return response()->json(
@@ -103,13 +96,6 @@ class SearchController extends Controller
     {
         return response()->json(
             $this->searchService->aiBrain($slugOrId)
-        );
-    }
-
-    public function aiBrainRunner(string | int $slugOrId): JsonResponse
-    {
-        return response()->json(
-            $this->searchService->aiBrainRunner($slugOrId)
         );
     }
 

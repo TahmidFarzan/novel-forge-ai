@@ -8,7 +8,6 @@ export const groups = {
     User: 'User',
     Genre: 'Genre',
     AiBrain: 'Ai Brain',
-    AiBrainRunner: 'Ai Brain Runner',
 }
 
 export const access = {
@@ -116,9 +115,6 @@ export const canDeleteGenre = async (authUser, genre) => hasPermission(authUser,
 
 export const canAccessAiBrain = async (authUser) => hasPermission(authUser, groups.AiBrain, access.View)
 export const canViewAiBrain = async (authUser, aiBrain) => hasPermission(authUser, groups.AiBrain, access.ViewAny)
-
-export const canAccessAiBrainRunner = async (authUser) => hasPermission(authUser, groups.AiBrainRunner, access.View)
-export const canViewAiBrainRunner = async (authUser, aiBrainRunner) => hasPermission(authUser, groups.AiBrainRunner, access.ViewAny)
 
 export const canAccessActivityLog = async (authUser) => true
 export const canDeleteActivityLog = async (authUser) => authUser?.is_super_admin

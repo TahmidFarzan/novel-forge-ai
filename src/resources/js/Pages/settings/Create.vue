@@ -33,9 +33,6 @@ const authUser = inject("authUser");
 const { settingOptionValueTypes, getDefaultValueByType, isTruthyValue } =
     useSetting();
 
-const OPTION_AI_BRAIN_RUNNER =
-    settingOptionsData?.OPTION_AI_BRAIN_RUNNER;
-
 const OPTION_AI_BRAIN =
     settingOptionsData?.OPTION_AI_BRAIN;
 
@@ -119,10 +116,6 @@ const isStringOrInteger = (option) => {
         option?.valueType === "integer" ||
         option?.valueType === "int"
     );
-};
-
-const isAiBrainRunnerOption = (key, option) => {
-    return isStringOrInteger(option) && key === OPTION_AI_BRAIN_RUNNER;
 };
 
 const isAiBrainOption = (key, option) => {
@@ -362,17 +355,7 @@ onMounted(async () => {
                             </div>
 
                             <InfiniteScrollApiSelect
-                                v-if="isAiBrainRunnerOption(key, option)"
-                                :form="option"
-                                fieldName="value"
-                                :selectedItem="option.value"
-                                :apiUrl="route('search.ai-brain-runners')"
-                                :multiple="false"
-                                placeholder="Ai Brain Runner"
-                            />
-
-                            <InfiniteScrollApiSelect
-                                v-else-if="isAiBrainOption(key, option)"
+                                v-if="isAiBrainOption(key, option)"
                                 :form="option"
                                 fieldName="value"
                                 :selectedItem="option.value"

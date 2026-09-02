@@ -20,5 +20,4 @@ class SettingHelper
     public const OPTION_VALUE_TYPE_COLOR   = 'color';
 
     public const OPTION_AI_BRAIN = 'ai-brain-id';
-    public const OPTION_AI_BRAIN_RUNNER = 'ai-brain-runner-id';
 }
