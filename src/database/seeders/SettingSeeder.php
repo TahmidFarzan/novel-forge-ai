@@ -36,10 +36,6 @@ class SettingSeeder extends Seeder
                         'valueType' => SettingHelper::OPTION_VALUE_TYPE_INTEGER,
                         'value' => 1,
                     ],
-                    SettingHelper::OPTION_AI_BRAIN_RUNNER => [
-                        'valueType' => SettingHelper::OPTION_VALUE_TYPE_INTEGER,
-                        'value' => 1,
-                    ],
                 ],
             ],
 
