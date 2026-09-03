@@ -9,7 +9,6 @@ use App\Http\Controllers\KdpLayoutController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
-use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use romanzipp\QueueMonitor\Controllers\ShowQueueMonitorController;
@@ -145,14 +144,6 @@ Route::prefix('users')->name('users.')->middleware(['is.super.admin'])->group(fu
     Route::delete('delete/{slug}', [UserController::class, 'delete'])->name('delete');
     Route::patch('active/{slug}', [UserController::class, 'active'])->name('active');
     Route::patch('inactive/{slug}', [UserController::class, 'inactive'])->name('inactive');
-});
-
-Route::prefix('settings')->name('settings.')->group(function () {
-    Route::get('/', [SettingController::class, 'index'])->name('index');
-    Route::get('edit/{slug}', [SettingController::class, 'edit'])->name('edit');
-    Route::get('details/{slug}', [SettingController::class, 'details'])->name('details');
-
-    Route::patch('update/{slug}', [SettingController::class, 'update'])->name('update');
 });
 
 Route::prefix('queue-monitor')->name('queue-monitor.')->middleware(['is.super.admin'])->group(function () {

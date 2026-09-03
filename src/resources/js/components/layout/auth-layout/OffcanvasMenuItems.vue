@@ -350,16 +350,5 @@ const isSubMenuVisible = (key) => {
                 </a>
             </div>
         </Transition>
-
-        <a
-            :href="route('settings.index')"
-            class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-            :class="
-                isCurrentPage('/settings/*') ? 'bg-gray-200 font-medium' : ''
-            "
-        >
-            <FontAwesomeIcon icon="gears" />
-            Settings
-        </a>
     </div>
 </template>

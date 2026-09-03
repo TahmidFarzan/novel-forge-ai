@@ -17,7 +17,6 @@ class UserPermissionHelper
 
     public const MODULE_USER  = 'User';
     public const MODULE_GENRE = 'Genre';
-    public const MODULE_SETTING = 'Setting';
     public const MODULE_AI_BRAIN = 'Ai Brain';
     public const MODULE_KDP_LAYOUT = 'Kdp Layout';
     public const MODULE_DOCUMENT_STYLE = 'Document Style';
@@ -25,7 +24,6 @@ class UserPermissionHelper
     public static function modules(): Collection
     {
         return SystemHelper::toOptions([
-            self::MODULE_SETTING,
             self::MODULE_GENRE,
             self::MODULE_USER,
             self::MODULE_AI_BRAIN,
@@ -49,14 +47,6 @@ class UserPermissionHelper
                 self::ACCESS_DELETE,
                 self::ACCESS_RESTORE,
                 self::ACCESS_FORCE_DELETE,
-            ]);
-        }
-
-        if ($moduleName == self::MODULE_SETTING) {
-            return SystemHelper::toOptions([
-                self::ACCESS_VIEW_ANY,
-                self::ACCESS_VIEW,
-                self::ACCESS_UPDATE,
             ]);
         }
 
