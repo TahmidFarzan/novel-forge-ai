@@ -9,6 +9,7 @@ use App\Models\Genre;
 use App\Models\AiBrain;
 use App\Models\KdpLayout;
 use App\Models\DocumentStyle;
+use App\Models\AiPrompt;
 use App\Models\UserPermission;
 use Illuminate\Http\Request;
 
@@ -280,6 +281,36 @@ class SearchService
         $items = $records->map(fn($documentStyle) => [
             'id'           => $documentStyle->id,
             'section_name' => $documentStyle->section_name,
+        ]);
+
+        return [
+            'items'        => $items,
+            'total'        => $records->total(),
+            'current_page' => $records->currentPage(),
+            'last_page'    => $records->lastPage(),
+        ];
+    }
+
+    public function aiPrompts(Request $request): array
+    {
+        $query = AiPrompt::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('prompt', 'like', "%{$search}%");
+            });
+        }
+
+        $records = $query
+            ->orderByDesc('id')
+            ->paginate($request->input('per_page', 25));
+
+        $items = $records->map(fn($aiPrompt) => [
+            'id'   => $aiPrompt->id,
+            'name' => $aiPrompt->name,
+            'slug' => $aiPrompt->slug,
         ]);
 
         return [

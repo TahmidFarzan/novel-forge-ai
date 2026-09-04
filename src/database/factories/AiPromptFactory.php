@@ -1,0 +1,28 @@
+<?php
+namespace Database\Factories;
+
+use App\Models\AiPrompt;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<AiPrompt>
+ */
+class AiPromptFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        $user = User::where("is_super_admin", true)->inRandomOrder()->first();
+
+        return [
+            'name'          => $this->faker->unique()->words(3, true),
+            'prompt'        => $this->faker->paragraphs(4, true),
+            'created_by_id' => $user?->id ?? "1",
+        ];
+    }
+}

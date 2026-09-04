@@ -10,6 +10,7 @@ export const groups = {
     AiBrain: 'Ai Brain',
     KdpLayout: 'Kdp Layout',
     DocumentStyle: 'Document Style',
+    AiPrompt: 'Ai Prompt',
 }
 
 export const access = {
@@ -126,6 +127,10 @@ export const canViewKdpLayout = async (authUser, kdpLayout) => hasPermission(aut
 
 export const canAccessDocumentStyle = async (authUser) => hasPermission(authUser, groups.DocumentStyle, access.View)
 export const canViewDocumentStyle = async (authUser, documentStyle) => hasPermission(authUser, groups.DocumentStyle, access.ViewAny)
+
+export const canAccessAiPrompt = async (authUser) => hasPermission(authUser, groups.AiPrompt, access.View)
+export const canViewAiPrompt = async (authUser, aiPrompt) => hasPermission(authUser, groups.AiPrompt, access.ViewAny)
+export const canUpdateAiPrompt = async (authUser, aiPrompt) => hasPermission(authUser, groups.AiPrompt, access.Update)
 
 export const canAccessActivityLog = async (authUser) => true
 export const canDeleteActivityLog = async (authUser) => authUser?.is_super_admin

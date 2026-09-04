@@ -17,6 +17,7 @@ import {
     faGears,
     faTableColumns,
     faFileLines,
+    faClipboardList,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -31,6 +32,7 @@ library.add(
     faGears,
     faTableColumns,
     faFileLines,
+    faClipboardList,
 );
 
 import {
@@ -39,6 +41,7 @@ import {
     canAccessAiBrain,
     canAccessKdpLayout,
     canAccessDocumentStyle,
+    canAccessAiPrompt,
 } from "@/composables/useUserPermissions";
 
 const { authUser } = defineProps({
@@ -86,6 +89,10 @@ const canAccessKdpLayoutComputed = computed(() => {
 
 const canAccessDocumentStyleComputed = computed(() => {
     return canAccessDocumentStyle(authUser);
+});
+
+const canAccessAiPromptComputed = computed(() => {
+    return canAccessAiPrompt(authUser);
 });
 
 const toggleShowSubMenu = (key) => {
@@ -254,6 +261,20 @@ const isSubMenuVisible = (key) => {
                 >
                     <FontAwesomeIcon icon="brain" />
                     Ai Brain
+                </a>
+
+                <a
+                    v-if="canAccessAiPromptComputed"
+                    :href="route('ai-prompts.index')"
+                    class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
+                    :class="
+                        isCurrentPage('/ai-prompts/*')
+                            ? 'bg-gray-200 font-medium'
+                            : ''
+                    "
+                >
+                    <FontAwesomeIcon icon="clipboard-list" />
+                    Ai Prompt
                 </a>
             </div>
         </Transition>

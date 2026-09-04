@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AiBrainController;
+use App\Http\Controllers\AiPromptController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DocumentStyleController;
 use App\Http\Controllers\GenreController;
@@ -82,6 +83,7 @@ Route::prefix('search')->name('search.')->group(function () {
         Route::get('ai-brains', [SearchController::class, 'aiBrains'])->name('ai-brains');
         Route::get('kdp-layouts', [SearchController::class, 'kdpLayouts'])->name('kdp-layouts');
         Route::get('document-styles', [SearchController::class, 'documentStyles'])->name('document-styles');
+        Route::get('ai-prompts', [SearchController::class, 'aiPrompts'])->name('ai-prompts');
         Route::get('users', [SearchController::class, 'users'])->name('users');
 
         Route::get('ai-brain/{slugOrId}', [SearchController::class, 'aiBrain'])->name('ai-brain');
@@ -126,6 +128,15 @@ Route::prefix('ai-brains')->name('ai-brains.')->group(function () {
 Route::prefix('kdp-layouts')->name('kdp-layouts.')->group(function () {
     Route::get('/', [KdpLayoutController::class, 'index'])->name('index');
     Route::get('details/{slug}', [KdpLayoutController::class, 'details'])->name('details');
+});
+
+Route::prefix('ai-prompts')->name('ai-prompts.')->group(function () {
+    Route::get('/', [AiPromptController::class, 'index'])->name('index');
+    Route::get('edit/{slug}', [AiPromptController::class, 'edit'])->name('edit');
+    Route::get('details/{slug}', [AiPromptController::class, 'details'])->name('details');
+
+    Route::post('save', [AiPromptController::class, 'save'])->name('save');
+    Route::patch('update/{slug}', [AiPromptController::class, 'update'])->name('update');
 });
 
 Route::prefix('document-styles')->name('document-styles.')->group(function () {

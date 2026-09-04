@@ -20,6 +20,7 @@ class UserPermissionHelper
     public const MODULE_AI_BRAIN = 'Ai Brain';
     public const MODULE_KDP_LAYOUT = 'Kdp Layout';
     public const MODULE_DOCUMENT_STYLE = 'Document Style';
+    public const MODULE_AI_PROMPT = 'Ai Prompt';
 
     public static function modules(): Collection
     {
@@ -29,6 +30,7 @@ class UserPermissionHelper
             self::MODULE_AI_BRAIN,
             self::MODULE_KDP_LAYOUT,
             self::MODULE_DOCUMENT_STYLE,
+            self::MODULE_AI_PROMPT,
         ]);
     }
 
@@ -61,6 +63,14 @@ class UserPermissionHelper
             return SystemHelper::toOptions([
                 self::ACCESS_VIEW_ANY,
                 self::ACCESS_VIEW,
+            ]);
+        }
+
+        if ($moduleName == self::MODULE_AI_PROMPT) {
+            return SystemHelper::toOptions([
+                self::ACCESS_VIEW_ANY,
+                self::ACCESS_VIEW,
+                self::ACCESS_UPDATE,
             ]);
         }
 

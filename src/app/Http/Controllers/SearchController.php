@@ -85,6 +85,13 @@ class SearchController extends Controller
         );
     }
 
+    public function aiPrompts(Request $request): JsonResponse
+    {
+        return response()->json(
+            $this->searchService->aiPrompts($request)
+        );
+    }
+
     public function documentStyles(Request $request): JsonResponse
     {
         return response()->json(
