@@ -57,6 +57,13 @@ class SearchController extends Controller
         );
     }
 
+    public function novelContinuities(Request $request): JsonResponse
+    {
+        return response()->json(
+            $this->searchService->novelContinuities($request)
+        );
+    }
+
     public function novelGeneratorStatuses(Request $request): JsonResponse
     {
         return response()->json(
