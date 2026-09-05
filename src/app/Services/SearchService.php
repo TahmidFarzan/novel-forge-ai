@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Helpers\ActivityLogHelper;
+use App\Helpers\NovelGeneratorHelper;
 use App\Helpers\DatatableHelper;
 use App\Helpers\UserHelper;
 use App\Models\User;
@@ -170,6 +171,59 @@ class SearchService
             'last_page'    => 1,
         ];
     }
+
+    public function novelGeneratorStatuses(Request $request): array
+    {
+        $options = NovelGeneratorHelper::statuses();
+
+        if ($request->filled('search')) {
+            $search  = $request->input('search');
+            $options = $options->filter(
+                fn($row) =>
+                stripos((string) $row->id, $search) !== false ||
+                    stripos($row->name, $search) !== false
+            );
+        }
+
+        $items = $options->map(fn($row) => [
+            'id'   => $row->id,
+            'name' => $row->name,
+        ]);
+
+        return [
+            'items'        => $items,
+            'total'        => 1,
+            'current_page' => 1,
+            'last_page'    => 1,
+        ];
+    }
+
+    public function novelGeneratorStepStatuses(Request $request): array
+    {
+        $options = NovelGeneratorHelper::stepStatuses();
+
+        if ($request->filled('search')) {
+            $search  = $request->input('search');
+            $options = $options->filter(
+                fn($row) =>
+                stripos((string) $row->id, $search) !== false ||
+                    stripos($row->name, $search) !== false
+            );
+        }
+
+        $items = $options->map(fn($row) => [
+            'id'   => $row->id,
+            'name' => $row->name,
+        ]);
+
+        return [
+            'items'        => $items,
+            'total'        => 1,
+            'current_page' => 1,
+            'last_page'    => 1,
+        ];
+    }
+
 
     public function genres(Request $request): array
     {

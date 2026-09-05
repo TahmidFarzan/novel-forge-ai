@@ -4,7 +4,7 @@ namespace App\Helpers;
 use Illuminate\Support\Collection;
 use App\Helpers\SystemHelper;
 
-class NovelGenerator
+class NovelGeneratorHelper
 {
     public const STATUS_DRAFT    = 'Draft';
     public const STATUS_ONGOING    = 'Ongoing';
@@ -18,7 +18,7 @@ class NovelGenerator
     public const STEP_STATUS_FAILED    = 'Failed';
     public const STEP_STATUS_CANCELLED    = 'Cancelled';
 
-    public static function statuses(array $items): Collection
+    public static function statuses(): Collection
     {
         return SystemHelper::toOptions([
             self::STATUS_DRAFT,
@@ -28,7 +28,7 @@ class NovelGenerator
         ]);
     }
 
-    public static function stepStatuses(array $items): Collection
+    public static function stepStatuses(): Collection
     {
         return SystemHelper::toOptions([
             self::STEP_STATUS_DRAFT,

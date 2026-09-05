@@ -76,6 +76,9 @@ Route::prefix('search')->name('search.')->group(function () {
         Route::get('user-permissions', [SearchController::class, 'userPermissions'])->name('user-permissions');
         Route::get('user-permissions-by-group', [SearchController::class, 'userPermissionsByGroup'])->name('user-permissions-by-group');
 
+        Route::get('novel-generator-statuses', [SearchController::class, 'novelGeneratorStatuses'])->name('novel-generator-statuses');
+        Route::get('novel-generator-step-statuses', [SearchController::class, 'novelGeneratorStepStatuses'])->name('novel-generator-step-statuses');
+
     });
 
     Route::middleware(['response.cache:60,public,30,etag'])->group(function () {
