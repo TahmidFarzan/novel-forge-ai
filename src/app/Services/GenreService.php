@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Http\Requests\GenreRequest;
@@ -13,7 +14,7 @@ class GenreService
 {
     public function new(): Genre
     {
-        return new Genre();
+        return new Genre;
     }
 
     public function find(string $slug): Genre
@@ -21,7 +22,7 @@ class GenreService
         return Genre::with([
             'createdBy',
 
-            'activityLogs' => fn($query) => $query->latest()->limit(10),
+            'activityLogs' => fn ($query) => $query->latest()->limit(10),
             'activityLogs.causer',
 
             'latestActivityLog',
@@ -46,7 +47,7 @@ class GenreService
         }
 
         if ($request->filled('search')) {
-            $search     = $request->input('search');
+            $search = $request->input('search');
             $likeSearch = "%{$search}%";
 
             $query->whereAny([
@@ -54,6 +55,7 @@ class GenreService
                 'brief',
             ], 'like', $likeSearch);
         }
+
         return $query->orderByDesc('id')
             ->paginate($perPage)
             ->appends($request->all());
@@ -61,20 +63,22 @@ class GenreService
 
     public function save(GenreRequest $request, Genre $genre): array
     {
-        $isNew       = empty($genre->id);
-        $statusEvent = $isNew ? "save" : "update";
+        $isNew = empty($genre->id);
+        $statusEvent = $isNew ? 'save' : 'update';
 
         try {
 
             DB::transaction(function () use ($request, $genre, $isNew) {
-                $genre->name          = $request->input('name');
-                $genre->brief         = $request->input('brief');
+                $genre->name = $request->input('name');
+                $genre->brief = $request->input('brief');
+                $genre->prompt_instruction = $request->input('prompt_instruction');
                 $genre->created_by_id = $isNew ? Auth::id() : $genre->created_by_id;
 
                 $genre->save();
             });
+
             return [
-                'status'  => 'success',
+                'status' => 'success',
                 'message' => $isNew ? 'Genre created successfully.' : 'Genre updated successfully.',
             ];
         } catch (Exception $exception) {
@@ -83,7 +87,7 @@ class GenreService
             ]);
 
             return [
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Failed to save genre. Please try again.',
             ];
         }
@@ -99,7 +103,7 @@ class GenreService
             });
 
             return [
-                'status'  => 'success',
+                'status' => 'success',
                 'message' => 'Genre deleted successfully.',
             ];
         } catch (Exception $exception) {
@@ -109,10 +113,9 @@ class GenreService
             ]);
 
             return [
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Failed to delete genre. Please try again.',
             ];
         }
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Factories;
 
 use App\Models\Genre;
@@ -17,15 +18,17 @@ class GenreFactory extends Factory
      */
     public function definition(): array
     {
-        $user     = User::where("is_super_admin", true)->inRandomOrder()->first();
+        $user = User::where('is_super_admin', true)->inRandomOrder()->first();
 
-        $name  = $this->faker->name();
+        $name = $this->faker->name();
         $brief = $this->faker->sentence();
+        $promptIns = $this->faker->paragraphs(2, true);
 
         return [
-            'name'          => $name,
-            'brief'         => $brief,
-            "created_by_id" => $user?->id ?? "1",
+            'name' => $name,
+            'brief' => $brief,
+            'prompt_instruction' => $promptIns,
+            'created_by_id' => $user?->id ?? '1',
         ];
     }
 }

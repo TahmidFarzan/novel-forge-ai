@@ -108,6 +108,21 @@ onMounted(async () => {
 
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
             <h3 class="text-base font-semibold border-b pb-2">
+                Prompt Instruction
+            </h3>
+
+            <div v-if="genre?.prompt_instruction" class="border border-gray-200 rounded-lg p-4 text-sm text-gray-700"
+                style="white-space: pre-wrap; word-break: break-word;">
+                {{ genre.prompt_instruction }}
+            </div>
+
+            <div v-else class="border border-gray-200 rounded-lg p-4 text-sm text-gray-500">
+                No prompt instruction set.
+            </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
+            <h3 class="text-base font-semibold border-b pb-2">
                 System Information
             </h3>
 

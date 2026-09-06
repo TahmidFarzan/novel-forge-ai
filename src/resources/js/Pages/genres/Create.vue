@@ -28,6 +28,7 @@ const pageTitle = computed(() => {
 const saveForm = useForm({
     name: genre?.name || null,
     brief: genre?.brief || null,
+    prompt_instruction: genre?.prompt_instruction || null,
 })
 
 function validateForm() {
@@ -135,6 +136,27 @@ onMounted(async () => {
                             </p>
                         </div>
 
+                    </div>
+                </div>
+
+                <div class="bg-white border rounded-xl p-5 shadow-sm space-y-4">
+                    <h3 class="text-base font-semibold">
+                        Prompt Instruction
+                    </h3>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">
+                            Master AI Configuration Instruction
+                        </label>
+
+                        <textarea v-model="saveForm.prompt_instruction" rows="8"
+                            placeholder="Enter the master instruction for AI form generation for this genre. This controls required form sections, descriptions and genre-specific generation rules."
+                            class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            :class="saveForm.errors.prompt_instruction ? 'border-red-500' : 'border-gray-300'"></textarea>
+
+                        <p v-if="saveForm.errors.prompt_instruction" class="text-red-500 text-sm mt-1">
+                            {{ saveForm.errors.prompt_instruction }}
+                        </p>
                     </div>
                 </div>
 

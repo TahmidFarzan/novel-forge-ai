@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Observers\GenreObserver;
@@ -10,8 +11,6 @@ use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
@@ -23,14 +22,15 @@ use Spatie\Sluggable\SlugOptions;
 
 #[Table('genres')]
 #[Fillable([
-        'name', 'brief', 'slug',
-        'created_by_id',
-    ])]
+    'name', 'brief', 'slug',
+    'prompt_instruction',
+    'created_by_id',
+])]
 #[UsePolicy(GenrePolicy::class)]
 #[ObservedBy([GenreObserver::class])]
 class Genre extends Model
 {
-    use HasFactory, LogsActivity, HasSlug;
+    use HasFactory, HasSlug, LogsActivity;
 
     protected $appends = [];
 
@@ -46,10 +46,10 @@ class Genre extends Model
     {
         return LogOptions::defaults()
             ->logOnly([
-                'name', 'brief', 'slug',
+                'name', 'brief', 'slug', 'prompt_instruction',
             ])
             ->useLogName('Genre')
-            ->setDescriptionForEvent(fn(string $eventName) => "The record has been {$eventName}.")
+            ->setDescriptionForEvent(fn (string $eventName) => "The record has been {$eventName}.")
             ->logOnlyDirty()
             ->logExcept([
                 'id',
@@ -63,10 +63,10 @@ class Genre extends Model
     {
         return SlugOptions::create()
             ->saveSlugsTo('slug')
-            ->generateSlugsFrom("name")
+            ->generateSlugsFrom('name')
             ->doNotGenerateSlugsOnUpdate()
             ->slugsShouldBeNoLongerThan(255)
-            ->usingSuffixGenerator(fn() => Str::lower(Str::random(5)));
+            ->usingSuffixGenerator(fn () => Str::lower(Str::random(5)));
     }
 
     public function getRouteKeyName(): string
