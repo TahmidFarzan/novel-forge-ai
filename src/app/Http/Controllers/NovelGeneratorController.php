@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Http\Controllers;
 
-
-use App\Services\NovelGeneratorService;
-use App\Http\Requests\NovelGeneratorStep1Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\NovelGeneratorStep1Request;
+use App\Services\NovelGeneratorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -38,6 +36,20 @@ class NovelGeneratorController extends Controller
         Gate::authorize('create', $novelGenerator);
 
         $result = $this->novelGeneratorService->step1Save($request, $novelGenerator);
+
+        return to_route('novel-generators.index')->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function delete(string $slug): RedirectResponse
+    {
+        $user = $this->novelGeneratorService->find($slug);
+
+        Gate::authorize('forceDelete', $user);
+
+        $result = $this->novelGeneratorService->delete($user);
 
         return to_route('novel-generators.index')->with('flash_message', [
             'message' => $result['message'],

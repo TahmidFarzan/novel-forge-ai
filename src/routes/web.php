@@ -163,7 +163,10 @@ Route::prefix('users')->name('users.')->middleware(['is.super.admin'])->group(fu
 });
 
 Route::prefix('novel-generators')->name('novel-generators.')->group(function () {
+    Route::get('/', [NovelGeneratorController::class, 'index'])->name('index');
     Route::post('step-1-save', [NovelGeneratorController::class, 'step1Save'])->name('step-1-save');
+
+    Route::delete('delete/{slug}', [NovelGeneratorController::class, 'delete'])->name('delete');
 });
 
 

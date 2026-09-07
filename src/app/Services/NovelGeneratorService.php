@@ -8,8 +8,8 @@ use App\Models\NovelGenerator;
 use App\Services\AiBrainService;
 use App\Services\AiPromptService;
 use App\Services\GenreService;
-use App\Services\OpenAiApiService;
 use App\Services\NovelGeneratorStepService;
+use App\Services\OpenAiApiService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,10 +26,10 @@ class NovelGeneratorService
 
     public function __construct(AiBrainService $aiBrainService, AiPromptService $aiPromptService, GenreService $genreService, OpenAiApiService $openAiApiService, NovelGeneratorStepService $novelGeneratorStepService)
     {
-        $this->aiBrainService   = $aiBrainService;
-        $this->aiPromptService  = $aiPromptService;
-        $this->genreService     = $genreService;
-        $this->openAiApiService = $openAiApiService;
+        $this->aiBrainService            = $aiBrainService;
+        $this->aiPromptService           = $aiPromptService;
+        $this->genreService              = $genreService;
+        $this->openAiApiService          = $openAiApiService;
         $this->novelGeneratorStepService = $novelGeneratorStepService;
     }
 
@@ -102,12 +102,12 @@ class NovelGeneratorService
                     $genreNames        = [];
                     $genreInstructions = [];
 
-                    $mainCharacterGender = $request->input("main_character_gender",UserHelper::USER_GENDER_MALE);
-                    $is18Plus = $request->boolean("is_18_plus",false);
-                    $enableMatureContent = $request->boolean("enable_mature_content",false);
-                    $language = $request->input("language","English");
+                    $mainCharacterGender   = $request->input("main_character_gender", UserHelper::USER_GENDER_MALE);
+                    $is18Plus              = $request->boolean("is_18_plus", false);
+                    $enableMatureContent   = $request->boolean("enable_mature_content", false);
+                    $language              = $request->input("language", "English");
                     $additionalInformation = $request->input("additional_information", "Auto");
-                    $novelContinuity = $request->input("novel_continuity",NovelGeneratorHelper::CONTINUITY_STANDALONE);
+                    $novelContinuity       = $request->input("novel_continuity", NovelGeneratorHelper::CONTINUITY_STANDALONE);
 
                     $genres = $this->genreService->findByIdsOrRandom($request->input("genre_ids"));
                     foreach ($genres as $genre) {
@@ -143,7 +143,7 @@ class NovelGeneratorService
                         $genrePromptInstruction .= $instruction;
                     }
 
-                    $aiBrain = $this->aiBrainService->findById($request->input("ai_brain_id"));
+                    $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
                     $aiPrompt = $this->aiPromptService->findByStepNumber(1);
 
                     $prompt = str_replace(
@@ -200,6 +200,32 @@ class NovelGeneratorService
             return [
                 'status'  => 'error',
                 'message' => 'Failed to save novel generator. Please try again.',
+            ];
+        }
+    }
+
+    public function delete(NovelGenerator $novelGenerator): array
+    {
+
+        try {
+
+            DB::transaction(function () use ($novelGenerator) {
+                $novelGenerator->delete();
+            });
+
+            return [
+                'status'  => 'success',
+                'message' => 'Novel Generator deleted successfully.',
+            ];
+        } catch (Exception $exception) {
+
+            Log::error('Novel Generator delete failed.', [
+                'exception' => $exception,
+            ]);
+
+            return [
+                'status'  => 'error',
+                'message' => 'Failed to delete novel generator. Please try again.',
             ];
         }
     }
