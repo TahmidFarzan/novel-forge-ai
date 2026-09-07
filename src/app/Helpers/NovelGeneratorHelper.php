@@ -18,7 +18,7 @@ class NovelGeneratorHelper
     public const STEP_STATUS_FAILED    = 'Failed';
     public const STEP_STATUS_CANCELLED    = 'Cancelled';
 
-    public const CONTINUITY    = 'Standalone';
+    public const CONTINUITY_STANDALONE    = 'Standalone';
 
     public static function statuses(): Collection
     {
@@ -45,7 +45,7 @@ class NovelGeneratorHelper
     public static function continuities(): Collection
     {
         return SystemHelper::toOptions([
-            self::CONTINUITY,
+            self::CONTINUITY_STANDALONE,
         ]);
     }
 }

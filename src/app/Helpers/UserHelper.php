@@ -6,9 +6,9 @@ use Illuminate\Support\Collection;
 
 class UserHelper
 {
-    private const USER_GENDER_MALE   = 'Male';
-    private const USER_GENDER_FEMALE = 'Female';
-    private const USER_GENDER_OTHER  = 'Other';
+    public const USER_GENDER_MALE   = 'Male';
+    public const USER_GENDER_FEMALE = 'Female';
+    public const USER_GENDER_OTHER  = 'Other';
 
     private const USER_RELIGION_ISLAM     = 'Islam';
     private const USER_RELIGION_HINDU     = 'Hindu';

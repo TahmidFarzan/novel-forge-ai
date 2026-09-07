@@ -21,6 +21,7 @@ class UserPermissionHelper
     public const MODULE_KDP_LAYOUT = 'Kdp Layout';
     public const MODULE_DOCUMENT_STYLE = 'Document Style';
     public const MODULE_AI_PROMPT = 'Ai Prompt';
+    public const MODULE_NOVEL_GENERATOR = 'Novel Generator';
 
     public static function modules(): Collection
     {

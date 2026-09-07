@@ -1,16 +1,16 @@
 <?php
-
 namespace App\Models;
 
-use App\Observers\AiBrainObserver;
-use App\Policies\AiBrainPolicy;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
+use App\Observers\NovelGeneratorObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use App\Policies\NovelGeneratorPolicy;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
@@ -20,16 +20,14 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-#[Table('ai_brains')]
+#[Table('novel_generators')]
 #[Fillable([
-        'name', 'model','api_url', 'api_key', 'brief', 'focus', 'slug',
-        'context_window', 'average_latency', 'minimum_wait_time',
-        'timeout_seconds', 'max_output_tokens',
+        'name', 'datetime', 'slug',
         'created_by_id',
     ])]
-#[UsePolicy(AiBrainPolicy::class)]
-#[ObservedBy([AiBrainObserver::class])]
-class AiBrain extends Model
+#[UsePolicy(NovelGeneratorPolicy::class)]
+#[ObservedBy([NovelGeneratorObserver::class])]
+class NovelGenerator extends Model
 {
     use HasFactory, LogsActivity, HasSlug;
 
@@ -38,13 +36,9 @@ class AiBrain extends Model
     protected function casts(): array
     {
         return [
-            'context_window'    => 'integer',
-            'average_latency'   => 'decimal:2',
-            'minimum_wait_time' => 'integer',
-            'timeout_seconds'   => 'integer',
-            'max_output_tokens' => 'integer',
-            'created_at'        => 'datetime',
-            'updated_at'        => 'datetime',
+            'datetime'   => 'datetime',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 
@@ -52,11 +46,9 @@ class AiBrain extends Model
     {
         return LogOptions::defaults()
             ->logOnly([
-                'name', 'model','api_url', 'brief', 'focus', 'slug',
-                'context_window', 'average_latency', 'minimum_wait_time',
-                'timeout_seconds', 'max_output_tokens',
+                'name', 'datetime', 'slug',
             ])
-            ->useLogName('Ai Brain')
+            ->useLogName('Novel Generator')
             ->setDescriptionForEvent(fn(string $eventName) => "The record has been {$eventName}.")
             ->logOnlyDirty()
             ->logExcept([
@@ -96,4 +88,10 @@ class AiBrain extends Model
     {
         return $this->morphOne(Activity::class, 'subject')->latestOfMany();
     }
+
+    public function novelGeneratorSteps(): HasMany
+    {
+        return $this->hasMany(NovelGeneratorStep::class);
+    }
+
 }

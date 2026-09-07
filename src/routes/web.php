@@ -11,6 +11,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\NovelGeneratorController;
 use Illuminate\Support\Facades\Route;
 use romanzipp\QueueMonitor\Controllers\ShowQueueMonitorController;
 
@@ -160,6 +161,11 @@ Route::prefix('users')->name('users.')->middleware(['is.super.admin'])->group(fu
     Route::patch('active/{slug}', [UserController::class, 'active'])->name('active');
     Route::patch('inactive/{slug}', [UserController::class, 'inactive'])->name('inactive');
 });
+
+Route::prefix('novel-generators')->name('novel-generators.')->group(function () {
+    Route::post('step-1-save', [NovelGeneratorController::class, 'step1Save'])->name('step-1-save');
+});
+
 
 Route::prefix('queue-monitor')->name('queue-monitor.')->middleware(['is.super.admin'])->group(function () {
     Route::get('/', ShowQueueMonitorController::class)->name('index');

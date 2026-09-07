@@ -149,6 +149,28 @@ class SeederHelper
             ],
         ]);
     }
+
+    public static function aiBrains()
+    {
+        return collect([
+
+            (object) [
+                'name'              => 'Google: Gemma 4 26B A4B',
+                "model"             => "google/gemma-4-26b-a4b-it:free",
+                'api_url'           => 'https://openrouter.ai/api/v1/chat/completions',
+                'api_key'           => 'sk-your-openrouter-api-key',
+                'brief'             => 'AI writing model for generating documents, workbooks, ebooks and structured educational content.',
+                'focus'             => 'Premium document generation, chapter writing, workbook creation, story generation, educational materials',
+                'context_window'    => 262000,
+                'average_latency'   => 0.90,
+                'minimum_wait_time' => 2,
+                'timeout_seconds'   => 60,
+                'max_output_tokens' => 5000,
+            ],
+
+        ]);
+    }
+
     public static function aiPrompts()
     {
         return collect([

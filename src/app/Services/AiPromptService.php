@@ -29,6 +29,32 @@ class AiPromptService
         ])->where('slug', $slug)->firstOrFail();
     }
 
+    public function findById(string|int $id): AiPrompt
+    {
+        return AiPrompt::with([
+            'createdBy',
+
+            'activityLogs' => fn($query) => $query->latest()->limit(10),
+            'activityLogs.causer',
+
+            'latestActivityLog',
+            'latestActivityLog.causer',
+        ])->where('id', $id)->firstOrFail();
+    }
+
+    public function findByStepNumber(string|int $stepNumber): AiPrompt
+    {
+        return AiPrompt::with([
+            'createdBy',
+
+            'activityLogs' => fn($query) => $query->latest()->limit(10),
+            'activityLogs.causer',
+
+            'latestActivityLog',
+            'latestActivityLog.causer',
+        ])->where('step_number', $stepNumber)->firstOrFail();
+    }
+
     public function search(Request $request)
     {
         $perPage = $request->input('per_page', 10);
