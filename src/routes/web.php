@@ -100,6 +100,10 @@ Route::prefix('search')->name('search.')->group(function () {
     Route::middleware(['response.cache:60,private,300,etag'])->get('user/{slugOrId}', [SearchController::class, 'user'])->name('user');
 });
 
+Route::prefix('back-office')->name('back-office.')->group(function () {
+
+});
+
 Route::prefix('medias')->name('medias.')->group(function () {
     Route::get('/', [MediaController::class, 'index'])->name('index');
     Route::get('details/{slug}', [MediaController::class, 'details'])->name('details');
@@ -177,7 +181,7 @@ Route::prefix('users')->name('users.')->middleware(['is.super.admin'])->group(fu
 
 Route::prefix('novel-generators')->name('novel-generators.')->group(function () {
     Route::get('/', [NovelGeneratorController::class, 'index'])->name('index');
-    Route::post('step-1-save', [NovelGeneratorController::class, 'step1Save'])->name('step-1-save');
+    Route::post('step-1-save', [NovelGeneratorController::class, 'save'])->name('step-1-save');
 
     Route::delete('delete/{slug}', [NovelGeneratorController::class, 'delete'])->name('delete');
 });

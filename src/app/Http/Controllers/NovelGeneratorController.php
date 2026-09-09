@@ -47,7 +47,7 @@ class NovelGeneratorController extends Controller
     {
         $user = $this->novelGeneratorService->find($slug);
 
-        Gate::authorize('forceDelete', $user);
+        Gate::authorize('delete', $user);
 
         $result = $this->novelGeneratorService->delete($user);
 

@@ -11,6 +11,7 @@ use App\Services\GenreService;
 use App\Services\NovelGeneratorStepService;
 use App\Services\OpenAiApiService;
 use Exception;
+use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -75,7 +76,12 @@ class NovelGeneratorService
                 'name',
             ], 'like', $likeSearch);
         }
-        return $query->orderByDesc('id')
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+        return $query->with(['novelGeneratorSteps' => fn($q) => $q->orderBy('id')])
+            ->orderByDesc('id')
             ->paginate($perPage)
             ->appends($request->all());
     }
@@ -87,7 +93,7 @@ class NovelGeneratorService
 
         try {
 
-            DB::transaction(function () use ($request, $novelGenerator, $isNew) {
+            $novelGenerator = DB::transaction(function () use ($request, $novelGenerator, $isNew) {
 
                 $novelGenerator->name = "Novel Generator " . now()->format('YmdHis');
 
@@ -98,6 +104,7 @@ class NovelGeneratorService
                 $novelGenerator->status = NovelGeneratorHelper::STATUS_ONGOING;
 
                 if ($novelGenerator->save()) {
+                    $language = Language::where("id",$request->input("language_id"))->firstOrFail();
 
                     $genreNames        = [];
                     $genreInstructions = [];
@@ -105,7 +112,7 @@ class NovelGeneratorService
                     $mainCharacterGender   = $request->input("main_character_gender", UserHelper::USER_GENDER_MALE);
                     $is18Plus              = $request->boolean("is_18_plus", false);
                     $enableMatureContent   = $request->boolean("enable_mature_content", false);
-                    $language              = $request->input("language", "English");
+                    $language              = $language?->name ?? "English";
                     $additionalInformation = $request->input("additional_information", "Auto");
                     $novelContinuity       = $request->input("novel_continuity", NovelGeneratorHelper::CONTINUITY_STANDALONE);
 
@@ -181,6 +188,8 @@ class NovelGeneratorService
                         "response" => $response,
                     ]);
                 }
+
+                return $novelGenerator;
 
             });
 

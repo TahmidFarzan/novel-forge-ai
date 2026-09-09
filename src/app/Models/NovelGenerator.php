@@ -22,7 +22,7 @@ use Spatie\Sluggable\SlugOptions;
 
 #[Table('novel_generators')]
 #[Fillable([
-        'name', 'datetime', 'slug',
+        'name', 'datetime', 'slug', 'status',
         'created_by_id',
     ])]
 #[UsePolicy(NovelGeneratorPolicy::class)]
@@ -46,7 +46,7 @@ class NovelGenerator extends Model
     {
         return LogOptions::defaults()
             ->logOnly([
-                'name', 'datetime', 'slug',
+                'name', 'datetime', 'status', 'slug',
             ])
             ->useLogName('Novel Generator')
             ->setDescriptionForEvent(fn(string $eventName) => "The record has been {$eventName}.")

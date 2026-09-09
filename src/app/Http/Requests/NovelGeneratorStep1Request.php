@@ -37,13 +37,13 @@ class NovelGeneratorStep1Request extends FormRequest
                 'required',
                 'string',
             ],
-            'language'               => [
+            'language_id'            => [
                 'required',
                 'string',
             ],
 
             'genre_ids'              => [
-                'nullable',
+                'required',
                 'array',
             ],
 
@@ -66,8 +66,9 @@ class NovelGeneratorStep1Request extends FormRequest
             'main_character_gender.required' => 'Please select a main character gender.',
 
             'novel_continuity.required'      => 'Please select a novel continuity.',
-            'language.required'              => 'Please select a language.',
+            'language_id.required'           => 'Please select a language.',
 
+            'genre_ids.required'             => 'Genres must be required.',
             'genre_ids.array'                => 'Genres must be selected as an array.',
 
             'genre_ids.*.exists'             => 'Selected genre does not exist.',

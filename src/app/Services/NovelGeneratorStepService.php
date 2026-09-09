@@ -70,14 +70,15 @@ class NovelGeneratorStepService
 
         $novelGeneratorStep = $this->new();
 
+        $novelGeneratorStep->name                            = ('Novel Generator Step ' . now()->format('YmdHis'));
         $novelGeneratorStep->novel_generator_id              = $novelGenerator->id;
         $novelGeneratorStep->ai_prompt_id                    = $aiPrompt->id;
         $novelGeneratorStep->privous_novel_generator_step_id = $privousNovelGeneratorStep?->id ?? null;
-        $novelGeneratorStep->depends_on_steps                = $aiPrompt->depends_on_steps;
+        $novelGeneratorStep->depend_on_prompt_ids            = $aiPrompt->depend_on_prompt_ids;
         $novelGeneratorStep->status                          = NovelGeneratorHelper::STATUS_COMPLETE;
 
         $novelGeneratorStep->input  = $input;
-        $novelGeneratorStep->output = $output;
+        $novelGeneratorStep->outout = $output;
 
         if ($isNew) {
             $novelGeneratorStep->created_by_id = $novelGeneratorStep->created_by_id ?? Auth::id();

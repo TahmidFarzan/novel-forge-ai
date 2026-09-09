@@ -20,8 +20,8 @@ use Spatie\Sluggable\SlugOptions;
 #[Table('novel_generator_steps')]
 #[Fillable([
         'name', 'novel_generator_id', 'privous_novel_generator_step_id',
-        'ai_prompt_id', 'depends_on_steps',
-        'input', 'outout', 'slug',
+        'ai_prompt_id', 'depend_on_prompt_ids',
+        'input', 'outout', 'status', 'slug',
         'created_by_id',
     ])]
 #[ObservedBy([NovelGeneratorStepObserver::class])]
@@ -36,7 +36,7 @@ class NovelGeneratorStep extends Model
         return [
             'input'      => 'array',
             'outout'     => 'array',
-            'depends_on_steps'     => 'array',
+            'depend_on_prompt_ids'     => 'array',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
@@ -47,7 +47,7 @@ class NovelGeneratorStep extends Model
         return LogOptions::defaults()
             ->logOnly([
                 'name', 'novel_generator_id', 'privous_novel_generator_step_id',
-                'ai_prompt_id', 'depends_on_steps',
+                'ai_prompt_id', 'depend_on_prompt_ids',
                 'input', 'outout',
             ])
             ->useLogName('Novel Generator Step')

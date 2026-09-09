@@ -17,9 +17,10 @@ return new class extends Migration
             $table->foreignId('privous_novel_generator_step_id')->nullable()->constrained('novel_generator_steps')->cascadeOnDelete();
             $table->foreignId('ai_prompt_id')->constrained('ai_prompts')->cascadeOnDelete();
             $table->string('name', 255)->unique();
-            $table->json('depends_on_steps')->nullable();
+            $table->json('depend_on_prompt_ids')->nullable();
             $table->json('input')->nullable();
             $table->json('outout')->nullable();
+            $table->string('status', 50)->nullable();
             $table->string('slug')->unique();
             $table->foreignId('created_by_id')->constrained('users')->cascadeOnDelete();
 

@@ -166,6 +166,19 @@ const isSubMenuVisible = (key) => {
             Media
         </a>
 
+        <a
+            :href="route('novel-generators.index')"
+            class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
+            :class="
+                isCurrentPage('/auth-user/novel-generators/*')
+                    ? 'bg-gray-200 font-medium'
+                    : ''
+            "
+        >
+            <!-- <FontAwesomeIcon icon="gauge" /> -->
+            Novel generators
+        </a>
+
         <button
             @click="toggleShowSubMenu('NovelAttributes')"
             class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-100"
