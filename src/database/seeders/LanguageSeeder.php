@@ -33,7 +33,6 @@ class LanguageSeeder extends Seeder
             Language::factory()->state([
                 'name' => $language->name,
                 'brief' => $language->brief ?? null,
-                'prompt_instruction' => $language->prompt_instruction ?? null,
             ])->create();
 
         }
