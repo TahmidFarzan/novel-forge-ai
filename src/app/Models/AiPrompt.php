@@ -20,7 +20,7 @@ use Spatie\Sluggable\SlugOptions;
 
 #[Table('ai_prompts')]
 #[Fillable([
-        'name', 'prompt', 'slug',
+        'name', 'prompt', 'slug', 'step_number', 'depend_on_prompt_ids',
         'created_by_id',
     ])]
 #[UsePolicy(AiPromptPolicy::class)]
@@ -33,8 +33,10 @@ class AiPrompt extends Model
     protected function casts(): array
     {
         return [
-            'created_at' => 'datetime',
-            'updated_at' => 'datetime',
+            'step_number'          => 'integer',
+            'depend_on_prompt_ids' => 'array',
+            'created_at'           => 'datetime',
+            'updated_at'           => 'datetime',
         ];
     }
 

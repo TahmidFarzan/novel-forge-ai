@@ -33,7 +33,7 @@ class AiPromptSeeder extends Seeder
                 'name'             => $aiPrompt->name,
                 'prompt'           => $aiPrompt->prompt,
                 'step_number'      => $aiPrompt->step_number,
-                'depends_on_steps' => $aiPrompt->depends_on_steps,
+                'depend_on_prompt_ids' => $aiPrompt->depend_on_prompt_ids,
             ])->create();
 
         }

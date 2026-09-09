@@ -177,7 +177,7 @@ class SeederHelper
 
             (object) [
                 'name'                 => "Novel Generation Planning",
-                'step'                 => 1,
+                'step_number'                 => 1,
                 'depend_on_prompt_ids' => null,
                 'prompt'               => <<<'PROMPT'
 
@@ -259,7 +259,7 @@ PROMPT
 
             (object) [
                 'name'                 => "Story Foundation Development",
-                'step'                 => 2,
+                'step_number'                 => 2,
                 'depend_on_prompt_ids' => [1],
                 'prompt'               => <<<'PROMPT'
 
@@ -298,7 +298,7 @@ PROMPT
 
             (object) [
                 'name'                 => "Character Development Planning",
-                'step'                 => 3,
+                'step_number'                 => 3,
                 'depend_on_prompt_ids' => [1, 2],
                 'prompt'               => <<<'PROMPT'
 
@@ -344,7 +344,7 @@ PROMPT
 
             (object) [
                 'name'                 => "Story Plot Generation",
-                'step'                 => 4,
+                'step_number'                 => 4,
                 'depend_on_prompt_ids' => [2, 3],
                 'prompt'               => <<<'PROMPT'
 
@@ -394,7 +394,7 @@ PROMPT
 
             (object) [
                 'name'                 => "Chapter Planning",
-                'step'                 => 5,
+                'step_number'                 => 5,
                 'depend_on_prompt_ids' => [4],
                 'prompt'               => <<<'PROMPT'
 
@@ -443,7 +443,7 @@ PROMPT
 
             (object) [
                 'name'                 => "Chapter Writing",
-                'step'                 => 6,
+                'step_number'                 => 6,
                 'depend_on_prompt_ids' => [5],
                 'prompt'               => <<<'PROMPT'
 
@@ -483,7 +483,7 @@ PROMPT
 
             (object) [
                 'name'                 => "Novel Quality Review",
-                'step'                 => 7,
+                'step_number'                 => 7,
                 'depend_on_prompt_ids' => [6],
                 'prompt'               => <<<'PROMPT'
 

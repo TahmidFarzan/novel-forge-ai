@@ -20,9 +20,11 @@ class AiPromptFactory extends Factory
         $user = User::where("is_super_admin", true)->inRandomOrder()->first();
 
         return [
-            'name'          => $this->faker->unique()->words(3, true),
-            'prompt'        => $this->faker->paragraphs(4, true),
-            'created_by_id' => $user?->id ?? "1",
+            'name'                 => $this->faker->unique()->words(3, true),
+            'prompt'               => $this->faker->paragraphs(4, true),
+            'created_by_id'        => $user?->id ?? "1",
+            'step_number'          => 0,
+            'depend_on_prompt_ids' => null,
         ];
     }
 }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name', 255)->unique();
             $table->longText('prompt');
             $table->unsignedInteger('step_number');
-            $table->json('depends_on_steps')->nullable();
+            $table->json('depend_on_prompt_ids')->nullable();
             $table->string('slug')->unique();
             $table->foreignId('created_by_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
