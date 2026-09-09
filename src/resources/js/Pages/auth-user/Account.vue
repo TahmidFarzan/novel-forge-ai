@@ -1,7 +1,7 @@
 <script setup>
 import Layout from "@/pages/layouts/AuthLayout.vue";
-import RecentActivities from "@/components/activity-log/RecentModelActivityLogs.vue";
-import MediaRenderer from "@/components/media/MediaRenderer.vue";
+import RecentActivities from "@/components/back-office/activity-log/RecentModelActivityLogs.vue";
+import MediaRenderer from "@/components/common/media/MediaRenderer.vue";
 
 import { onMounted, nextTick, ref } from "vue";
 import { Head, useForm, router as inertiaJsRoute } from "@inertiajs/vue3";

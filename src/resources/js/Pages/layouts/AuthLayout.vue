@@ -1,8 +1,8 @@
 <script setup>
-import OffCanvasMenu from '@/components/layout/auth-layout/OffCanvasMenu.vue'
-import Breadcrumbs from '@/components/layout/auth-layout/Breadcrumbs.vue'
-import AuthTopbarDropdownMenu from '@/components/layout/auth-layout/AuthTopbarDropdownMenu.vue'
-import FlashMessageToaster from '@/components/layout/FlashMessageToaster.vue'
+import OffCanvasMenu from '@/components/common/layout/auth-layout/OffCanvasMenu.vue'
+import Breadcrumbs from '@/components/common/layout/auth-layout/Breadcrumbs.vue'
+import AuthTopbarDropdownMenu from '@/components/common/layout/auth-layout/AuthTopbarDropdownMenu.vue'
+import FlashMessageToaster from '@/components/common/layout/FlashMessageToaster.vue'
 
 import { usePage } from '@inertiajs/vue3'
 import { computed, provide } from 'vue'

@@ -10,7 +10,7 @@ import {
     faUser,
     faUserGear,
 } from '@fortawesome/free-solid-svg-icons'
-import FlashMessageToaster from '@/components/layout/FlashMessageToaster.vue'
+import FlashMessageToaster from '@/components/common/layout/FlashMessageToaster.vue'
 
 library.add(
     faChevronDown,

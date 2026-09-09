@@ -1,8 +1,8 @@
 <script setup>
 import Layout from '@/pages/layouts/AuthLayout.vue'
-import RecentActivities from '@/components/activity-log/RecentModelActivityLogs.vue'
-import InfiniteScrollApiSelect from '@/components/multi-select/InfiniteScrollApiSelect.vue'
-import MediaRenderer from '@/components/media/MediaRenderer.vue'
+import RecentActivities from '@/components/back-office/activity-log/RecentModelActivityLogs.vue'
+import InfiniteScrollApiSelect from '@/components/common/multi-select/InfiniteScrollApiSelect.vue'
+import MediaRenderer from '@/components/common/media/MediaRenderer.vue'
 
 import { ref, onMounted, nextTick } from 'vue'
 import { Head, useForm, router as inertiaJsRoute } from '@inertiajs/vue3'
