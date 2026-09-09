@@ -7,6 +7,7 @@ use App\Helpers\DatatableHelper;
 use App\Helpers\UserHelper;
 use App\Models\User;
 use App\Models\Genre;
+use App\Models\Language;
 use App\Models\AiBrain;
 use App\Models\KdpLayout;
 use App\Models\DocumentStyle;
@@ -271,6 +272,36 @@ class SearchService
             'id'   => $genre->id,
             'name' => $genre->name,
             'slug' => $genre->slug,
+        ]);
+
+        return [
+            'items'        => $items,
+            'total'        => $records->total(),
+            'current_page' => $records->currentPage(),
+            'last_page'    => $records->lastPage(),
+        ];
+    }
+
+    public function languages(Request $request): array
+    {
+        $query = Language::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('brief', 'like', "%{$search}%");
+            });
+        }
+
+        $records = $query
+            ->orderByDesc('id')
+            ->paginate($request->input('per_page', 25));
+
+        $items = $records->map(fn($language) => [
+            'id'   => $language->id,
+            'name' => $language->name,
+            'slug' => $language->slug,
         ]);
 
         return [

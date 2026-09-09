@@ -18,6 +18,7 @@ import {
     faTableColumns,
     faFileLines,
     faClipboardList,
+    faLanguage,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -33,11 +34,13 @@ library.add(
     faTableColumns,
     faFileLines,
     faClipboardList,
+    faLanguage,
 );
 
 import {
     canAccessUser,
     canAccessGenre,
+    canAccessLanguage,
     canAccessAiBrain,
     canAccessKdpLayout,
     canAccessDocumentStyle,
@@ -66,7 +69,7 @@ const subMenus = ref({
 const routeMap = {
     UserManagement: ["/users/*"],
     AiAttributes: ["/ai-brains/*"],
-    NovelAttributes: ["/genres/*", "/kdp-layouts/*"],
+    NovelAttributes: ["/genres/*", "/languages/*", "/kdp-layouts/*"],
     Configuration: ["/document-styles/*"],
     Reports: ["/reports/*"],
 };
@@ -81,6 +84,10 @@ const canAccessAiBrainComputed = computed(() => {
 
 const canAccessGenreComputed = computed(() => {
     return canAccessGenre(authUser);
+});
+
+const canAccessLanguageComputed = computed(() => {
+    return canAccessLanguage(authUser);
 });
 
 const canAccessKdpLayoutComputed = computed(() => {
@@ -201,6 +208,20 @@ const isSubMenuVisible = (key) => {
                 >
                     <FontAwesomeIcon icon="book-open" />
                     Genre
+                </a>
+
+                <a
+                    v-if="canAccessLanguageComputed"
+                    :href="route('languages.index')"
+                    class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
+                    :class="
+                        isCurrentPage('/languages/*')
+                            ? 'bg-gray-200 font-medium'
+                            : ''
+                    "
+                >
+                    <FontAwesomeIcon icon="language" />
+                    Languages
                 </a>
 
                 <a

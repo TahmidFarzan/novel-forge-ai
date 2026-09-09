@@ -17,6 +17,7 @@ class UserPermissionHelper
 
     public const MODULE_USER  = 'User';
     public const MODULE_GENRE = 'Genre';
+    public const MODULE_LANGUAGE = 'Language';
     public const MODULE_AI_BRAIN = 'Ai Brain';
     public const MODULE_KDP_LAYOUT = 'Kdp Layout';
     public const MODULE_DOCUMENT_STYLE = 'Document Style';
@@ -27,6 +28,7 @@ class UserPermissionHelper
     {
         return SystemHelper::toOptions([
             self::MODULE_GENRE,
+            self::MODULE_LANGUAGE,
             self::MODULE_USER,
             self::MODULE_AI_BRAIN,
             self::MODULE_KDP_LAYOUT,

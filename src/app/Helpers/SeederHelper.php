@@ -150,6 +150,16 @@ class SeederHelper
         ]);
     }
 
+    public static function languages()
+    {
+        return collect([
+            (object) [
+                'name'               => 'English',
+                'brief'              => 'English',
+            ],
+        ]);
+    }
+
     public static function aiBrains()
     {
         return collect([

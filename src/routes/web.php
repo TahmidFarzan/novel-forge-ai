@@ -6,6 +6,7 @@ use App\Http\Controllers\AiPromptController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DocumentStyleController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\KdpLayoutController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PageController;
@@ -85,6 +86,7 @@ Route::prefix('search')->name('search.')->group(function () {
 
     Route::middleware(['response.cache:60,public,30,etag'])->group(function () {
         Route::get('genres', [SearchController::class, 'genres'])->name('genres');
+        Route::get('languages', [SearchController::class, 'languages'])->name('languages');
         Route::get('ai-brains', [SearchController::class, 'aiBrains'])->name('ai-brains');
         Route::get('kdp-layouts', [SearchController::class, 'kdpLayouts'])->name('kdp-layouts');
         Route::get('document-styles', [SearchController::class, 'documentStyles'])->name('document-styles');
@@ -116,6 +118,17 @@ Route::prefix('genres')->name('genres.')->group(function () {
     Route::post('save', [GenreController::class, 'save'])->name('save');
     Route::patch('update/{slug}', [GenreController::class, 'update'])->name('update');
     Route::delete('delete/{slug}', [GenreController::class, 'delete'])->name('delete');
+});
+
+Route::prefix('languages')->name('languages.')->group(function () {
+    Route::get('/', [LanguageController::class, 'index'])->name('index');
+    Route::get('create', [LanguageController::class, 'create'])->name('create');
+    Route::get('edit/{slug}', [LanguageController::class, 'edit'])->name('edit');
+    Route::get('details/{slug}', [LanguageController::class, 'details'])->name('details');
+
+    Route::post('save', [LanguageController::class, 'save'])->name('save');
+    Route::patch('update/{slug}', [LanguageController::class, 'update'])->name('update');
+    Route::delete('delete/{slug}', [LanguageController::class, 'delete'])->name('delete');
 });
 
 Route::prefix('ai-brains')->name('ai-brains.')->group(function () {

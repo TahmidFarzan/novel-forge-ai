@@ -7,6 +7,7 @@ const { clearByPrefix } = useApiCache()
 export const groups = {
     User: 'User',
     Genre: 'Genre',
+    Language: 'Language',
     AiBrain: 'Ai Brain',
     KdpLayout: 'Kdp Layout',
     DocumentStyle: 'Document Style',
@@ -115,6 +116,12 @@ export const canViewGenre = async (authUser, genre) => hasPermission(authUser, g
 export const canCreateGenre = async (authUser, genre) => hasPermission(authUser, groups.Genre, access.Create)
 export const canUpdateGenre = async (authUser, genre) => hasPermission(authUser, groups.Genre, access.Update)
 export const canDeleteGenre = async (authUser, genre) => hasPermission(authUser, groups.Genre, access.Delete)
+
+export const canAccessLanguage = async (authUser) => hasPermission(authUser, groups.Language, access.View)
+export const canViewLanguage = async (authUser, language) => hasPermission(authUser, groups.Language, access.ViewAny)
+export const canCreateLanguage = async (authUser, language) => hasPermission(authUser, groups.Language, access.Create)
+export const canUpdateLanguage = async (authUser, language) => hasPermission(authUser, groups.Language, access.Update)
+export const canDeleteLanguage = async (authUser, language) => hasPermission(authUser, groups.Language, access.Delete)
 
 export const canAccessAiBrain = async (authUser) => hasPermission(authUser, groups.AiBrain, access.View)
 export const canViewAiBrain = async (authUser, aiBrain) => hasPermission(authUser, groups.AiBrain, access.ViewAny)

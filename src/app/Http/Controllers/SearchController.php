@@ -92,6 +92,13 @@ class SearchController extends Controller
         );
     }
 
+    public function languages(Request $request): JsonResponse
+    {
+        return response()->json(
+            $this->searchService->languages($request)
+        );
+    }
+
     public function aiBrains(Request $request): JsonResponse
     {
         return response()->json(
