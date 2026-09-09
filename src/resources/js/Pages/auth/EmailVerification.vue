@@ -85,7 +85,7 @@ function handleResendVerification() {
 }
 
 .verification-card {
-    border-color: var(--news-border);
-    box-shadow: var(--news-shadow-soft);
+    border-color: var(--novel-forge-ai-border);
+    box-shadow: var(--novel-forge-ai-shadow-sm);
 }
 </style>

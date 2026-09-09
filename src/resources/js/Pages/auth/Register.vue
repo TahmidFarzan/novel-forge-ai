@@ -88,30 +88,30 @@ function handleRegister() {
     <div class="auth-page">
         <div class="ai-container auth-shell">
             <aside class="auth-story">
-                <a :href="route('home')" class="inline-flex items-center gap-3 text-sm font-bold text-[var(--ai-ink)]">
+                <a :href="route('home')" class="inline-flex items-center gap-3 text-sm font-bold text-[var(--novel-forge-ai-ink)]">
                     <img :src="appFavicon" :alt="appName" class="h-10 w-10 rounded-xl object-cover shadow-[0_8px_18px_rgb(46_196_230_/_16%)]" />
                     {{ appName }}
                 </a>
-                <div class="mt-12 flex h-48 w-48 items-center justify-center rounded-[2.5rem] border border-white/70 bg-white/60 p-5 shadow-[var(--ai-shadow-md)]">
+                <div class="mt-12 flex h-48 w-48 items-center justify-center rounded-[2.5rem] border border-white/70 bg-white/60 p-5 shadow-[var(--novel-forge-ai-shadow-md)]">
                     <img :src="appFavicon" :alt="`${appName} mark`" class="h-full w-full rounded-[1.7rem] object-cover" />
                 </div>
-                <p class="mt-9 text-xs font-bold uppercase tracking-[0.18em] text-[var(--ai-primary)]">A smarter starting point</p>
-                <h1 class="mt-4 max-w-md text-4xl font-bold leading-[1.05] tracking-[-0.05em] text-[var(--ai-ink)] sm:text-5xl">Bring your ideas into focus.</h1>
-                <p class="mt-5 max-w-md text-base leading-7 text-[var(--ai-muted)]">Create a workspace where your thinking gets a little clearer and your best work happens a lot sooner.</p>
+                <p class="mt-9 text-xs font-bold uppercase tracking-[0.18em] text-[var(--novel-forge-ai-primary)]">A smarter starting point</p>
+                <h1 class="mt-4 max-w-md text-4xl font-bold leading-[1.05] tracking-[-0.05em] text-[var(--novel-forge-ai-ink)] sm:text-5xl">Bring your ideas into focus.</h1>
+                <p class="mt-5 max-w-md text-base leading-7 text-[var(--novel-forge-ai-muted)]">Create a workspace where your thinking gets a little clearer and your best work happens a lot sooner.</p>
             </aside>
 
             <section class="auth-card auth-card--wide">
                 <div class="flex items-center gap-3">
                     <img :src="appFavicon" :alt="appName" class="auth-card__logo" />
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-[0.14em] text-[var(--ai-primary)]">Start creating</p>
-                        <p class="mt-0.5 text-xs text-[var(--ai-muted)]">Join {{ appName }} today</p>
+                        <p class="text-xs font-bold uppercase tracking-[0.14em] text-[var(--novel-forge-ai-primary)]">Start creating</p>
+                        <p class="mt-0.5 text-xs text-[var(--novel-forge-ai-muted)]">Join {{ appName }} today</p>
                     </div>
                 </div>
 
                 <div class="mt-8">
-                    <h2 class="text-3xl font-bold tracking-[-0.04em] text-[var(--ai-ink)]">Create your workspace</h2>
-                    <p class="mt-2 text-sm leading-6 text-[var(--ai-muted)]">Set up your account and start building with AI.</p>
+                    <h2 class="text-3xl font-bold tracking-[-0.04em] text-[var(--novel-forge-ai-ink)]">Create your workspace</h2>
+                    <p class="mt-2 text-sm leading-6 text-[var(--novel-forge-ai-muted)]">Set up your account and start building with AI.</p>
                 </div>
 
                 <form class="mt-8 space-y-5" @submit.prevent="handleRegister">
@@ -132,7 +132,7 @@ function handleRegister() {
                         <label for="password" class="auth-label">Password</label>
                         <div class="relative">
                             <input id="password" v-model="registerForm.password" :type="showPassword ? 'text' : 'password'" autocomplete="new-password" placeholder="Create a password" class="auth-input pr-12" :class="{ 'is-invalid': registerForm.errors.password }" />
-                            <button type="button" class="absolute right-0 top-0 flex h-[3.1rem] w-12 items-center justify-center text-[var(--ai-muted)] hover:text-[var(--ai-primary)]" @click="togglePasswordVisibility" :aria-label="showPassword ? 'Hide password' : 'Show password'"><FontAwesomeIcon :icon="showPassword ? 'eye-slash' : 'eye'" /></button>
+                            <button type="button" class="absolute right-0 top-0 flex h-[3.1rem] w-12 items-center justify-center text-[var(--novel-forge-ai-muted)] hover:text-[var(--novel-forge-ai-primary)]" @click="togglePasswordVisibility" :aria-label="showPassword ? 'Hide password' : 'Show password'"><FontAwesomeIcon :icon="showPassword ? 'eye-slash' : 'eye'" /></button>
                         </div>
                         <p v-if="registerForm.errors.password" class="auth-error">{{ registerForm.errors.password }}</p>
                     </div>
@@ -141,7 +141,7 @@ function handleRegister() {
                         <label for="passwordConfirmation" class="auth-label">Confirm password</label>
                         <div class="relative">
                             <input id="passwordConfirmation" v-model="registerForm.password_confirmation" :type="showConfirmPassword ? 'text' : 'password'" autocomplete="new-password" placeholder="Repeat your password" class="auth-input pr-12" :class="{ 'is-invalid': registerForm.errors.password_confirmation }" />
-                            <button type="button" class="absolute right-0 top-0 flex h-[3.1rem] w-12 items-center justify-center text-[var(--ai-muted)] hover:text-[var(--ai-primary)]" @click="toggleConfirmPasswordVisibility" :aria-label="showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'"><FontAwesomeIcon :icon="showConfirmPassword ? 'eye-slash' : 'eye'" /></button>
+                            <button type="button" class="absolute right-0 top-0 flex h-[3.1rem] w-12 items-center justify-center text-[var(--novel-forge-ai-muted)] hover:text-[var(--novel-forge-ai-primary)]" @click="toggleConfirmPasswordVisibility" :aria-label="showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'"><FontAwesomeIcon :icon="showConfirmPassword ? 'eye-slash' : 'eye'" /></button>
                         </div>
                         <p v-if="registerForm.errors.password_confirmation" class="auth-error">{{ registerForm.errors.password_confirmation }}</p>
                     </div>
@@ -153,7 +153,7 @@ function handleRegister() {
                     </button>
                 </form>
 
-                <p class="mt-7 text-center text-sm text-[var(--ai-muted)]">
+                <p class="mt-7 text-center text-sm text-[var(--novel-forge-ai-muted)]">
                     Already have an account?
                     <a :href="route('login')" class="auth-link ml-1">Log in</a>
                 </p>
@@ -169,7 +169,7 @@ function handleRegister() {
     overflow: hidden;
     min-height: calc(100vh - 9.5rem);
     padding: clamp(2.5rem, 6vw, 5.5rem) 0;
-    background: var(--ai-gradient-hero);
+    background: var(--novel-forge-ai-gradient-hero);
 }
 
 .auth-page::before,
@@ -210,9 +210,9 @@ function handleRegister() {
     width: min(100%, 30rem);
     margin-inline: auto;
     border: 1px solid rgb(255 255 255 / 80%);
-    border-radius: var(--ai-radius-lg);
+    border-radius: var(--novel-forge-ai-radius-lg);
     background: rgb(255 255 255 / 92%);
-    box-shadow: var(--ai-shadow-lg);
+    box-shadow: var(--novel-forge-ai-shadow-lg);
     padding: clamp(1.5rem, 4vw, 2.5rem);
     backdrop-filter: blur(18px);
 }
@@ -232,7 +232,7 @@ function handleRegister() {
 .auth-label {
     display: block;
     margin-bottom: 0.45rem;
-    color: var(--ai-ink-soft);
+    color: var(--novel-forge-ai-ink-soft);
     font-size: 0.82rem;
     font-weight: 600;
     letter-spacing: 0.01em;
@@ -241,25 +241,25 @@ function handleRegister() {
 .auth-input {
     width: 100%;
     min-height: 3.1rem;
-    border: 1px solid var(--ai-border-strong);
-    border-radius: var(--ai-radius-sm);
+    border: 1px solid var(--novel-forge-ai-border-strong);
+    border-radius: var(--novel-forge-ai-radius-sm);
     background: rgb(255 255 255 / 80%);
-    color: var(--ai-ink);
+    color: var(--novel-forge-ai-ink);
     padding: 0.78rem 0.9rem;
     outline: 0;
 }
 
 .auth-input::placeholder {
-    color: var(--ai-muted-light);
+    color: var(--novel-forge-ai-muted-light);
 }
 
 .auth-input:focus {
-    border-color: var(--ai-primary);
-    box-shadow: var(--ai-focus-ring);
+    border-color: var(--novel-forge-ai-primary);
+    box-shadow: var(--novel-forge-ai-focus-ring);
 }
 
 .auth-input.is-invalid {
-    border-color: var(--ai-danger);
+    border-color: var(--novel-forge-ai-danger);
 }
 
 .auth-input.is-invalid:focus {
@@ -268,7 +268,7 @@ function handleRegister() {
 
 .auth-error {
     margin-top: 0.45rem;
-    color: var(--ai-danger);
+    color: var(--novel-forge-ai-danger);
     font-size: 0.78rem;
     line-height: 1.4;
 }
@@ -280,12 +280,12 @@ function handleRegister() {
     justify-content: center;
     gap: 0.55rem;
     border: 0;
-    border-radius: var(--ai-radius-sm);
-    background: var(--ai-gradient-brand);
+    border-radius: var(--novel-forge-ai-radius-sm);
+    background: var(--novel-forge-ai-gradient-brand);
     color: white;
     padding: 0.75rem 1.15rem;
     font-weight: 700;
-    box-shadow: var(--ai-shadow-primary);
+    box-shadow: var(--novel-forge-ai-shadow-primary);
 }
 
 .auth-button:hover:not(:disabled) {
@@ -299,12 +299,12 @@ function handleRegister() {
 }
 
 .auth-link {
-    color: var(--ai-primary-strong);
+    color: var(--novel-forge-ai-primary-strong);
     font-weight: 600;
 }
 
 .auth-link:hover {
-    color: var(--ai-primary);
+    color: var(--novel-forge-ai-primary);
 }
 
 @media (min-width: 768px) {

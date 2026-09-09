@@ -19,6 +19,7 @@ import {
     faFileLines,
     faClipboardList,
     faLanguage,
+    faBook,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -35,6 +36,7 @@ library.add(
     faFileLines,
     faClipboardList,
     faLanguage,
+    faBook
 );
 
 import {
@@ -146,54 +148,43 @@ const isSubMenuVisible = (key) => {
     <div class="flex flex-col space-y-1 text-sm">
         <a
             :href="route('auth-user.dashboard.index')"
-            class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-            :class="
-                isCurrentPage('/auth-user/dashboard/*')
-                    ? 'bg-gray-200 font-medium'
-                    : ''
-            "
+            class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+            :class="isCurrentPage('/auth-user/dashboard/*') ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
         >
-            <FontAwesomeIcon icon="gauge" />
+            <FontAwesomeIcon icon="gauge" class="w-4" />
             Dashboard
         </a>
 
         <a
             :href="route('back-office.medias.index')"
-            class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-            :class="isCurrentPage('/back-office/medias/*') ? 'bg-gray-200 font-medium' : ''"
+            class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+            :class="isCurrentPage('/back-office/medias/*') ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
         >
-            <FontAwesomeIcon icon="photo-film" />
+            <FontAwesomeIcon icon="photo-film" class="w-4" />
             Media
         </a>
 
         <a
             :href="route('back-office.novel-generators.index')"
-            class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-            :class="
-                isCurrentPage('/back-office/novel-generators/*')
-                    ? 'bg-gray-200 font-medium'
-                    : ''
-            "
+            class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+            :class="isCurrentPage('/back-office/novel-generators/*') ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
         >
-            <!-- <FontAwesomeIcon icon="gauge" /> -->
+            <FontAwesomeIcon icon="book" />
             Novel generators
         </a>
 
         <button
             @click="toggleShowSubMenu('NovelAttributes')"
-            class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-100"
+            class="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
         >
-            <span class="flex items-center gap-2">
-                <FontAwesomeIcon icon="book-open" />
+            <span class="flex items-center gap-3">
+                <FontAwesomeIcon icon="book-open" class="w-4" />
                 Novel Attribute
             </span>
 
             <FontAwesomeIcon
-                :icon="
-                    isSubMenuVisible('NovelAttributes')
-                        ? 'chevron-up'
-                        : 'chevron-down'
-                "
+                :icon="isSubMenuVisible('NovelAttributes') ? 'chevron-up' : 'chevron-down'"
+                class="text-xs text-[var(--novel-forge-ai-muted)]"
             />
         </button>
 
@@ -207,47 +198,35 @@ const isSubMenuVisible = (key) => {
         >
             <div
                 v-if="isSubMenuVisible('NovelAttributes')"
-                class="ml-4 flex flex-col space-y-1 overflow-hidden"
+                class="ml-2 flex flex-col space-y-1 overflow-hidden border-l border-[var(--novel-forge-ai-border)] pl-2"
             >
                 <a
                     v-if="canAccessGenreComputed"
                     :href="route('back-office.genres.index')"
-                    class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-                    :class="
-                        isCurrentPage('/back-office/genres/*')
-                            ? 'bg-gray-200 font-medium'
-                            : ''
-                    "
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+                    :class="isCurrentPage('/back-office/genres/*') ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
                 >
-                    <FontAwesomeIcon icon="book-open" />
+                    <FontAwesomeIcon icon="book-open" class="w-4" />
                     Genre
                 </a>
 
                 <a
                     v-if="canAccessLanguageComputed"
                     :href="route('back-office.languages.index')"
-                    class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-                    :class="
-                        isCurrentPage('/back-office/languages/*')
-                            ? 'bg-gray-200 font-medium'
-                            : ''
-                    "
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+                    :class="isCurrentPage('/back-office/languages/*') ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
                 >
-                    <FontAwesomeIcon icon="language" />
+                    <FontAwesomeIcon icon="language" class="w-4" />
                     Languages
                 </a>
 
                 <a
                     v-if="canAccessKdpLayoutComputed"
                     :href="route('back-office.kdp-layouts.index')"
-                    class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-                    :class="
-                        isCurrentPage('/back-office/kdp-layouts/*')
-                            ? 'bg-gray-200 font-medium'
-                            : ''
-                    "
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+                    :class="isCurrentPage('/back-office/kdp-layouts/*') ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
                 >
-                    <FontAwesomeIcon icon="table-columns" />
+                    <FontAwesomeIcon icon="table-columns" class="w-4" />
                     Layout
                 </a>
             </div>
@@ -255,19 +234,16 @@ const isSubMenuVisible = (key) => {
 
         <button
             @click="toggleShowSubMenu('AiAttributes')"
-            class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-100"
+            class="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
         >
-            <span class="flex items-center gap-2">
-                <FontAwesomeIcon icon="brain" />
+            <span class="flex items-center gap-3">
+                <FontAwesomeIcon icon="brain" class="w-4" />
                 Ai Attributes
             </span>
 
             <FontAwesomeIcon
-                :icon="
-                    isSubMenuVisible('AiAttributes')
-                        ? 'chevron-up'
-                        : 'chevron-down'
-                "
+                :icon="isSubMenuVisible('AiAttributes') ? 'chevron-up' : 'chevron-down'"
+                class="text-xs text-[var(--novel-forge-ai-muted)]"
             />
         </button>
 
@@ -281,33 +257,25 @@ const isSubMenuVisible = (key) => {
         >
             <div
                 v-if="isSubMenuVisible('AiAttributes')"
-                class="ml-4 flex flex-col space-y-1 overflow-hidden"
+                class="ml-2 flex flex-col space-y-1 overflow-hidden border-l border-[var(--novel-forge-ai-border)] pl-2"
             >
                 <a
                     v-if="canAccessAiBrainComputed"
                     :href="route('back-office.ai-brains.index')"
-                    class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-                    :class="
-                        isCurrentPage('/back-office/ai-brains/*')
-                            ? 'bg-gray-200 font-medium'
-                            : ''
-                    "
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+                    :class="isCurrentPage('/back-office/ai-brains/*') ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
                 >
-                    <FontAwesomeIcon icon="brain" />
+                    <FontAwesomeIcon icon="brain" class="w-4" />
                     Ai Brain
                 </a>
 
                 <a
                     v-if="canAccessAiPromptComputed"
                     :href="route('back-office.ai-prompts.index')"
-                    class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-                    :class="
-                        isCurrentPage('/back-office/ai-prompts/*')
-                            ? 'bg-gray-200 font-medium'
-                            : ''
-                    "
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+                    :class="isCurrentPage('/back-office/ai-prompts/*') ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
                 >
-                    <FontAwesomeIcon icon="clipboard-list" />
+                    <FontAwesomeIcon icon="clipboard-list" class="w-4" />
                     Ai Prompt
                 </a>
             </div>
@@ -315,19 +283,16 @@ const isSubMenuVisible = (key) => {
 
         <button
             @click="toggleShowSubMenu('UserManagement')"
-            class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-100"
+            class="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
         >
-            <span class="flex items-center gap-2">
-                <FontAwesomeIcon icon="users" />
+            <span class="flex items-center gap-3">
+                <FontAwesomeIcon icon="users" class="w-4" />
                 User Management
             </span>
 
             <FontAwesomeIcon
-                :icon="
-                    isSubMenuVisible('UserManagement')
-                        ? 'chevron-up'
-                        : 'chevron-down'
-                "
+                :icon="isSubMenuVisible('UserManagement') ? 'chevron-up' : 'chevron-down'"
+                class="text-xs text-[var(--novel-forge-ai-muted)]"
             />
         </button>
 
@@ -340,21 +305,15 @@ const isSubMenuVisible = (key) => {
             leave-to-class="opacity-0 max-h-0"
         >
             <div
-                v-if="
-                    isSubMenuVisible('UserManagement') && canAccessUserComputed
-                "
-                class="ml-4 flex flex-col space-y-1 overflow-hidden"
+                v-if="isSubMenuVisible('UserManagement') && canAccessUserComputed"
+                class="ml-2 flex flex-col space-y-1 overflow-hidden border-l border-[var(--novel-forge-ai-border)] pl-2"
             >
                 <a
                     :href="route('back-office.users.index')"
-                    class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-                    :class="
-                        isAnyCurrentPage(routeMap.UserManagement)
-                            ? 'bg-gray-200 font-medium'
-                            : ''
-                    "
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+                    :class="isAnyCurrentPage(routeMap.UserManagement) ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
                 >
-                    <FontAwesomeIcon icon="user" />
+                    <FontAwesomeIcon icon="user" class="w-4" />
                     Users
                 </a>
             </div>
@@ -362,19 +321,16 @@ const isSubMenuVisible = (key) => {
 
         <button
             @click="toggleShowSubMenu('Configuration')"
-            class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-100"
+            class="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
         >
-            <span class="flex items-center gap-2">
-                <FontAwesomeIcon icon="file-lines" />
+            <span class="flex items-center gap-3">
+                <FontAwesomeIcon icon="file-lines" class="w-4" />
                 Configuration
             </span>
 
             <FontAwesomeIcon
-                :icon="
-                    isSubMenuVisible('Configuration')
-                        ? 'chevron-up'
-                        : 'chevron-down'
-                "
+                :icon="isSubMenuVisible('Configuration') ? 'chevron-up' : 'chevron-down'"
+                class="text-xs text-[var(--novel-forge-ai-muted)]"
             />
         </button>
 
@@ -388,19 +344,15 @@ const isSubMenuVisible = (key) => {
         >
             <div
                 v-if="isSubMenuVisible('Configuration')"
-                class="ml-4 flex flex-col space-y-1 overflow-hidden"
+                class="ml-2 flex flex-col space-y-1 overflow-hidden border-l border-[var(--novel-forge-ai-border)] pl-2"
             >
                 <a
                     v-if="canAccessDocumentStyleComputed"
                     :href="route('back-office.document-styles.index')"
-                    class="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100"
-                    :class="
-                        isCurrentPage('/back-office/document-styles/*')
-                            ? 'bg-gray-200 font-medium'
-                            : ''
-                    "
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+                    :class="isCurrentPage('/back-office/document-styles/*') ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
                 >
-                    <FontAwesomeIcon icon="file-lines" />
+                    <FontAwesomeIcon icon="file-lines" class="w-4" />
                     Document Style
                 </a>
             </div>

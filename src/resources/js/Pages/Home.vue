@@ -93,44 +93,44 @@ const technology = [
 
     <PublicLayout>
         <div class="home-page overflow-hidden">
-        <section class="hero-section relative isolate overflow-hidden border-b border-[var(--ai-border)]">
+        <section class="hero-section relative isolate overflow-hidden border-b border-[var(--novel-forge-ai-border)]">
             <div class="hero-glow hero-glow--one" aria-hidden="true"></div>
             <div class="hero-glow hero-glow--two" aria-hidden="true"></div>
             <div class="ai-container relative grid items-center gap-14 py-16 sm:py-20 lg:grid-cols-[minmax(0,0.92fr)_minmax(27rem,1.08fr)] lg:gap-10 lg:py-28">
                 <div class="max-w-2xl">
-                    <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-[rgb(91_92_240_/_16%)] bg-white/70 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-[var(--ai-primary-strong)] shadow-[var(--ai-shadow-sm)]">
-                        <span class="h-2 w-2 rounded-full bg-[var(--ai-cyan)] shadow-[0_0_0_4px_rgb(46_196_230_/_15%)]"></span>
+                    <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-[rgb(91_92_240_/_16%)] bg-white/70 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-[var(--novel-forge-ai-primary-strong)] shadow-[var(--novel-forge-ai-shadow-sm)]">
+                        <span class="h-2 w-2 rounded-full bg-[var(--novel-forge-ai-cyan)] shadow-[0_0_0_4px_rgb(46_196_230_/_15%)]"></span>
                         The intelligent workspace
                     </div>
 
-                    <h1 class="max-w-3xl text-5xl font-bold leading-[0.98] tracking-[-0.06em] text-[var(--ai-ink)] sm:text-6xl lg:text-7xl">
+                    <h1 class="max-w-3xl text-5xl font-bold leading-[0.98] tracking-[-0.06em] text-[var(--novel-forge-ai-ink)] sm:text-6xl lg:text-7xl">
                         Make your next big idea
                         <span class="ai-gradient-text">unstoppable.</span>
                     </h1>
 
-                    <p class="mt-7 max-w-xl text-base leading-7 text-[var(--ai-muted)] sm:text-lg sm:leading-8">
+                    <p class="mt-7 max-w-xl text-base leading-7 text-[var(--novel-forge-ai-muted)] sm:text-lg sm:leading-8">
                         {{ appName }} gives ambitious people an AI-powered edge to think clearer, create faster, and turn possibility into polished work.
                     </p>
 
                     <div class="mt-9 flex flex-col gap-3 sm:flex-row">
-                        <a :href="route('login')" class="ai-gradient-brand-bg inline-flex min-h-12 items-center justify-center gap-3 rounded-xl px-5 text-sm font-bold text-white shadow-[var(--ai-shadow-primary)] hover:-translate-y-0.5 hover:shadow-[0_18px_34px_rgb(91_92_240_/_30%)]">
+                        <a :href="route('login')" class="ai-gradient-brand-bg inline-flex min-h-12 items-center justify-center gap-3 rounded-xl px-5 text-sm font-bold text-white shadow-[var(--novel-forge-ai-shadow-primary)] hover:-translate-y-0.5 hover:shadow-[0_18px_34px_rgb(91_92_240_/_30%)]">
                             Start building free
                             <FontAwesomeIcon icon="arrow-right" class="text-xs" />
                         </a>
-                        <a href="#workflow" class="inline-flex min-h-12 items-center justify-center rounded-xl border border-[var(--ai-border-strong)] bg-white/70 px-5 text-sm font-bold text-[var(--ai-ink)] hover:-translate-y-0.5 hover:border-[var(--ai-primary)] hover:text-[var(--ai-primary-strong)]">
+                        <a href="#workflow" class="inline-flex min-h-12 items-center justify-center rounded-xl border border-[var(--novel-forge-ai-border-strong)] bg-white/70 px-5 text-sm font-bold text-[var(--novel-forge-ai-ink)] hover:-translate-y-0.5 hover:border-[var(--novel-forge-ai-primary)] hover:text-[var(--novel-forge-ai-primary-strong)]">
                             See how it works
                         </a>
                     </div>
 
-                    <div class="mt-10 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-[var(--ai-muted)]">
-                        <span class="flex items-center gap-2"><FontAwesomeIcon icon="circle-check" class="text-[var(--ai-success)]" /> No credit card required</span>
-                        <span class="flex items-center gap-2"><FontAwesomeIcon icon="circle-check" class="text-[var(--ai-success)]" /> Built for your workflow</span>
+                    <div class="mt-10 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-[var(--novel-forge-ai-muted)]">
+                        <span class="flex items-center gap-2"><FontAwesomeIcon icon="circle-check" class="text-[var(--novel-forge-ai-success)]" /> No credit card required</span>
+                        <span class="flex items-center gap-2"><FontAwesomeIcon icon="circle-check" class="text-[var(--novel-forge-ai-success)]" /> Built for your workflow</span>
                     </div>
                 </div>
 
                 <div class="hero-visual relative mx-auto w-full max-w-xl lg:ml-auto" aria-label="AI workspace preview">
                     <div class="hero-visual__halo" aria-hidden="true"></div>
-                    <div class="hero-console ai-gradient-dark-bg relative overflow-hidden rounded-[2rem] border border-white/15 p-3 shadow-[var(--ai-shadow-lg)] sm:p-5">
+                    <div class="hero-console ai-gradient-dark-bg relative overflow-hidden rounded-[2rem] border border-white/15 p-3 shadow-[var(--novel-forge-ai-shadow-lg)] sm:p-5">
                         <div class="flex items-center justify-between border-b border-white/10 px-2 pb-4 sm:px-3">
                             <div class="flex items-center gap-2">
                                 <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10">
@@ -165,13 +165,13 @@ const technology = [
                             </div>
                         </div>
                     </div>
-                    <div class="hero-chip hero-chip--top hidden items-center gap-3 rounded-2xl border border-[var(--ai-border)] bg-white p-3 shadow-[var(--ai-shadow-md)] sm:flex">
-                        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#fff4dc] text-[var(--ai-gold)]"><FontAwesomeIcon icon="brain" /></span>
-                        <span><strong class="block text-xs text-[var(--ai-ink)]">Context understood</strong><small class="text-[10px] text-[var(--ai-muted)]">Your intent is in focus</small></span>
+                    <div class="hero-chip hero-chip--top hidden items-center gap-3 rounded-2xl border border-[var(--novel-forge-ai-border)] bg-white p-3 shadow-[var(--novel-forge-ai-shadow-md)] sm:flex">
+                        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#fff4dc] text-[var(--novel-forge-ai-gold)]"><FontAwesomeIcon icon="brain" /></span>
+                        <span><strong class="block text-xs text-[var(--novel-forge-ai-ink)]">Context understood</strong><small class="text-[10px] text-[var(--novel-forge-ai-muted)]">Your intent is in focus</small></span>
                     </div>
-                    <div class="hero-chip hero-chip--bottom hidden items-center gap-3 rounded-2xl border border-[var(--ai-border)] bg-white p-3 shadow-[var(--ai-shadow-md)] sm:flex">
-                        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#e9fbff] text-[var(--ai-cyan)]"><FontAwesomeIcon icon="chart-line" /></span>
-                        <span><strong class="block text-xs text-[var(--ai-ink)]">Output ready</strong><small class="text-[10px] text-[var(--ai-muted)]">Your next move is clear</small></span>
+                    <div class="hero-chip hero-chip--bottom hidden items-center gap-3 rounded-2xl border border-[var(--novel-forge-ai-border)] bg-white p-3 shadow-[var(--novel-forge-ai-shadow-md)] sm:flex">
+                        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#e9fbff] text-[var(--novel-forge-ai-cyan)]"><FontAwesomeIcon icon="chart-line" /></span>
+                        <span><strong class="block text-xs text-[var(--novel-forge-ai-ink)]">Output ready</strong><small class="text-[10px] text-[var(--novel-forge-ai-muted)]">Your next move is clear</small></span>
                     </div>
                 </div>
             </div>
@@ -180,47 +180,47 @@ const technology = [
         <section id="features" class="bg-white py-20 sm:py-24">
             <div class="ai-container">
                 <div class="max-w-2xl">
-                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-[var(--ai-primary)]">One platform. More possibilities.</p>
-                    <h2 class="mt-4 text-3xl font-bold tracking-[-0.04em] text-[var(--ai-ink)] sm:text-5xl">Everything you need to do your best work.</h2>
-                    <p class="mt-5 text-base leading-7 text-[var(--ai-muted)] sm:text-lg">Powerful AI capabilities, presented simply, so you can stay in flow from the first prompt to the final result.</p>
+                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-[var(--novel-forge-ai-primary)]">One platform. More possibilities.</p>
+                    <h2 class="mt-4 text-3xl font-bold tracking-[-0.04em] text-[var(--novel-forge-ai-ink)] sm:text-5xl">Everything you need to do your best work.</h2>
+                    <p class="mt-5 text-base leading-7 text-[var(--novel-forge-ai-muted)] sm:text-lg">Powerful AI capabilities, presented simply, so you can stay in flow from the first prompt to the final result.</p>
                 </div>
 
                 <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <article v-for="feature in features" :key="feature.title" class="feature-card group rounded-[1.35rem] border border-[var(--ai-border)] bg-[var(--ai-surface)] p-6 shadow-[var(--ai-shadow-sm)] hover:-translate-y-1 hover:border-[rgb(91_92_240_/_25%)] hover:shadow-[var(--ai-shadow-md)]">
+                    <article v-for="feature in features" :key="feature.title" class="feature-card group rounded-[1.35rem] border border-[var(--novel-forge-ai-border)] bg-[var(--novel-forge-ai-surface)] p-6 shadow-[var(--novel-forge-ai-shadow-sm)] hover:-translate-y-1 hover:border-[rgb(91_92_240_/_25%)] hover:shadow-[var(--novel-forge-ai-shadow-md)]">
                         <div class="feature-icon" :class="`feature-icon--${feature.tone}`"><FontAwesomeIcon :icon="feature.icon" /></div>
-                        <p class="mt-7 text-xs font-bold uppercase tracking-[0.14em] text-[var(--ai-muted-light)]">{{ feature.eyebrow }}</p>
-                        <h3 class="mt-2 text-xl font-bold tracking-[-0.03em] text-[var(--ai-ink)]">{{ feature.title }}</h3>
-                        <p class="mt-3 text-sm leading-6 text-[var(--ai-muted)]">{{ feature.description }}</p>
+                        <p class="mt-7 text-xs font-bold uppercase tracking-[0.14em] text-[var(--novel-forge-ai-muted-light)]">{{ feature.eyebrow }}</p>
+                        <h3 class="mt-2 text-xl font-bold tracking-[-0.03em] text-[var(--novel-forge-ai-ink)]">{{ feature.title }}</h3>
+                        <p class="mt-3 text-sm leading-6 text-[var(--novel-forge-ai-muted)]">{{ feature.description }}</p>
                     </article>
                 </div>
             </div>
         </section>
 
-        <section id="workflow" class="border-y border-[var(--ai-border)] bg-[var(--ai-canvas)] py-20 sm:py-24">
+        <section id="workflow" class="border-y border-[var(--novel-forge-ai-border)] bg-[var(--novel-forge-ai-canvas)] py-20 sm:py-24">
             <div class="ai-container">
                 <div class="flex flex-col justify-between gap-6 md:flex-row md:items-end">
                     <div class="max-w-2xl">
-                        <p class="text-xs font-bold uppercase tracking-[0.18em] text-[var(--ai-primary)]">Simple by design</p>
-                        <h2 class="mt-4 text-3xl font-bold tracking-[-0.04em] text-[var(--ai-ink)] sm:text-5xl">From thought to finished work in three clear steps.</h2>
+                        <p class="text-xs font-bold uppercase tracking-[0.18em] text-[var(--novel-forge-ai-primary)]">Simple by design</p>
+                        <h2 class="mt-4 text-3xl font-bold tracking-[-0.04em] text-[var(--novel-forge-ai-ink)] sm:text-5xl">From thought to finished work in three clear steps.</h2>
                     </div>
-                    <p class="max-w-sm text-sm leading-6 text-[var(--ai-muted)]">You bring the direction. {{ appName }} brings the intelligence to help you get there.</p>
+                    <p class="max-w-sm text-sm leading-6 text-[var(--novel-forge-ai-muted)]">You bring the direction. {{ appName }} brings the intelligence to help you get there.</p>
                 </div>
 
                 <div class="mt-14 grid gap-8 md:grid-cols-3 md:gap-6">
                     <article v-for="(step, index) in workflow" :key="step.number" class="workflow-step relative">
                         <div v-if="index < workflow.length - 1" class="workflow-connector hidden md:block" aria-hidden="true"></div>
                         <div class="flex items-center justify-between">
-                            <span class="ai-gradient-brand-bg flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-[var(--ai-shadow-primary)]"><FontAwesomeIcon :icon="step.icon" /></span>
+                            <span class="ai-gradient-brand-bg flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-[var(--novel-forge-ai-shadow-primary)]"><FontAwesomeIcon :icon="step.icon" /></span>
                             <span class="text-4xl font-bold tracking-[-0.06em] text-[rgb(91_92_240_/_14%)]">{{ step.number }}</span>
                         </div>
-                        <h3 class="mt-7 text-xl font-bold tracking-[-0.03em] text-[var(--ai-ink)]">{{ step.title }}</h3>
-                        <p class="mt-3 max-w-xs text-sm leading-6 text-[var(--ai-muted)]">{{ step.description }}</p>
+                        <h3 class="mt-7 text-xl font-bold tracking-[-0.03em] text-[var(--novel-forge-ai-ink)]">{{ step.title }}</h3>
+                        <p class="mt-3 max-w-xs text-sm leading-6 text-[var(--novel-forge-ai-muted)]">{{ step.description }}</p>
                     </article>
                 </div>
             </div>
         </section>
 
-        <section id="technology" class="relative overflow-hidden bg-[var(--ai-surface-dark)] py-20 text-white sm:py-24">
+        <section id="technology" class="relative overflow-hidden bg-[var(--novel-forge-ai-surface-dark)] py-20 text-white sm:py-24">
             <div class="technology-glow" aria-hidden="true"></div>
             <div class="ai-container relative grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
                 <div>
@@ -257,11 +257,11 @@ const technology = [
 
         <section class="ai-gradient-soft-bg relative overflow-hidden py-20 sm:py-24">
             <div class="ai-container relative">
-                <div class="rounded-[2rem] border border-[rgb(91_92_240_/_12%)] bg-white/75 px-6 py-12 text-center shadow-[var(--ai-shadow-md)] sm:px-12 sm:py-16">
-                    <div class="ai-gradient-brand-bg mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-[var(--ai-shadow-primary)]"><FontAwesomeIcon icon="wand-magic-sparkles" /></div>
-                    <h2 class="mx-auto mt-7 max-w-2xl text-3xl font-bold tracking-[-0.04em] text-[var(--ai-ink)] sm:text-5xl">Your best work is closer than you think.</h2>
-                    <p class="mx-auto mt-5 max-w-xl text-base leading-7 text-[var(--ai-muted)]">Create your account and give every idea the intelligent starting point it deserves.</p>
-                    <a :href="route('login')" class="ai-gradient-brand-bg mt-8 inline-flex min-h-12 items-center justify-center gap-3 rounded-xl px-5 text-sm font-bold text-white shadow-[var(--ai-shadow-primary)] hover:-translate-y-0.5">
+                <div class="rounded-[2rem] border border-[rgb(91_92_240_/_12%)] bg-white/75 px-6 py-12 text-center shadow-[var(--novel-forge-ai-shadow-md)] sm:px-12 sm:py-16">
+                    <div class="ai-gradient-brand-bg mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-[var(--novel-forge-ai-shadow-primary)]"><FontAwesomeIcon icon="wand-magic-sparkles" /></div>
+                    <h2 class="mx-auto mt-7 max-w-2xl text-3xl font-bold tracking-[-0.04em] text-[var(--novel-forge-ai-ink)] sm:text-5xl">Your best work is closer than you think.</h2>
+                    <p class="mx-auto mt-5 max-w-xl text-base leading-7 text-[var(--novel-forge-ai-muted)]">Create your account and give every idea the intelligent starting point it deserves.</p>
+                    <a :href="route('login')" class="ai-gradient-brand-bg mt-8 inline-flex min-h-12 items-center justify-center gap-3 rounded-xl px-5 text-sm font-bold text-white shadow-[var(--novel-forge-ai-shadow-primary)] hover:-translate-y-0.5">
                         Create your workspace
                         <FontAwesomeIcon icon="arrow-right" class="text-xs" />
                     </a>
@@ -274,22 +274,22 @@ const technology = [
 
 <style scoped>
 .ai-gradient-text {
-    background: var(--ai-gradient-brand);
+    background: var(--novel-forge-ai-gradient-brand);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
 }
 
 .ai-gradient-brand-bg {
-    background: var(--ai-gradient-brand);
+    background: var(--novel-forge-ai-gradient-brand);
 }
 
 .ai-gradient-dark-bg {
-    background: var(--ai-gradient-dark);
+    background: var(--novel-forge-ai-gradient-dark);
 }
 
 .ai-gradient-soft-bg {
-    background: var(--ai-gradient-soft);
+    background: var(--novel-forge-ai-gradient-soft);
 }
 
 .ai-dot-grid {
@@ -298,7 +298,7 @@ const technology = [
 }
 
 .hero-section {
-    background: var(--ai-gradient-hero);
+    background: var(--novel-forge-ai-gradient-hero);
 }
 
 .hero-glow,
@@ -371,7 +371,7 @@ const technology = [
 .feature-card,
 .workflow-step,
 .technology-card {
-    transition: transform var(--ai-transition), border-color var(--ai-transition), box-shadow var(--ai-transition);
+    transition: transform var(--novel-forge-ai-transition), border-color var(--novel-forge-ai-transition), box-shadow var(--novel-forge-ai-transition);
 }
 
 .feature-icon {

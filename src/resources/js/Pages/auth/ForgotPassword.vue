@@ -58,30 +58,30 @@ function handleForgotPassword() {
     <div class="auth-page">
         <div class="ai-container auth-shell">
             <aside class="auth-story">
-                <a :href="route('home')" class="inline-flex items-center gap-3 text-sm font-bold text-[var(--ai-ink)]">
+                <a :href="route('home')" class="inline-flex items-center gap-3 text-sm font-bold text-[var(--novel-forge-ai-ink)]">
                     <img :src="appFavicon" :alt="appName" class="h-10 w-10 rounded-xl object-cover shadow-[0_8px_18px_rgb(46_196_230_/_16%)]" />
                     {{ appName }}
                 </a>
-                <div class="mt-12 flex h-48 w-48 items-center justify-center rounded-[2.5rem] border border-white/70 bg-white/60 p-5 shadow-[var(--ai-shadow-md)]">
+                <div class="mt-12 flex h-48 w-48 items-center justify-center rounded-[2.5rem] border border-white/70 bg-white/60 p-5 shadow-[var(--novel-forge-ai-shadow-md)]">
                     <img :src="appFavicon" :alt="`${appName} mark`" class="h-full w-full rounded-[1.7rem] object-cover" />
                 </div>
-                <p class="mt-9 text-xs font-bold uppercase tracking-[0.18em] text-[var(--ai-primary)]">Back in the flow</p>
-                <h1 class="mt-4 max-w-md text-4xl font-bold leading-[1.05] tracking-[-0.05em] text-[var(--ai-ink)] sm:text-5xl">A small reset. A clear next step.</h1>
-                <p class="mt-5 max-w-md text-base leading-7 text-[var(--ai-muted)]">We’ll help you get back to your workspace securely, so you can keep your ideas moving.</p>
+                <p class="mt-9 text-xs font-bold uppercase tracking-[0.18em] text-[var(--novel-forge-ai-primary)]">Back in the flow</p>
+                <h1 class="mt-4 max-w-md text-4xl font-bold leading-[1.05] tracking-[-0.05em] text-[var(--novel-forge-ai-ink)] sm:text-5xl">A small reset. A clear next step.</h1>
+                <p class="mt-5 max-w-md text-base leading-7 text-[var(--novel-forge-ai-muted)]">We’ll help you get back to your workspace securely, so you can keep your ideas moving.</p>
             </aside>
 
             <section class="auth-card">
                 <div class="flex items-center gap-3">
                     <img :src="appFavicon" :alt="appName" class="auth-card__logo" />
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-[0.14em] text-[var(--ai-primary)]">Account recovery</p>
-                        <p class="mt-0.5 text-xs text-[var(--ai-muted)]">Secure access to {{ appName }}</p>
+                        <p class="text-xs font-bold uppercase tracking-[0.14em] text-[var(--novel-forge-ai-primary)]">Account recovery</p>
+                        <p class="mt-0.5 text-xs text-[var(--novel-forge-ai-muted)]">Secure access to {{ appName }}</p>
                     </div>
                 </div>
 
                 <div class="mt-8">
-                    <h2 class="text-3xl font-bold tracking-[-0.04em] text-[var(--ai-ink)]">Forgot your password?</h2>
-                    <p class="mt-2 text-sm leading-6 text-[var(--ai-muted)]">Enter your email and we’ll send a secure reset link.</p>
+                    <h2 class="text-3xl font-bold tracking-[-0.04em] text-[var(--novel-forge-ai-ink)]">Forgot your password?</h2>
+                    <p class="mt-2 text-sm leading-6 text-[var(--novel-forge-ai-muted)]">Enter your email and we’ll send a secure reset link.</p>
                 </div>
 
                 <form class="mt-8 space-y-5" @submit.prevent="handleForgotPassword">
@@ -98,7 +98,7 @@ function handleForgotPassword() {
                     </button>
                 </form>
 
-                <p class="mt-7 text-center text-sm text-[var(--ai-muted)]">
+                <p class="mt-7 text-center text-sm text-[var(--novel-forge-ai-muted)]">
                     Remembered your password?
                     <a :href="route('login')" class="auth-link ml-1">Back to log in</a>
                 </p>
@@ -114,7 +114,7 @@ function handleForgotPassword() {
     overflow: hidden;
     min-height: calc(100vh - 9.5rem);
     padding: clamp(2.5rem, 6vw, 5.5rem) 0;
-    background: var(--ai-gradient-hero);
+    background: var(--novel-forge-ai-gradient-hero);
 }
 
 .auth-page::before,
@@ -155,9 +155,9 @@ function handleForgotPassword() {
     width: min(100%, 30rem);
     margin-inline: auto;
     border: 1px solid rgb(255 255 255 / 80%);
-    border-radius: var(--ai-radius-lg);
+    border-radius: var(--novel-forge-ai-radius-lg);
     background: rgb(255 255 255 / 92%);
-    box-shadow: var(--ai-shadow-lg);
+    box-shadow: var(--novel-forge-ai-shadow-lg);
     padding: clamp(1.5rem, 4vw, 2.5rem);
     backdrop-filter: blur(18px);
 }
@@ -173,7 +173,7 @@ function handleForgotPassword() {
 .auth-label {
     display: block;
     margin-bottom: 0.45rem;
-    color: var(--ai-ink-soft);
+    color: var(--novel-forge-ai-ink-soft);
     font-size: 0.82rem;
     font-weight: 600;
     letter-spacing: 0.01em;
@@ -182,25 +182,25 @@ function handleForgotPassword() {
 .auth-input {
     width: 100%;
     min-height: 3.1rem;
-    border: 1px solid var(--ai-border-strong);
-    border-radius: var(--ai-radius-sm);
+    border: 1px solid var(--novel-forge-ai-border-strong);
+    border-radius: var(--novel-forge-ai-radius-sm);
     background: rgb(255 255 255 / 80%);
-    color: var(--ai-ink);
+    color: var(--novel-forge-ai-ink);
     padding: 0.78rem 0.9rem;
     outline: 0;
 }
 
 .auth-input::placeholder {
-    color: var(--ai-muted-light);
+    color: var(--novel-forge-ai-muted-light);
 }
 
 .auth-input:focus {
-    border-color: var(--ai-primary);
-    box-shadow: var(--ai-focus-ring);
+    border-color: var(--novel-forge-ai-primary);
+    box-shadow: var(--novel-forge-ai-focus-ring);
 }
 
 .auth-input.is-invalid {
-    border-color: var(--ai-danger);
+    border-color: var(--novel-forge-ai-danger);
 }
 
 .auth-input.is-invalid:focus {
@@ -209,7 +209,7 @@ function handleForgotPassword() {
 
 .auth-error {
     margin-top: 0.45rem;
-    color: var(--ai-danger);
+    color: var(--novel-forge-ai-danger);
     font-size: 0.78rem;
     line-height: 1.4;
 }
@@ -221,12 +221,12 @@ function handleForgotPassword() {
     justify-content: center;
     gap: 0.55rem;
     border: 0;
-    border-radius: var(--ai-radius-sm);
-    background: var(--ai-gradient-brand);
+    border-radius: var(--novel-forge-ai-radius-sm);
+    background: var(--novel-forge-ai-gradient-brand);
     color: white;
     padding: 0.75rem 1.15rem;
     font-weight: 700;
-    box-shadow: var(--ai-shadow-primary);
+    box-shadow: var(--novel-forge-ai-shadow-primary);
 }
 
 .auth-button:hover:not(:disabled) {
@@ -240,12 +240,12 @@ function handleForgotPassword() {
 }
 
 .auth-link {
-    color: var(--ai-primary-strong);
+    color: var(--novel-forge-ai-primary-strong);
     font-weight: 600;
 }
 
 .auth-link:hover {
-    color: var(--ai-primary);
+    color: var(--novel-forge-ai-primary);
 }
 
 @media (min-width: 768px) {

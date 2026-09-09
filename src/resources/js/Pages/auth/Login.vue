@@ -66,30 +66,30 @@ function handleLogin() {
     <div class="auth-page">
         <div class="ai-container auth-shell">
             <aside class="auth-story">
-                <a :href="route('home')" class="inline-flex items-center gap-3 text-sm font-bold text-[var(--ai-ink)]">
+                <a :href="route('home')" class="inline-flex items-center gap-3 text-sm font-bold text-[var(--novel-forge-ai-ink)]">
                     <img :src="appFavicon" :alt="appName" class="h-10 w-10 rounded-xl object-cover shadow-[0_8px_18px_rgb(46_196_230_/_16%)]" />
                     {{ appName }}
                 </a>
-                <div class="mt-12 flex h-48 w-48 items-center justify-center rounded-[2.5rem] border border-white/70 bg-white/60 p-5 shadow-[var(--ai-shadow-md)]">
+                <div class="mt-12 flex h-48 w-48 items-center justify-center rounded-[2.5rem] border border-white/70 bg-white/60 p-5 shadow-[var(--novel-forge-ai-shadow-md)]">
                     <img :src="appFavicon" :alt="`${appName} mark`" class="h-full w-full rounded-[1.7rem] object-cover" />
                 </div>
-                <p class="mt-9 text-xs font-bold uppercase tracking-[0.18em] text-[var(--ai-primary)]">Your ideas, amplified</p>
-                <h1 class="mt-4 max-w-md text-4xl font-bold leading-[1.05] tracking-[-0.05em] text-[var(--ai-ink)] sm:text-5xl">Pick up where your best thinking left off.</h1>
-                <p class="mt-5 max-w-md text-base leading-7 text-[var(--ai-muted)]">Sign in to your intelligent workspace and keep turning momentum into meaningful output.</p>
+                <p class="mt-9 text-xs font-bold uppercase tracking-[0.18em] text-[var(--novel-forge-ai-primary)]">Your ideas, amplified</p>
+                <h1 class="mt-4 max-w-md text-4xl font-bold leading-[1.05] tracking-[-0.05em] text-[var(--novel-forge-ai-ink)] sm:text-5xl">Pick up where your best thinking left off.</h1>
+                <p class="mt-5 max-w-md text-base leading-7 text-[var(--novel-forge-ai-muted)]">Sign in to your intelligent workspace and keep turning momentum into meaningful output.</p>
             </aside>
 
             <section class="auth-card">
                 <div class="flex items-center gap-3">
                     <img :src="appFavicon" :alt="appName" class="auth-card__logo" />
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-[0.14em] text-[var(--ai-primary)]">Welcome back</p>
-                        <p class="mt-0.5 text-xs text-[var(--ai-muted)]">Continue with {{ appName }}</p>
+                        <p class="text-xs font-bold uppercase tracking-[0.14em] text-[var(--novel-forge-ai-primary)]">Welcome back</p>
+                        <p class="mt-0.5 text-xs text-[var(--novel-forge-ai-muted)]">Continue with {{ appName }}</p>
                     </div>
                 </div>
 
                 <div class="mt-8">
-                    <h2 class="text-3xl font-bold tracking-[-0.04em] text-[var(--ai-ink)]">Log in to your workspace</h2>
-                    <p class="mt-2 text-sm leading-6 text-[var(--ai-muted)]">Your next great idea is waiting.</p>
+                    <h2 class="text-3xl font-bold tracking-[-0.04em] text-[var(--novel-forge-ai-ink)]">Log in to your workspace</h2>
+                    <p class="mt-2 text-sm leading-6 text-[var(--novel-forge-ai-muted)]">Your next great idea is waiting.</p>
                 </div>
 
                 <form class="mt-8 space-y-5" @submit.prevent="handleLogin">
@@ -111,7 +111,7 @@ function handleLogin() {
                     <div>
                         <div class="mb-2 flex items-center justify-between gap-3">
                             <label for="password" class="auth-label mb-0">Password</label>
-                            <a :href="route('forgot-password')" class="text-xs font-semibold text-[var(--ai-primary-strong)] hover:text-[var(--ai-primary)]">Forgot password?</a>
+                            <a :href="route('forgot-password')" class="text-xs font-semibold text-[var(--novel-forge-ai-primary-strong)] hover:text-[var(--novel-forge-ai-primary)]">Forgot password?</a>
                         </div>
                         <div class="relative">
                             <input
@@ -123,15 +123,15 @@ function handleLogin() {
                                 class="auth-input pr-12"
                                 :class="{ 'is-invalid': loginForm.errors.password }"
                             />
-                            <button type="button" class="absolute right-0 top-0 flex h-[3.1rem] w-12 items-center justify-center text-[var(--ai-muted)] hover:text-[var(--ai-primary)]" @click="togglePasswordVisibility" :aria-label="showPassword ? 'Hide password' : 'Show password'">
+                            <button type="button" class="absolute right-0 top-0 flex h-[3.1rem] w-12 items-center justify-center text-[var(--novel-forge-ai-muted)] hover:text-[var(--novel-forge-ai-primary)]" @click="togglePasswordVisibility" :aria-label="showPassword ? 'Hide password' : 'Show password'">
                                 <FontAwesomeIcon :icon="showPassword ? 'eye-slash' : 'eye'" />
                             </button>
                         </div>
                         <p v-if="loginForm.errors.password" class="auth-error">{{ loginForm.errors.password }}</p>
                     </div>
 
-                    <label class="flex cursor-pointer items-center gap-2 text-sm text-[var(--ai-muted)]">
-                        <input id="remember" v-model="loginForm.remember" type="checkbox" class="h-4 w-4 rounded border-[var(--ai-border-strong)] accent-[var(--ai-primary)]" />
+                    <label class="flex cursor-pointer items-center gap-2 text-sm text-[var(--novel-forge-ai-muted)]">
+                        <input id="remember" v-model="loginForm.remember" type="checkbox" class="h-4 w-4 rounded border-[var(--novel-forge-ai-border-strong)] accent-[var(--novel-forge-ai-primary)]" />
                         Keep me signed in
                     </label>
 
@@ -142,7 +142,7 @@ function handleLogin() {
                     </button>
                 </form>
 
-                <!-- <p class="mt-7 text-center text-sm text-[var(--ai-muted)]">
+                <!-- <p class="mt-7 text-center text-sm text-[var(--novel-forge-ai-muted)]">
                     New to {{ appName }}?
                     <a :href="route('register')" class="auth-link ml-1">Create an account</a>
                 </p> -->
@@ -158,7 +158,7 @@ function handleLogin() {
     overflow: hidden;
     min-height: calc(100vh - 9.5rem);
     padding: clamp(2.5rem, 6vw, 5.5rem) 0;
-    background: var(--ai-gradient-hero);
+    background: var(--novel-forge-ai-gradient-hero);
 }
 
 .auth-page::before,
@@ -199,9 +199,9 @@ function handleLogin() {
     width: min(100%, 30rem);
     margin-inline: auto;
     border: 1px solid rgb(255 255 255 / 80%);
-    border-radius: var(--ai-radius-lg);
+    border-radius: var(--novel-forge-ai-radius-lg);
     background: rgb(255 255 255 / 92%);
-    box-shadow: var(--ai-shadow-lg);
+    box-shadow: var(--novel-forge-ai-shadow-lg);
     padding: clamp(1.5rem, 4vw, 2.5rem);
     backdrop-filter: blur(18px);
 }
@@ -217,7 +217,7 @@ function handleLogin() {
 .auth-label {
     display: block;
     margin-bottom: 0.45rem;
-    color: var(--ai-ink-soft);
+    color: var(--novel-forge-ai-ink-soft);
     font-size: 0.82rem;
     font-weight: 600;
     letter-spacing: 0.01em;
@@ -226,25 +226,25 @@ function handleLogin() {
 .auth-input {
     width: 100%;
     min-height: 3.1rem;
-    border: 1px solid var(--ai-border-strong);
-    border-radius: var(--ai-radius-sm);
+    border: 1px solid var(--novel-forge-ai-border-strong);
+    border-radius: var(--novel-forge-ai-radius-sm);
     background: rgb(255 255 255 / 80%);
-    color: var(--ai-ink);
+    color: var(--novel-forge-ai-ink);
     padding: 0.78rem 0.9rem;
     outline: 0;
 }
 
 .auth-input::placeholder {
-    color: var(--ai-muted-light);
+    color: var(--novel-forge-ai-muted-light);
 }
 
 .auth-input:focus {
-    border-color: var(--ai-primary);
-    box-shadow: var(--ai-focus-ring);
+    border-color: var(--novel-forge-ai-primary);
+    box-shadow: var(--novel-forge-ai-focus-ring);
 }
 
 .auth-input.is-invalid {
-    border-color: var(--ai-danger);
+    border-color: var(--novel-forge-ai-danger);
 }
 
 .auth-input.is-invalid:focus {
@@ -253,7 +253,7 @@ function handleLogin() {
 
 .auth-error {
     margin-top: 0.45rem;
-    color: var(--ai-danger);
+    color: var(--novel-forge-ai-danger);
     font-size: 0.78rem;
     line-height: 1.4;
 }
@@ -265,12 +265,12 @@ function handleLogin() {
     justify-content: center;
     gap: 0.55rem;
     border: 0;
-    border-radius: var(--ai-radius-sm);
-    background: var(--ai-gradient-brand);
+    border-radius: var(--novel-forge-ai-radius-sm);
+    background: var(--novel-forge-ai-gradient-brand);
     color: white;
     padding: 0.75rem 1.15rem;
     font-weight: 700;
-    box-shadow: var(--ai-shadow-primary);
+    box-shadow: var(--novel-forge-ai-shadow-primary);
 }
 
 .auth-button:hover:not(:disabled) {
@@ -284,12 +284,12 @@ function handleLogin() {
 }
 
 .auth-link {
-    color: var(--ai-primary-strong);
+    color: var(--novel-forge-ai-primary-strong);
     font-weight: 600;
 }
 
 .auth-link:hover {
-    color: var(--ai-primary);
+    color: var(--novel-forge-ai-primary);
 }
 
 @media (min-width: 768px) {

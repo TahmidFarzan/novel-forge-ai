@@ -17,7 +17,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <nav v-if="breadcrumbItems.length" class="mb-4 border border-gray-200 rounded-lg p-3 bg-white shadow-sm"
+    <nav v-if="breadcrumbItems.length" class="mb-4 rounded-lg border border-[var(--novel-forge-ai-border)] bg-[var(--novel-forge-ai-surface)] p-3 shadow-[var(--novel-forge-ai-shadow-sm)]"
         aria-label="Breadcrumb">
         <div class="text-sm text-gray-600 flex flex-wrap gap-2">
             <template v-for="(item, index) in breadcrumbItems" :key="index">
