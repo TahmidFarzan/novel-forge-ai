@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name', 255);
             $table->string('model', 500);
             $table->string('api_url', 500);
-            $table->string('api_key', 500);
+            $table->string('api_key', 500)->nullable();
             $table->text('brief')->nullable();
             $table->text('focus')->nullable();
             $table->string('slug')->unique();
