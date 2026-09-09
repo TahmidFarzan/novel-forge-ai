@@ -34,6 +34,7 @@ class UserPermissionHelper
             self::MODULE_KDP_LAYOUT,
             self::MODULE_DOCUMENT_STYLE,
             self::MODULE_AI_PROMPT,
+            self::MODULE_NOVEL_GENERATOR,
         ]);
     }
 
