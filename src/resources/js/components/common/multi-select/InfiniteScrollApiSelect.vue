@@ -93,9 +93,14 @@ const updateForm = val => {
     if (!form || !fieldName) return
 
     if (multiple) {
-        form[fieldName] = Array.isArray(val)
+        const newVal = Array.isArray(val)
             ? val.map(v => v?.raw?.[selectedValueKey] ?? v?.value ?? v)
             : []
+        const currentVal = form[fieldName]
+        if (newVal.length === 0 && Array.isArray(currentVal) && currentVal.length === 0) {
+            return
+        }
+        form[fieldName] = newVal
     } else {
         form[fieldName] = val
             ? val?.raw?.[selectedValueKey] ?? val?.value ?? val
