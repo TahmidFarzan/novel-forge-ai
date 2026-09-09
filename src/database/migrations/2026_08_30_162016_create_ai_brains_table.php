@@ -21,7 +21,7 @@ return new class extends Migration
             $table->text('focus')->nullable();
             $table->string('slug')->unique();
 
-            $table->bigInteger('context_window');
+            $table->bigInteger('context_window')->nullable();
             $table->decimal('average_latency', 8, 2);
             $table->integer('minimum_wait_time');
             $table->integer('timeout_seconds');

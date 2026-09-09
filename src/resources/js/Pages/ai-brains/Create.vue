@@ -29,11 +29,11 @@ const saveForm = useForm({
     api_key: aiBrain?.api_key || null,
     brief: aiBrain?.brief || null,
     focus: aiBrain?.focus || null,
-    context_window: aiBrain?.context_window || null,
-    average_latency: aiBrain?.average_latency || null,
-    minimum_wait_time: aiBrain?.minimum_wait_time || null,
-    timeout_seconds: aiBrain?.timeout_seconds || null,
-    max_output_tokens: aiBrain?.max_output_tokens || null,
+    context_window: aiBrain?.context_window,
+    average_latency: aiBrain?.average_latency,
+    minimum_wait_time: aiBrain?.minimum_wait_time,
+    timeout_seconds: aiBrain?.timeout_seconds,
+    max_output_tokens: aiBrain?.max_output_tokens,
 });
 
 function validateForm() {

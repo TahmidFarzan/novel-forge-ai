@@ -158,7 +158,7 @@ class SeederHelper
                 'name'              => 'Google: Gemma 4 26B A4B',
                 "model"             => "google/gemma-4-26b-a4b-it:free",
                 'api_url'           => 'https://openrouter.ai/api/v1/chat/completions',
-                'api_key'           => 'sk-your-openrouter-api-key',
+                'api_key'           => null,
                 'brief'             => 'AI writing model for generating documents, workbooks, ebooks and structured educational content.',
                 'focus'             => 'Premium document generation, chapter writing, workbook creation, story generation, educational materials',
                 'context_window'    => 262000,
