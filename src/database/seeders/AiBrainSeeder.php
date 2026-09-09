@@ -30,6 +30,7 @@ class AiBrainSeeder extends Seeder
         foreach (SeederHelper::aiBrains() as $aiBrain) {
             AiBrain::factory()->state([
                 'name'              => $aiBrain->name,
+                'model'              => $aiBrain->model,
                 'api_url'           => $aiBrain->api_url,
                 'api_key'           => $aiBrain->api_key,
                 'brief'             => $aiBrain->brief ?? null,
