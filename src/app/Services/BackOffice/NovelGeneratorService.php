@@ -7,6 +7,7 @@ use App\Http\Requests\NovelGeneratorStep1Request;
 use App\Models\NovelGenerator;
 use App\Services\BackOffice\AiBrainService;
 use App\Services\BackOffice\AiPromptService;
+use App\Services\BackOffice\AudienceService;
 use App\Services\BackOffice\GenreService;
 use App\Services\BackOffice\NovelGeneratorStepService;
 use App\Services\BackOffice\OpenAiApiService;
@@ -21,14 +22,16 @@ class NovelGeneratorService
 {
     protected AiBrainService $aiBrainService;
     protected AiPromptService $aiPromptService;
+    protected AudienceService $audienceService;
     protected GenreService $genreService;
     protected OpenAiApiService $openAiApiService;
     protected NovelGeneratorStepService $novelGeneratorStepService;
 
-    public function __construct(AiBrainService $aiBrainService, AiPromptService $aiPromptService, GenreService $genreService, OpenAiApiService $openAiApiService, NovelGeneratorStepService $novelGeneratorStepService)
+    public function __construct(AiBrainService $aiBrainService, AiPromptService $aiPromptService, AudienceService $audienceService, GenreService $genreService, OpenAiApiService $openAiApiService, NovelGeneratorStepService $novelGeneratorStepService)
     {
         $this->aiBrainService            = $aiBrainService;
         $this->aiPromptService           = $aiPromptService;
+        $this->audienceService           = $audienceService;
         $this->genreService              = $genreService;
         $this->openAiApiService          = $openAiApiService;
         $this->novelGeneratorStepService = $novelGeneratorStepService;
@@ -109,6 +112,9 @@ class NovelGeneratorService
                     $genreNames        = [];
                     $genreInstructions = [];
 
+                    $audienceNames        = [];
+                    $audienceInstructions = [];
+
                     $mainCharacterGender   = $request->input("main_character_gender", UserHelper::USER_GENDER_MALE);
                     $is18Plus              = $request->boolean("is_18_plus", false);
                     $enableMatureContent   = $request->boolean("enable_mature_content", false);
@@ -150,12 +156,47 @@ class NovelGeneratorService
                         $genrePromptInstruction .= $instruction;
                     }
 
+                    $audiences = $this->audienceService->findByIdsOrRandom($request->input("audience_ids"));
+                    foreach ($audiences as $audience) {
+
+                        $audienceNames[] = $audience->name;
+
+                        if (! empty($audience->prompt_instruction)) {
+
+                            $instruction = trim($audience->prompt_instruction);
+
+                            if (! empty($instruction)) {
+                                $audienceInstructions[] = $instruction;
+                            }
+                        }
+                    }
+
+                    $audienceNames = implode(", ", $audienceNames);
+
+                    $audiencePromptInstruction = '';
+
+                    foreach ($audienceInstructions as $instruction) {
+
+                        $instruction = trim($instruction);
+
+                        if (! str_ends_with($instruction, '.')) {
+                            $instruction .= '.';
+                        }
+
+                        if ($audiencePromptInstruction !== '') {
+                            $audiencePromptInstruction .= ' ';
+                        }
+
+                        $audiencePromptInstruction .= $instruction;
+                    }
+
                     $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
                     $aiPrompt = $this->aiPromptService->findByStepNumber(1);
 
                     $prompt = str_replace(
                         [
                             '{{genres}}',
+                            '{{audiences}}',
                             '{{main_character_gender}}',
                             '{{is_18_plus}}',
                             '{{enable_mature_content}}',
@@ -163,9 +204,11 @@ class NovelGeneratorService
                             '{{novel_continuity}}',
                             '{{additional_information}}',
                             '{{genre_instructions}}',
+                            '{{audience_instructions}}',
                         ],
                         [
                             $genreNames,
+                            $audienceNames,
                             $mainCharacterGender,
                             $is18Plus ? "True" : "False",
                             $enableMatureContent ? "True" : "False",
@@ -173,6 +216,7 @@ class NovelGeneratorService
                             $novelContinuity,
                             $additionalInformation ?? "Auto",
                             $genrePromptInstruction,
+                            $audiencePromptInstruction,
                         ],
                         $aiPrompt->prompt
                     );

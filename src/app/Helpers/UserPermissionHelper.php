@@ -22,12 +22,14 @@ class UserPermissionHelper
     public const MODULE_KDP_LAYOUT = 'Kdp Layout';
     public const MODULE_DOCUMENT_STYLE = 'Document Style';
     public const MODULE_AI_PROMPT = 'Ai Prompt';
+    public const MODULE_AUDIENCE = 'Audience';
     public const MODULE_NOVEL_GENERATOR = 'Novel Generator';
 
     public static function modules(): Collection
     {
         return SystemHelper::toOptions([
             self::MODULE_GENRE,
+            self::MODULE_AUDIENCE,
             self::MODULE_LANGUAGE,
             self::MODULE_USER,
             self::MODULE_AI_BRAIN,

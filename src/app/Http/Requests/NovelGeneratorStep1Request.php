@@ -52,6 +52,16 @@ class NovelGeneratorStep1Request extends FormRequest
                 'exists:genres,id',
             ],
 
+            'audience_ids'           => [
+                'nullable',
+                'array',
+            ],
+
+            'audience_ids.*'         => [
+                'integer',
+                'exists:audiences,id',
+            ],
+
             'ai_brain_id'            => [
                 'required',
                 'integer',
@@ -72,6 +82,10 @@ class NovelGeneratorStep1Request extends FormRequest
             'genre_ids.array'                => 'Genres must be selected as an array.',
 
             'genre_ids.*.exists'             => 'Selected genre does not exist.',
+
+            'audience_ids.array'             => 'Audiences must be selected as an array.',
+
+            'audience_ids.*.exists'          => 'Selected audience does not exist.',
 
             'ai_brain_id.required'           => 'Please select a ai brain.',
             'ai_brain_id.exists'             => 'Selected ai brain does not exist.',

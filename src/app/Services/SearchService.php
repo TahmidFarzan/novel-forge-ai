@@ -7,6 +7,7 @@ use App\Helpers\DatatableHelper;
 use App\Helpers\UserHelper;
 use App\Models\User;
 use App\Models\Genre;
+use App\Models\Audience;
 use App\Models\Language;
 use App\Models\AiBrain;
 use App\Models\KdpLayout;
@@ -272,6 +273,36 @@ class SearchService
             'id'   => $genre->id,
             'name' => $genre->name,
             'slug' => $genre->slug,
+        ]);
+
+        return [
+            'items'        => $items,
+            'total'        => $records->total(),
+            'current_page' => $records->currentPage(),
+            'last_page'    => $records->lastPage(),
+        ];
+    }
+
+    public function audiences(Request $request): array
+    {
+        $query = Audience::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('brief', 'like', "%{$search}%");
+            });
+        }
+
+        $records = $query
+            ->orderByDesc('id')
+            ->paginate($request->input('per_page', 25));
+
+        $items = $records->map(fn($audience) => [
+            'id'   => $audience->id,
+            'name' => $audience->name,
+            'slug' => $audience->slug,
         ]);
 
         return [

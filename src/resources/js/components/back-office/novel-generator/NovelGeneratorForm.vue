@@ -52,6 +52,7 @@ const step1Form = useForm({
     novel_continuity: null,
     language_id: null,
     genre_ids: [],
+    audience_ids: [],
     ai_brain_id: null,
 })
 
@@ -303,6 +304,16 @@ onMounted(async () => {
                             <InfiniteScrollApiSelect :form="step1Form" fieldName="genre_ids"
                                 :selectedItem="step1Form.genre_ids" :apiUrl="route('search.genres')"
                                 :multiple="true" placeholder="Select genres" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">
+                                Audiences
+                            </label>
+
+                            <InfiniteScrollApiSelect :form="step1Form" fieldName="audience_ids"
+                                :selectedItem="step1Form.audience_ids" :apiUrl="route('search.audiences')"
+                                :multiple="true" placeholder="Select audiences" />
                         </div>
 
                         <div class="md:col-span-2">

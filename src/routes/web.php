@@ -6,6 +6,7 @@ use App\Http\Controllers\BackOffice\AiBrainController;
 use App\Http\Controllers\BackOffice\AiPromptController;
 use App\Http\Controllers\BackOffice\DocumentStyleController;
 use App\Http\Controllers\BackOffice\GenreController;
+use App\Http\Controllers\BackOffice\AudienceController;
 use App\Http\Controllers\BackOffice\KdpLayoutController;
 use App\Http\Controllers\BackOffice\LanguageController;
 use App\Http\Controllers\BackOffice\MediaController;
@@ -86,6 +87,7 @@ Route::prefix('search')->name('search.')->group(function () {
 
     Route::middleware(['response.cache:60,public,30,etag'])->group(function () {
         Route::get('genres', [SearchController::class, 'genres'])->name('genres');
+        Route::get('audiences', [SearchController::class, 'audiences'])->name('audiences');
         Route::get('languages', [SearchController::class, 'languages'])->name('languages');
         Route::get('ai-brains', [SearchController::class, 'aiBrains'])->name('ai-brains');
         Route::get('kdp-layouts', [SearchController::class, 'kdpLayouts'])->name('kdp-layouts');
@@ -120,6 +122,17 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
         Route::post('save', [GenreController::class, 'save'])->name('save');
         Route::patch('update/{slug}', [GenreController::class, 'update'])->name('update');
         Route::delete('delete/{slug}', [GenreController::class, 'delete'])->name('delete');
+    });
+
+    Route::prefix('audiences')->name('audiences.')->group(function () {
+        Route::get('/', [AudienceController::class, 'index'])->name('index');
+        Route::get('create', [AudienceController::class, 'create'])->name('create');
+        Route::get('edit/{slug}', [AudienceController::class, 'edit'])->name('edit');
+        Route::get('details/{slug}', [AudienceController::class, 'details'])->name('details');
+
+        Route::post('save', [AudienceController::class, 'save'])->name('save');
+        Route::patch('update/{slug}', [AudienceController::class, 'update'])->name('update');
+        Route::delete('delete/{slug}', [AudienceController::class, 'delete'])->name('delete');
     });
 
     Route::prefix('languages')->name('languages.')->group(function () {

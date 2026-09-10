@@ -92,6 +92,13 @@ class SearchController extends Controller
         );
     }
 
+    public function audiences(Request $request): JsonResponse
+    {
+        return response()->json(
+            $this->searchService->audiences($request)
+        );
+    }
+
     public function languages(Request $request): JsonResponse
     {
         return response()->json(
