@@ -8,6 +8,7 @@ export const groups = {
     User: 'User',
     Genre: 'Genre',
     Audience: 'Audience',
+    NovelType: 'Novel Type',
     Language: 'Language',
     AiBrain: 'Ai Brain',
     KdpLayout: 'Kdp Layout',
@@ -124,6 +125,12 @@ export const canViewAudience = async (authUser, audience) => hasPermission(authU
 export const canCreateAudience = async (authUser, audience) => hasPermission(authUser, groups.Audience, access.Create)
 export const canUpdateAudience = async (authUser, audience) => hasPermission(authUser, groups.Audience, access.Update)
 export const canDeleteAudience = async (authUser, audience) => hasPermission(authUser, groups.Audience, access.Delete)
+
+export const canAccessNovelType = async (authUser) => hasPermission(authUser, groups.NovelType, access.View)
+export const canViewNovelType = async (authUser, novelType) => hasPermission(authUser, groups.NovelType, access.ViewAny)
+export const canCreateNovelType = async (authUser, novelType) => hasPermission(authUser, groups.NovelType, access.Create)
+export const canUpdateNovelType = async (authUser, novelType) => hasPermission(authUser, groups.NovelType, access.Update)
+export const canDeleteNovelType = async (authUser, novelType) => hasPermission(authUser, groups.NovelType, access.Delete)
 
 export const canAccessLanguage = async (authUser) => hasPermission(authUser, groups.Language, access.View)
 export const canViewLanguage = async (authUser, language) => hasPermission(authUser, groups.Language, access.ViewAny)

@@ -26,6 +26,29 @@ class SeederHelper
         ]);
     }
 
+    public static function novelTypes()
+    {
+        return collect([
+            (object) [
+                'name' => 'Short Novel',
+                'brief' => 'Short-length novels with a focused but complete narrative structure',
+                'prompt_instruction' => 'Develop the novel with a focused narrative scope that produces a minimum of 150 pages. The story must contain sufficient plot development, meaningful character arcs, important relationships, dialogue, descriptions, conflicts, discoveries, turning points, climax, and resolution to naturally support at least 150 pages. Maintain a complete novel structure with a clear beginning, developed middle, and satisfying conclusion. Keep the narrative focused by controlling unnecessary characters, locations, and subplots while ensuring the story does not feel rushed or incomplete. Do not reduce important development to make the story shorter, and do not use repetition, filler, artificial padding, or meaningless scenes only to increase page count.'
+            ],
+
+            (object) [
+                'name' => 'Medium Novel',
+                'brief' => 'Medium-length novels with balanced storytelling and deeper character development',
+                'prompt_instruction' => 'Develop the novel with a broad and balanced narrative scope that produces a minimum of 300 pages. The story must contain substantial plot development, layered character arcs, meaningful relationships, rich dialogue, detailed descriptions, escalating conflicts, discoveries, turning points, climax, and resolution to naturally support at least 300 pages. Maintain a complete novel structure with a strong opening, a fully developed middle with multiple story threads, and a satisfying conclusion. Balance the narrative by allowing characters, locations, and subplots to develop progressively while keeping every element connected to the central story. Do not reduce important development to make the story shorter, and do not use repetition, filler, artificial padding, or meaningless scenes only to increase page count.'
+            ],
+
+            (object) [
+                'name' => 'Long Novel',
+                'brief' => 'Long-length novels with expansive plots, complex characters, and detailed development',
+                'prompt_instruction' => 'Develop the novel with an expansive narrative scope that produces a minimum of 500 pages. The story must contain extensive plot development, complex and evolving character arcs, deep relationships, detailed dialogue, immersive descriptions, multiple conflicts, discoveries, turning points, climax, and resolution to naturally support at least 500 pages. Maintain a complete novel structure with a compelling opening, a rich and layered middle with interconnected story threads, and a comprehensive conclusion that resolves the narrative. Expand the narrative through meaningful character growth, interconnected subplots, and deeper world-building while keeping every element serving the central story. Do not reduce important development to make the story shorter, and do not use repetition, filler, artificial padding, or meaningless scenes only to increase page count.'
+            ],
+        ]);
+    }
+
     public static function genres()
     {
         return collect([
@@ -316,6 +339,9 @@ User Input:
 Genre:
 {{genres}}
 
+Novel Type:
+{{novel_types}}
+
 Audience:
 {{audiences}}
 
@@ -355,6 +381,23 @@ Important instructions for Genre Instructions:
 - Do not ignore any important genre specific requirement.
 
 
+Novel Type Instructions:
+
+{{novel_type_instructions}}
+
+
+Important instructions for Novel Type Instructions:
+
+- Novel Type Instructions are provided as a complete merged instruction text.
+- Read and understand the entire instruction carefully.
+- Multiple novel type requirements may exist.
+- Novel Type requirements control story length, narrative scope, structure, development depth and page requirements.
+- Keep Novel Type requirements separate from Genre and Audience requirements.
+- Do not mix Novel Type responsibilities with Genre or Audience responsibilities.
+- Create a clean combined structure.
+- Do not ignore any important novel type specific requirement.
+
+
 Audience Instructions:
 
 {{audience_instructions}}
@@ -375,6 +418,7 @@ Important instructions for Audience Instructions:
 Create planning for:
 
 - Genre structure requirements
+- Novel Type requirements
 - Audience requirements
 - Character requirements
 - Relationship requirements
@@ -388,6 +432,7 @@ Output JSON format:
 
 {
     "genre_structure_elements": [],
+    "novel_type_structure_elements": [],
     "audience_requirements": [],
     "character_requirements": [],
     "relationship_requirements": [],

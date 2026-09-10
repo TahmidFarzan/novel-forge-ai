@@ -52,6 +52,16 @@ class NovelGeneratorStep1Request extends FormRequest
                 'exists:genres,id',
             ],
 
+            'novel_type_ids'         => [
+                'required',
+                'array',
+            ],
+
+            'novel_type_ids.*'       => [
+                'integer',
+                'exists:novel_types,id',
+            ],
+
             'audience_ids'           => [
                 'nullable',
                 'array',
@@ -82,6 +92,11 @@ class NovelGeneratorStep1Request extends FormRequest
             'genre_ids.array'                => 'Genres must be selected as an array.',
 
             'genre_ids.*.exists'             => 'Selected genre does not exist.',
+
+            'novel_type_ids.required'        => 'Novel types must be required.',
+            'novel_type_ids.array'           => 'Novel types must be selected as an array.',
+
+            'novel_type_ids.*.exists'        => 'Selected novel type does not exist.',
 
             'audience_ids.array'             => 'Audiences must be selected as an array.',
 

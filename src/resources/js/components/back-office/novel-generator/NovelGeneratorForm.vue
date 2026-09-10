@@ -52,6 +52,7 @@ const step1Form = useForm({
     novel_continuity: null,
     language_id: null,
     genre_ids: [],
+    novel_type_ids: [],
     audience_ids: [],
     ai_brain_id: null,
 })
@@ -97,6 +98,11 @@ function validateStep1() {
 
     if (!step1Form.genre_ids) {
         step1Form.setError('genre_ids', 'Genres is required')
+        valid = false
+    }
+
+    if (!step1Form.novel_type_ids) {
+        step1Form.setError('novel_type_ids', 'Novel types is required')
         valid = false
     }
 
@@ -304,6 +310,16 @@ onMounted(async () => {
                             <InfiniteScrollApiSelect :form="step1Form" fieldName="genre_ids"
                                 :selectedItem="step1Form.genre_ids" :apiUrl="route('search.genres')"
                                 :multiple="true" placeholder="Select genres" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">
+                                Novel Types <span class="text-red-500">*</span>
+                            </label>
+
+                            <InfiniteScrollApiSelect :form="step1Form" fieldName="novel_type_ids"
+                                :selectedItem="step1Form.novel_type_ids" :apiUrl="route('search.novel-types')"
+                                :multiple="true" placeholder="Select novel types" />
                         </div>
 
                         <div>

@@ -92,6 +92,13 @@ class SearchController extends Controller
         );
     }
 
+    public function novelTypes(Request $request): JsonResponse
+    {
+        return response()->json(
+            $this->searchService->novelTypes($request)
+        );
+    }
+
     public function audiences(Request $request): JsonResponse
     {
         return response()->json(

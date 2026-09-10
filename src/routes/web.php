@@ -7,6 +7,7 @@ use App\Http\Controllers\BackOffice\AiPromptController;
 use App\Http\Controllers\BackOffice\DocumentStyleController;
 use App\Http\Controllers\BackOffice\GenreController;
 use App\Http\Controllers\BackOffice\AudienceController;
+use App\Http\Controllers\BackOffice\NovelTypeController;
 use App\Http\Controllers\BackOffice\KdpLayoutController;
 use App\Http\Controllers\BackOffice\LanguageController;
 use App\Http\Controllers\BackOffice\MediaController;
@@ -88,6 +89,7 @@ Route::prefix('search')->name('search.')->group(function () {
     Route::middleware(['response.cache:60,public,30,etag'])->group(function () {
         Route::get('genres', [SearchController::class, 'genres'])->name('genres');
         Route::get('audiences', [SearchController::class, 'audiences'])->name('audiences');
+        Route::get('novel-types', [SearchController::class, 'novelTypes'])->name('novel-types');
         Route::get('languages', [SearchController::class, 'languages'])->name('languages');
         Route::get('ai-brains', [SearchController::class, 'aiBrains'])->name('ai-brains');
         Route::get('kdp-layouts', [SearchController::class, 'kdpLayouts'])->name('kdp-layouts');
@@ -133,6 +135,17 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
         Route::post('save', [AudienceController::class, 'save'])->name('save');
         Route::patch('update/{slug}', [AudienceController::class, 'update'])->name('update');
         Route::delete('delete/{slug}', [AudienceController::class, 'delete'])->name('delete');
+    });
+
+    Route::prefix('novel-types')->name('novel-types.')->group(function () {
+        Route::get('/', [NovelTypeController::class, 'index'])->name('index');
+        Route::get('create', [NovelTypeController::class, 'create'])->name('create');
+        Route::get('edit/{slug}', [NovelTypeController::class, 'edit'])->name('edit');
+        Route::get('details/{slug}', [NovelTypeController::class, 'details'])->name('details');
+
+        Route::post('save', [NovelTypeController::class, 'save'])->name('save');
+        Route::patch('update/{slug}', [NovelTypeController::class, 'update'])->name('update');
+        Route::delete('delete/{slug}', [NovelTypeController::class, 'delete'])->name('delete');
     });
 
     Route::prefix('languages')->name('languages.')->group(function () {

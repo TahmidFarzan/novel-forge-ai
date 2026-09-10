@@ -43,6 +43,7 @@ import {
     canAccessUser,
     canAccessGenre,
     canAccessAudience,
+    canAccessNovelType,
     canAccessLanguage,
     canAccessAiBrain,
     canAccessKdpLayout,
@@ -72,7 +73,7 @@ const subMenus = ref({
 const routeMap = {
     UserManagement: ["/back-office/users/*"],
     AiAttributes: ["/back-office/ai-brains/*"],
-    NovelAttributes: ["/back-office/genres/*", "/back-office/audiences/*", "/back-office/languages/*", "/back-office/kdp-layouts/*"],
+    NovelAttributes: ["/back-office/genres/*", "/back-office/audiences/*", "/back-office/novel-types/*", "/back-office/languages/*", "/back-office/kdp-layouts/*"],
     Configuration: ["/back-office/document-styles/*"],
     Reports: ["/reports/*"],
 };
@@ -91,6 +92,10 @@ const canAccessGenreComputed = computed(() => {
 
 const canAccessAudienceComputed = computed(() => {
     return canAccessAudience(authUser);
+});
+
+const canAccessNovelTypeComputed = computed(() => {
+    return canAccessNovelType(authUser);
 });
 
 const canAccessLanguageComputed = computed(() => {
@@ -223,6 +228,16 @@ const isSubMenuVisible = (key) => {
                 >
                     <FontAwesomeIcon icon="book-open" class="w-4" />
                     Audience
+                </a>
+
+                <a
+                    v-if="canAccessNovelTypeComputed"
+                    :href="route('back-office.novel-types.index')"
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+                    :class="isCurrentPage('/back-office/novel-types/*') ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
+                >
+                    <FontAwesomeIcon icon="book-open" class="w-4" />
+                    Novel Type
                 </a>
 
                 <a

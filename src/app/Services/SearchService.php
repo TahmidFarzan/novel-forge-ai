@@ -12,6 +12,7 @@ use App\Models\DocumentStyle;
 use App\Models\Genre;
 use App\Models\KdpLayout;
 use App\Models\Language;
+use App\Models\NovelType;
 use App\Models\User;
 use App\Models\UserPermission;
 use Illuminate\Http\Request;
@@ -249,6 +250,36 @@ class SearchService
             'total'        => 1,
             'current_page' => 1,
             'last_page'    => 1,
+        ];
+    }
+
+    public function novelTypes(Request $request): array
+    {
+        $query = NovelType::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('brief', 'like', "%{$search}%");
+            });
+        }
+
+        $records = $query
+            ->orderByDesc('id')
+            ->paginate($request->input('per_page', 25));
+
+        $items = $records->map(fn($novelType) => [
+            'id'   => $novelType->id,
+            'name' => $novelType->name,
+            'slug' => $novelType->slug,
+        ]);
+
+        return [
+            'items'        => $items,
+            'total'        => $records->total(),
+            'current_page' => $records->currentPage(),
+            'last_page'    => $records->lastPage(),
         ];
     }
 
