@@ -20,6 +20,7 @@ class AudienceService
     {
         return Audience::with([
             'createdBy',
+            'genres',
 
             'activityLogs' => fn($query) => $query->latest()->limit(10),
             'activityLogs.causer',
@@ -60,6 +61,13 @@ class AudienceService
             $query->whereDate('created_at', '<=', $date);
         }
 
+        if ($request->filled('genre_id')) {
+            $query->whereHas(
+                'genres',
+                fn($query) => $query->where('genres.id', $request->input('genre_id'))
+            );
+        }
+
         if ($request->filled('search')) {
             $search     = $request->input('search');
             $likeSearch = "%{$search}%";
@@ -89,6 +97,11 @@ class AudienceService
                 $audience->created_by_id      = $isNew ? Auth::id() : $audience->created_by_id;
 
                 $audience->save();
+
+
+                if ($request->has('genre_ids')) {
+                    $audience->genres()->sync((array) $request->input('genre_ids', []));
+                }
             });
 
             return [

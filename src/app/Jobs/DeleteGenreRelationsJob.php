@@ -43,7 +43,7 @@ class DeleteGenreRelationsJob implements ShouldQueue, ShouldBeUnique
     {
         $genre = Genre::find($this->genreId);
 
-        if ($genre && ($genre->activityLogs()->exists())) {
+        if ($genre && ($genre->activityLogs()->exists() || $genre->audiences()->exists())) {
 
             try {
 
@@ -51,6 +51,11 @@ class DeleteGenreRelationsJob implements ShouldQueue, ShouldBeUnique
                     if ($genre->activityLogs()->exists()) {
                         $genre->activityLogs()->delete();
                     }
+
+                    if ($genre->audiences()->exists()) {
+                        $genre->audiences()->detach();
+                    }
+
                 });
 
             } catch (Exception $ex) {

@@ -18,6 +18,8 @@ class GenreRequest extends FormRequest
             'name' => ['required', 'string', 'max:200', Rule::unique('genres')->ignore($this->route('slug'), 'slug')],
             'brief' => ['nullable'],
             'prompt_instruction' => ['nullable', 'string'],
+            'audience_ids' => ['nullable', 'array'],
+            'audience_ids.*' => ['integer', 'exists:audiences,id'],
         ];
     }
 
@@ -27,6 +29,8 @@ class GenreRequest extends FormRequest
             'name.required' => 'The name field is required.',
             'name.string' => 'The name must be a string.',
             'name.max' => 'The name may not be greater than 200 characters.',
+            'audience_ids.array' => 'Audiences must be selected as an array.',
+            'audience_ids.*.exists' => 'Selected audience does not exist.',
         ];
     }
 }

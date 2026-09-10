@@ -123,6 +123,24 @@ onMounted(async () => {
 
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
             <h3 class="text-base font-semibold border-b pb-2">
+                Related Genres
+            </h3>
+
+            <div v-if="audience?.genres?.length" class="flex flex-wrap gap-2">
+                <a v-for="genre in audience.genres" :key="genre.id"
+                    :href="route('back-office.genres.details', { slug: genre.slug })"
+                    class="px-3 py-1.5 text-sm bg-blue-50 text-blue-700 border border-blue-200 rounded-full hover:bg-blue-100 transition">
+                    {{ genre.name }}
+                </a>
+            </div>
+
+            <div v-else class="border border-gray-200 rounded-lg p-4 text-sm text-gray-500">
+                No related genres.
+            </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
+            <h3 class="text-base font-semibold border-b pb-2">
                 System Information
             </h3>
 

@@ -2,17 +2,17 @@
 namespace App\Services;
 
 use App\Helpers\ActivityLogHelper;
-use App\Helpers\NovelGeneratorHelper;
 use App\Helpers\DatatableHelper;
+use App\Helpers\NovelGeneratorHelper;
 use App\Helpers\UserHelper;
-use App\Models\User;
-use App\Models\Genre;
-use App\Models\Audience;
-use App\Models\Language;
 use App\Models\AiBrain;
-use App\Models\KdpLayout;
-use App\Models\DocumentStyle;
 use App\Models\AiPrompt;
+use App\Models\Audience;
+use App\Models\DocumentStyle;
+use App\Models\Genre;
+use App\Models\KdpLayout;
+use App\Models\Language;
+use App\Models\User;
 use App\Models\UserPermission;
 use Illuminate\Http\Request;
 
@@ -131,7 +131,7 @@ class SearchService
             $options = $options->filter(
                 fn($row) =>
                 stripos((string) $row->id, $search) !== false ||
-                    stripos($row->name, $search) !== false
+                stripos($row->name, $search) !== false
             );
         }
 
@@ -157,7 +157,7 @@ class SearchService
             $options = $options->filter(
                 fn($row) =>
                 stripos((string) $row->id, $search) !== false ||
-                    stripos($row->name, $search) !== false
+                stripos($row->name, $search) !== false
             );
         }
 
@@ -183,7 +183,7 @@ class SearchService
             $options = $options->filter(
                 fn($row) =>
                 stripos((string) $row->id, $search) !== false ||
-                    stripos($row->name, $search) !== false
+                stripos($row->name, $search) !== false
             );
         }
 
@@ -209,7 +209,7 @@ class SearchService
             $options = $options->filter(
                 fn($row) =>
                 stripos((string) $row->id, $search) !== false ||
-                    stripos($row->name, $search) !== false
+                stripos($row->name, $search) !== false
             );
         }
 
@@ -235,7 +235,7 @@ class SearchService
             $options = $options->filter(
                 fn($row) =>
                 stripos((string) $row->id, $search) !== false ||
-                    stripos($row->name, $search) !== false
+                stripos($row->name, $search) !== false
             );
         }
 
@@ -252,7 +252,6 @@ class SearchService
         ];
     }
 
-
     public function genres(Request $request): array
     {
         $query = Genre::query();
@@ -263,6 +262,13 @@ class SearchService
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('brief', 'like', "%{$search}%");
             });
+        }
+
+        if ($request->filled('audience_id')) {
+            $query->whereHas(
+                'audiences',
+                fn($query) => $query->where('audiences.id', $request->input('audience_id'))
+            );
         }
 
         $records = $query
@@ -293,6 +299,13 @@ class SearchService
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('brief', 'like', "%{$search}%");
             });
+        }
+
+        if ($request->filled('genre_id')) {
+            $query->whereHas(
+                'genres',
+                fn($query) => $query->where('genres.id', $request->input('genre_id'))
+            );
         }
 
         $records = $query

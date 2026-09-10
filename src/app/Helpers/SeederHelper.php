@@ -3,6 +3,29 @@ namespace App\Helpers;
 
 class SeederHelper
 {
+    public static function audiences()
+    {
+        return collect([
+            (object) [
+                'name'               => 'Children',
+                'brief'              => 'Content suitable for children under 12',
+                'prompt_instruction' => 'Focus on age-appropriate themes including friendship, adventure, imagination, moral lessons, and curiosity. Planning should consider simple but meaningful conflicts, positive role models, safe environments, and clear moral outcomes. Language should be accessible and engaging, with vocabulary appropriate for young readers. Character planning should include relatable child protagonists, supportive adults, and peers who model positive behaviour. Story structure should have clear beginnings, escalating but manageable challenges, and satisfying resolutions that reinforce positive values. Avoid complex romantic subplots, graphic violence, disturbing content, or morally ambiguous endings. When combined with other genres, ensure all elements remain age-appropriate while maintaining the core genre elements.',
+            ],
+
+            (object) [
+                'name'               => 'Young Adult',
+                'brief'              => 'Content suitable for teenagers aged 12-18',
+                'prompt_instruction' => 'Focus on themes of identity, self-discovery, independence, relationships, belonging, and navigating social pressures. Planning should consider teenage perspectives, authentic emotional experiences, coming-of-age challenges, peer dynamics, family tensions, and personal growth. Character planning should include protagonists who face real teenage concerns, make mistakes, learn from consequences, and develop stronger sense of self. Supporting characters should represent diverse perspectives and authentic teenage experiences. Story structure should balance internal emotional journeys with external conflicts, include relatable stakes, and provide resolutions that feel earned through character growth. Language should be engaging and authentic to teenage voice without being condescending. Content may include moderate themes but should avoid explicit material. When combined with other genres, maintain the adolescent perspective and coming-of-age elements throughout.',
+            ],
+
+            (object) [
+                'name'               => 'Adult',
+                'brief'              => 'Mature content suitable for adults aged 18 and above',
+                'prompt_instruction' => 'Focus on complex themes, mature relationships, nuanced moral situations, and sophisticated narrative structures. Planning should consider adult perspectives, realistic consequences, complicated motivations, and themes that explore the full range of human experience. Character planning should include psychologically complex individuals with detailed backstories, realistic flaws, and multifaceted relationships. Supporting characters should have their own goals, conflicts, and development arcs. Story structure may employ non-linear timelines, multiple perspectives, ambiguous morality, and endings that challenge rather than comfort. Content may include explicit themes, violence, sexuality, substance use, and dark subject matter when they serve the narrative meaningfully. Language should be sophisticated and tailored to the genre conventions. When combined with other genres, fully integrate mature elements throughout while maintaining narrative coherence.',
+            ],
+        ]);
+    }
+
     public static function genres()
     {
         return collect([
@@ -648,29 +671,6 @@ Output JSON format:
 PROMPT
             ],
 
-        ]);
-    }
-
-    public static function audiences()
-    {
-        return collect([
-            (object) [
-                'name'               => 'Children',
-                'brief'              => 'Content suitable for children under 12',
-                'prompt_instruction' => 'Focus on age-appropriate themes including friendship, adventure, imagination, moral lessons, and curiosity. Planning should consider simple but meaningful conflicts, positive role models, safe environments, and clear moral outcomes. Language should be accessible and engaging, with vocabulary appropriate for young readers. Character planning should include relatable child protagonists, supportive adults, and peers who model positive behaviour. Story structure should have clear beginnings, escalating but manageable challenges, and satisfying resolutions that reinforce positive values. Avoid complex romantic subplots, graphic violence, disturbing content, or morally ambiguous endings. When combined with other genres, ensure all elements remain age-appropriate while maintaining the core genre elements.',
-            ],
-
-            (object) [
-                'name'               => 'Young Adult',
-                'brief'              => 'Content suitable for teenagers aged 12-18',
-                'prompt_instruction' => 'Focus on themes of identity, self-discovery, independence, relationships, belonging, and navigating social pressures. Planning should consider teenage perspectives, authentic emotional experiences, coming-of-age challenges, peer dynamics, family tensions, and personal growth. Character planning should include protagonists who face real teenage concerns, make mistakes, learn from consequences, and develop stronger sense of self. Supporting characters should represent diverse perspectives and authentic teenage experiences. Story structure should balance internal emotional journeys with external conflicts, include relatable stakes, and provide resolutions that feel earned through character growth. Language should be engaging and authentic to teenage voice without being condescending. Content may include moderate themes but should avoid explicit material. When combined with other genres, maintain the adolescent perspective and coming-of-age elements throughout.',
-            ],
-
-            (object) [
-                'name'               => 'Adult',
-                'brief'              => 'Mature content suitable for adults aged 18 and above',
-                'prompt_instruction' => 'Focus on complex themes, mature relationships, nuanced moral situations, and sophisticated narrative structures. Planning should consider adult perspectives, realistic consequences, complicated motivations, and themes that explore the full range of human experience. Character planning should include psychologically complex individuals with detailed backstories, realistic flaws, and multifaceted relationships. Supporting characters should have their own goals, conflicts, and development arcs. Story structure may employ non-linear timelines, multiple perspectives, ambiguous morality, and endings that challenge rather than comfort. Content may include explicit themes, violence, sexuality, substance use, and dark subject matter when they serve the narrative meaningfully. Language should be sophisticated and tailored to the genre conventions. When combined with other genres, fully integrate mature elements throughout while maintaining narrative coherence.',
-            ],
         ]);
     }
 }

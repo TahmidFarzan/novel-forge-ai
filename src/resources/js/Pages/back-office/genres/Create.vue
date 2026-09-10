@@ -1,6 +1,7 @@
 
 <script setup>
 import Layout from '@/pages/layouts/AuthLayout.vue'
+import InfiniteScrollApiSelect from '@/components/common/multi-select/InfiniteScrollApiSelect.vue'
 
 import { computed, onMounted, nextTick } from 'vue'
 import { Head, useForm, router as intertiaJsRoute } from '@inertiajs/vue3'
@@ -29,6 +30,7 @@ const saveForm = useForm({
     name: genre?.name || null,
     brief: genre?.brief || null,
     prompt_instruction: genre?.prompt_instruction || null,
+    audience_ids: genre?.audiences?.map(a => a.id) ?? [],
 })
 
 function validateForm() {
@@ -119,6 +121,20 @@ onMounted(async () => {
 
                             <p v-if="saveForm.errors.name" class="text-red-500 text-sm mt-1">
                                 {{ saveForm.errors.name }}
+                            </p>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium mb-1">
+                                Related Audiences
+                            </label>
+
+                            <InfiniteScrollApiSelect :form="saveForm" fieldName="audience_ids"
+                                :selectedItem="genre?.audiences ?? []" :apiUrl="route('search.audiences')"
+                                :multiple="true" placeholder="Select audiences" />
+
+                            <p v-if="saveForm.errors.audience_ids" class="text-red-500 text-sm mt-1">
+                                {{ saveForm.errors.audience_ids }}
                             </p>
                         </div>
 
