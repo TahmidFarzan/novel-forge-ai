@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Observers\AiPromptObserver;
 use App\Policies\AiPromptPolicy;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
@@ -20,10 +22,11 @@ use Spatie\Sluggable\SlugOptions;
 
 #[Table('ai_prompts')]
 #[Fillable([
-        'name', 'prompt', 'slug', 'step_number', 'depend_on_prompt_ids',
+        'name','code' ,'prompt', 'slug', 'step_number', 'depend_on_prompt_ids',
         'created_by_id',
     ])]
 #[UsePolicy(AiPromptPolicy::class)]
+#[ObservedBy([AiPromptObserver::class])]
 class AiPrompt extends Model
 {
     use HasFactory, LogsActivity, HasSlug;

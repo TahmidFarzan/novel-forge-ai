@@ -3,6 +3,7 @@ namespace Database\Factories;
 
 use App\Models\AiPrompt;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,8 +20,10 @@ class AiPromptFactory extends Factory
     {
         $user = User::where("is_super_admin", true)->inRandomOrder()->first();
 
+        $name =  $this->faker->unique()->words(3, true);
         return [
-            'name'                 => $this->faker->unique()->words(3, true),
+            'name'                 => $name,
+            'code'                 => Str::studly($name),
             'prompt'               => $this->faker->paragraphs(4, true),
             'created_by_id'        => $user?->id ?? "1",
             'step_number'          => 0,
