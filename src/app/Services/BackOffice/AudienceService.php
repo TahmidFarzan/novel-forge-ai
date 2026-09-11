@@ -30,19 +30,9 @@ class AudienceService
         ])->where('slug', $slug)->firstOrFail();
     }
 
-    public function findByIdsOrRandom($ids = null)
+    public function findById(string|int $id): Audience
     {
-        if (empty($ids)) {
-            return Audience::inRandomOrder()
-                ->limit(rand(2, 3))
-                ->get();
-        }
-
-        if (! is_array($ids)) {
-            $ids = [$ids];
-        }
-
-        return Audience::whereIn('id', $ids)->get();
+        return Audience::whereIn('id', $id)->firstOrFail();
     }
 
     public function search(Request $request)

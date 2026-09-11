@@ -29,20 +29,14 @@ class LanguageService
         ])->where('slug', $slug)->firstOrFail();
     }
 
-    public function findByIdsOrRandom($ids = null)
+    public function findByIdsOrEnglish(string | int | null $id): Language
     {
-        if (empty($ids)) {
-            return Language::inRandomOrder()
-                ->limit(rand(2, 3))
-                ->get();
+        if (empty($id)) {
+            return Language::where('name', "English")->firstOrFail();
         }
-
-        if (! is_array($ids)) {
-            $ids = [$ids];
-        }
-
-        return Language::whereIn('id', $ids)->get();
+        return Language::where('id', $id)->firstOrFail();
     }
+
     public function search(Request $request)
     {
         $perPage = $request->input('per_page', 10);
@@ -82,9 +76,9 @@ class LanguageService
         try {
 
             DB::transaction(function () use ($request, $language, $isNew) {
-                $language->name               = $request->input('name');
-                $language->brief              = $request->input('brief');
-                $language->created_by_id      = $isNew ? Auth::id() : $language->created_by_id;
+                $language->name          = $request->input('name');
+                $language->brief         = $request->input('brief');
+                $language->created_by_id = $isNew ? Auth::id() : $language->created_by_id;
 
                 $language->save();
             });

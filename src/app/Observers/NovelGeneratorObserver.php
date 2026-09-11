@@ -2,14 +2,14 @@
 namespace App\Observers;
 
 
-use App\Models\NovelGenerator;
+use App\Models\Novel;
 use Illuminate\Support\Str;
-use App\Jobs\DeleteNovelGeneratorRelationsJob;
+use App\Jobs\DeleteNovelRelationsJob;
 
-class NovelGeneratorObserver
+class NovelObserver
 {
-    public function deleting(NovelGenerator $novelGenerator): void
+    public function deleting(Novel $novel): void
     {
-        DeleteNovelGeneratorRelationsJob::dispatchSync($novelGenerator->id);
+        DeleteNovelRelationsJob::dispatchSync($novel->id);
     }
 }

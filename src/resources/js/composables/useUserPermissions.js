@@ -14,7 +14,7 @@ export const groups = {
     KdpLayout: 'Kdp Layout',
     DocumentStyle: 'Document Style',
     AiPrompt: 'Ai Prompt',
-    NovelGenerator: 'Novel Generator',
+    Novel: 'Novel',
 }
 
 export const access = {
@@ -144,11 +144,11 @@ export const canCreateAiBrain = async (authUser, aiBrain) => hasPermission(authU
 export const canUpdateAiBrain = async (authUser, aiBrain) => hasPermission(authUser, groups.AiBrain, access.Update)
 export const canDeleteAiBrain = async (authUser, aiBrain) => hasPermission(authUser, groups.AiBrain, access.Delete)
 
-export const canAccessNovelGenerator = async (authUser) => hasPermission(authUser, groups.NovelGenerator, access.View)
-export const canViewNovelGenerator = async (authUser, novelGenerator) => hasPermission(authUser, groups.NovelGenerator, access.ViewAny)
-export const canCreateNovelGenerator = async (authUser, novelgenerator) => hasPermission(authUser, groups.NovelGenerator, access.Create)
-export const canUpdateNovelGenerator = async (authUser, novelGenerator) => hasPermission(authUser, groups.NovelGenerator, access.Update)
-export const canDeleteNovelGenerator = async (authUser, novelGenerator) => hasPermission(authUser, groups.NovelGenerator, access.Delete)
+export const canAccessNovel = async (authUser) => hasPermission(authUser, groups.Novel, access.View)
+export const canViewNovel = async (authUser, novel) => hasPermission(authUser, groups.Novel, access.ViewAny)
+export const canCreateNovel = async (authUser, novel) => hasPermission(authUser, groups.Novel, access.Create)
+export const canUpdateNovel = async (authUser, novel) => hasPermission(authUser, groups.Novel, access.Update)
+export const canDeleteNovel = async (authUser, novel) => hasPermission(authUser, groups.Novel, access.Delete)
 
 export const canAccessKdpLayout = async (authUser) => hasPermission(authUser, groups.KdpLayout, access.View)
 export const canViewKdpLayout = async (authUser, kdpLayout) => hasPermission(authUser, groups.KdpLayout, access.ViewAny)

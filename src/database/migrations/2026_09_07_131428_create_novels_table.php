@@ -11,10 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('novel_generators', function (Blueprint $table) {
+        Schema::create('novels', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 255)->unique();
+            $table->string('title', 255);
+            $table->string('sub_title', 255);
             $table->timestamp('datetime')->nullable();
+            $table->foreignId('audience_id')->constrained('audiences')->cascadeOnDelete();
+            $table->foreignId('novel_type_id')->constrained('novel_types')->cascadeOnDelete();
+            $table->foreignId('language_id')->constrained('languages')->cascadeOnDelete();
+
+            $table->longText('ai_prompt')->nullable();
+            $table->longText('plot')->nullable();
+
             $table->string('status', 50)->nullable();
             $table->string('slug')->unique();
             $table->foreignId('created_by_id')->constrained('users')->cascadeOnDelete();
@@ -27,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('novel_generators');
+        Schema::dropIfExists('novels');
     }
 };

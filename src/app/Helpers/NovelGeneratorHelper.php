@@ -4,7 +4,7 @@ namespace App\Helpers;
 use Illuminate\Support\Collection;
 use App\Helpers\SystemHelper;
 
-class NovelGeneratorHelper
+class NovelHelper
 {
     public const STATUS_DRAFT    = 'Draft';
     public const STATUS_ONGOING    = 'Ongoing';

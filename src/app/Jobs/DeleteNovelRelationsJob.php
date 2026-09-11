@@ -1,7 +1,7 @@
 <?php
 namespace App\Jobs;
 
-use App\Models\NovelGeneratorStep;
+use App\Models\Novel;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -13,20 +13,20 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class DeleteNovelGeneratorStepRelationsJob implements ShouldQueue, ShouldBeUnique
+class DeleteNovelRelationsJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
-    public int $novelGeneratorStepId;
+    public int $novelId;
 
-    public function __construct(int $novelGeneratorStepId)
+    public function __construct(int $novelId)
     {
-        $this->novelGeneratorStepId = $novelGeneratorStepId;
+        $this->novelId = $novelId;
     }
 
     public function uniqueId(): string
     {
-        return "delete-novel-generator-{$this->novelGeneratorStepId}-relations";
+        return "delete-novel-generator-{$this->novelId}-relations";
     }
 
     public function retryAfter()
@@ -41,19 +41,19 @@ class DeleteNovelGeneratorStepRelationsJob implements ShouldQueue, ShouldBeUniqu
 
     public function handle(): void
     {
-        $novelGeneratorStep = NovelGeneratorStep::find($this->novelGeneratorStepId);
+        $novel = Novel::find($this->novelId);
 
-        if ($novelGeneratorStep && ($novelGeneratorStep->activityLogs()->exists())) {
+        if ($novel && ($novel->activityLogs()->exists() )) {
 
             try {
-                DB::transaction(function () use ($novelGeneratorStep) {
-                    if ($novelGeneratorStep->activityLogs()->exists()) {
-                        $novelGeneratorStep->activityLogs()->delete();
+                DB::transaction(function () use ($novel) {
+                    if ($novel->activityLogs()->exists()) {
+                        $novel->activityLogs()->delete();
                     }
                 });
 
             } catch (Exception $ex) {
-                Log::error("Fail to delete novel generator relations.", [
+                Log::error("Fail to delete novel relations.", [
                     'exception' => $ex,
                 ]);
 

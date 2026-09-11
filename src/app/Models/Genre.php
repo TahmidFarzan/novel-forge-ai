@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use App\Observers\GenreObserver;
@@ -23,10 +22,10 @@ use Spatie\Sluggable\SlugOptions;
 
 #[Table('genres')]
 #[Fillable([
-    'name', 'brief', 'slug',
-    'prompt_instruction',
-    'created_by_id',
-])]
+        'name', 'brief', 'slug',
+        'prompt_instruction',
+        'created_by_id',
+    ])]
 #[UsePolicy(GenrePolicy::class)]
 #[ObservedBy([GenreObserver::class])]
 class Genre extends Model
@@ -50,7 +49,7 @@ class Genre extends Model
                 'name', 'brief', 'slug', 'prompt_instruction',
             ])
             ->useLogName('Genre')
-            ->setDescriptionForEvent(fn (string $eventName) => "The record has been {$eventName}.")
+            ->setDescriptionForEvent(fn(string $eventName) => "The record has been {$eventName}.")
             ->logOnlyDirty()
             ->logExcept([
                 'id',
@@ -67,7 +66,7 @@ class Genre extends Model
             ->generateSlugsFrom('name')
             ->doNotGenerateSlugsOnUpdate()
             ->slugsShouldBeNoLongerThan(255)
-            ->usingSuffixGenerator(fn () => Str::lower(Str::random(5)));
+            ->usingSuffixGenerator(fn() => Str::lower(Str::random(5)));
     }
 
     public function getRouteKeyName(): string
@@ -88,6 +87,11 @@ class Genre extends Model
     public function audiences(): BelongsToMany
     {
         return $this->belongsToMany(Audience::class, 'genre_audience');
+    }
+
+    public function novels(): BelongsToMany
+    {
+        return $this->belongsToMany(Novel::class,'genre_novel');
     }
 
     public function latestActivityLog(): MorphOne

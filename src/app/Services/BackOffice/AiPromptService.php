@@ -55,6 +55,19 @@ class AiPromptService
         ])->where('step_number', $stepNumber)->firstOrFail();
     }
 
+    public function findByCode(string $code): AiPrompt
+    {
+        return AiPrompt::with([
+            'createdBy',
+
+            'activityLogs' => fn($query) => $query->latest()->limit(10),
+            'activityLogs.causer',
+
+            'latestActivityLog',
+            'latestActivityLog.causer',
+        ])->where('id', $code)->firstOrFail();
+    }
+
     public function search(Request $request)
     {
         $perPage = $request->input('per_page', 10);

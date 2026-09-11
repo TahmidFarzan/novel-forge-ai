@@ -11,7 +11,7 @@ use App\Http\Controllers\BackOffice\NovelTypeController;
 use App\Http\Controllers\BackOffice\KdpLayoutController;
 use App\Http\Controllers\BackOffice\LanguageController;
 use App\Http\Controllers\BackOffice\MediaController;
-use App\Http\Controllers\BackOffice\NovelGeneratorController;
+use App\Http\Controllers\BackOffice\NovelController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\BackOffice\UserController;
 use App\Http\Controllers\SearchController;
@@ -81,8 +81,8 @@ Route::prefix('search')->name('search.')->group(function () {
         Route::get('user-permissions-by-group', [SearchController::class, 'userPermissionsByGroup'])->name('user-permissions-by-group');
 
         Route::get('novel-continuities', [SearchController::class, 'novelContinuities'])->name('novel-continuities');
-        Route::get('novel-generator-statuses', [SearchController::class, 'novelGeneratorStatuses'])->name('novel-generator-statuses');
-        Route::get('novel-generator-step-statuses', [SearchController::class, 'novelGeneratorStepStatuses'])->name('novel-generator-step-statuses');
+        Route::get('novel-generator-statuses', [SearchController::class, 'novelStatuses'])->name('novel-generator-statuses');
+
 
     });
 
@@ -203,11 +203,11 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
         Route::patch('inactive/{slug}', [UserController::class, 'inactive'])->name('inactive');
     });
 
-    Route::prefix('novel-generators')->name('novel-generators.')->group(function () {
-        Route::get('/', [NovelGeneratorController::class, 'index'])->name('index');
-        Route::post('step-1-save', [NovelGeneratorController::class, 'save'])->name('step-1-save');
+    Route::prefix('novels')->name('novels.')->group(function () {
+        Route::get('/', [NovelController::class, 'index'])->name('index');
+        Route::post('save', [NovelController::class, 'save'])->name('save');
 
-        Route::delete('delete/{slug}', [NovelGeneratorController::class, 'delete'])->name('delete');
+        Route::delete('delete/{slug}', [NovelController::class, 'delete'])->name('delete');
     });
 
     Route::prefix('activity-logs')->name('activity-logs.')->group(function () {

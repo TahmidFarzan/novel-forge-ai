@@ -1,16 +1,16 @@
 <?php
 namespace App\Models;
 
-use App\Observers\NovelGeneratorObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use App\Policies\NovelGeneratorPolicy;
+use App\Observers\NovelObserver;
+use App\Policies\NovelPolicy;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
@@ -20,14 +20,14 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-#[Table('novel_generators')]
+#[Table('novels')]
 #[Fillable([
         'name', 'datetime', 'slug', 'status',
         'created_by_id',
     ])]
-#[UsePolicy(NovelGeneratorPolicy::class)]
-#[ObservedBy([NovelGeneratorObserver::class])]
-class NovelGenerator extends Model
+#[UsePolicy(NovelPolicy::class)]
+#[ObservedBy([NovelObserver::class])]
+class Novel extends Model
 {
     use HasFactory, LogsActivity, HasSlug;
 
@@ -48,7 +48,7 @@ class NovelGenerator extends Model
             ->logOnly([
                 'name', 'datetime', 'status', 'slug',
             ])
-            ->useLogName('Novel Generator')
+            ->useLogName('Novel')
             ->setDescriptionForEvent(fn(string $eventName) => "The record has been {$eventName}.")
             ->logOnlyDirty()
             ->logExcept([
@@ -84,14 +84,13 @@ class NovelGenerator extends Model
         return $this->belongsTo(User::class, 'created_by_id');
     }
 
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class, 'genre_novel');
+    }
+
     public function latestActivityLog(): MorphOne
     {
         return $this->morphOne(Activity::class, 'subject')->latestOfMany();
     }
-
-    public function novelGeneratorSteps(): HasMany
-    {
-        return $this->hasMany(NovelGeneratorStep::class);
-    }
-
 }

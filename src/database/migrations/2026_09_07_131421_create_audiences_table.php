@@ -11,6 +11,10 @@ return new class extends Migration
         Schema::create('audiences', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
+
+            $table->text('brief')->nullable();
+            $table->longText('prompt_instruction')->nullable();
+
             $table->string('slug')->unique();
 
             $table->foreignId('created_by_id')->constrained('users')->cascadeOnDelete();

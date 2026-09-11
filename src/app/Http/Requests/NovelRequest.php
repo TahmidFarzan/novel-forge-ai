@@ -3,7 +3,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class NovelGeneratorStep1Request extends FormRequest
+class NovelRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -13,11 +13,6 @@ class NovelGeneratorStep1Request extends FormRequest
     public function rules()
     {
         return [
-            'main_character_gender'  => [
-                'required',
-                'in:Male,Female',
-            ],
-
             'is_18_plus'             => [
                 'nullable',
                 'boolean',
@@ -83,7 +78,7 @@ class NovelGeneratorStep1Request extends FormRequest
     public function messages()
     {
         return [
-            'main_character_gender.required' => 'Please select a main character gender.',
+
 
             'novel_continuity.required'      => 'Please select a novel continuity.',
             'language_id.required'           => 'Please select a language.',

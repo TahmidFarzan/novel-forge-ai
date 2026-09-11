@@ -31,6 +31,7 @@ class AiPromptSeeder extends Seeder
 
             AiPrompt::factory()->state([
                 'name'             => $aiPrompt->name,
+                'code'             => $aiPrompt->code,
                 'prompt'           => $aiPrompt->prompt,
                 'step_number'      => $aiPrompt->step_number,
                 'depend_on_prompt_ids' => $aiPrompt->depend_on_prompt_ids,

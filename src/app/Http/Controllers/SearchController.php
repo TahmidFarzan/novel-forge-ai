@@ -64,17 +64,10 @@ class SearchController extends Controller
         );
     }
 
-    public function novelGeneratorStatuses(Request $request): JsonResponse
+    public function novelStatuses(Request $request): JsonResponse
     {
         return response()->json(
-            $this->searchService->novelGeneratorStatuses($request)
-        );
-    }
-
-    public function novelGeneratorStepStatuses(Request $request): JsonResponse
-    {
-        return response()->json(
-            $this->searchService->novelGeneratorStepStatuses($request)
+            $this->searchService->novelStatuses($request)
         );
     }
 

@@ -29,20 +29,11 @@ class NovelTypeService
         ])->where('slug', $slug)->firstOrFail();
     }
 
-    public function findByIdsOrRandom($ids = null)
+    public function findById(string | int $id): NovelType
     {
-        if (empty($ids)) {
-            return NovelType::inRandomOrder()
-                ->limit(rand(2, 3))
-                ->get();
-        }
-
-        if (! is_array($ids)) {
-            $ids = [$ids];
-        }
-
-        return NovelType::whereIn('id', $ids)->get();
+        return NovelType::whereIn('id', $id)->firstOrFail();
     }
+
     public function search(Request $request)
     {
         $perPage = $request->input('per_page', 10);

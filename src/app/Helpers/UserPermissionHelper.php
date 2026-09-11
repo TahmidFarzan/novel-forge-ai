@@ -24,7 +24,7 @@ class UserPermissionHelper
     public const MODULE_AI_PROMPT = 'Ai Prompt';
     public const MODULE_AUDIENCE = 'Audience';
     public const MODULE_NOVEL_TYPE = 'Novel Type';
-    public const MODULE_NOVEL_GENERATOR = 'Novel Generator';
+    public const MODULE_NOVEL = 'Novel';
 
     public static function modules(): Collection
     {
@@ -38,7 +38,7 @@ class UserPermissionHelper
             self::MODULE_KDP_LAYOUT,
             self::MODULE_DOCUMENT_STYLE,
             self::MODULE_AI_PROMPT,
-            self::MODULE_NOVEL_GENERATOR,
+            self::MODULE_NOVEL,
         ]);
     }
 

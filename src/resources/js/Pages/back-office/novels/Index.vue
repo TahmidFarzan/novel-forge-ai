@@ -13,15 +13,15 @@ import {
     faCalendar, faHashtag, faWandMagicSparkles
 } from '@fortawesome/free-solid-svg-icons'
 
-import NovelGeneratorForm from '@/components/back-office/novel-generator/NovelGeneratorForm.vue'
+import NovelForm from '@/components/back-office/novel-generator/NovelForm.vue'
 
 import { formatDateTime } from '@/composables/useDateTime'
 import { itemListFilterParameters } from '@/composables/useDataTable'
 
 import {
-    canCreateNovelGenerator,
-    canUpdateNovelGenerator,
-    canDeleteNovelGenerator
+    canCreateNovel,
+    canUpdateNovel,
+    canDeleteNovel
 } from '@/composables/useUserPermissions'
 
 FontAwesomeLibrary.add(
@@ -40,13 +40,13 @@ const deleteProcessing = ref(false)
 const showCreateForm = ref(false)
 const showFloatingButton = ref(false)
 
-const { novelGenerators } = defineProps({
-    novelGenerators: Object,
+const { novels } = defineProps({
+    novels: Object,
 })
 
 const paginationOnly = computed(() => {
-    if (!novelGenerators) return {}
-    const { data, ...rest } = novelGenerators
+    if (!novels) return {}
+    const { data, ...rest } = novels
     return rest
 })
 
@@ -63,7 +63,7 @@ const applyFilter = () => {
 
     const cleanParams = itemListFilterParameters(filterForm.data())
 
-    intertiaJsRoute.get(route('back-office.novel-generators.index'), cleanParams, {
+    intertiaJsRoute.get(route('back-office.novels.index'), cleanParams, {
         replace: true,
         preserveScroll: true,
         preserveState: true,
@@ -80,7 +80,7 @@ const clearFilters = () => {
     filterForm.search = ''
     filterForm.status = null
 
-    intertiaJsRoute.get(route('back-office.novel-generators.index'), {}, {
+    intertiaJsRoute.get(route('back-office.novels.index'), {}, {
         replace: true,
         preserveScroll: true,
         preserveState: true,
@@ -102,16 +102,16 @@ const closeDeleteModal = () => {
     deletingRow.value = null
 }
 
-const canCreate = () => canCreateNovelGenerator(authUser?.value)
-const canUpdate = (item) => canUpdateNovelGenerator(authUser?.value, item)
-const canDelete = (item) => canDeleteNovelGenerator(authUser?.value, item)
+const canCreate = () => canCreateNovel(authUser?.value)
+const canUpdate = (item) => canUpdateNovel(authUser?.value, item)
+const canDelete = (item) => canDeleteNovel(authUser?.value, item)
 
 const handleDelete = (item) => {
     if (!item || deleteProcessing.value) return
 
     deleteProcessing.value = true
 
-    intertiaJsRoute.delete(route('back-office.novel-generators.delete', { slug: item?.slug }), {
+    intertiaJsRoute.delete(route('back-office.novels.delete', { slug: item?.slug }), {
         onFinish: () => {
             closeDeleteModal()
             deleteProcessing.value = false
@@ -175,7 +175,7 @@ onMounted(async () => {
     window.dispatchEvent(
         new CustomEvent('set-breadcrumb', {
             detail: [
-                { text: 'Novel Generators', active: true },
+                { text: 'Novels', active: true },
             ],
         })
     )
@@ -187,13 +187,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Head :title="'Novel Generators'" />
+    <Head :title="'Novels'" />
 
     <div class="w-full space-y-6">
 
         <div class="flex justify-between items-center">
             <h2 class="text-lg font-semibold">
-                Novel Generators
+                Novels
             </h2>
 
             <button v-if="canCreate()" type="button" @click="openCreateForm"
@@ -242,7 +242,7 @@ onUnmounted(() => {
         </form>
 
         <div class="space-y-4">
-            <div v-for="item in novelGenerators?.data" :key="item.id"
+            <div v-for="item in novels?.data" :key="item.id"
                 class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition p-5">
 
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -276,15 +276,7 @@ onUnmounted(() => {
                             </span>
                         </div>
 
-                        <div v-if="item.novelGeneratorSteps?.length" class="flex flex-wrap items-center gap-2 pt-1">
-                            <span class="text-xs text-gray-400 font-medium">Steps:</span>
 
-                            <span v-for="step in item.novelGeneratorSteps" :key="step.id"
-                                :class="getStepStatusColor(step.status)"
-                                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium">
-                                {{ step.name || `Step ${step.id}` }}
-                            </span>
-                        </div>
                     </div>
 
                     <div class="flex items-center gap-2 md:flex-shrink-0">
@@ -303,11 +295,11 @@ onUnmounted(() => {
                 </div>
             </div>
 
-            <div v-if="!novelGenerators?.data?.length"
+            <div v-if="!novels?.data?.length"
                 class="bg-white border border-gray-200 rounded-xl shadow-sm p-12 text-center">
                 <FontAwesomeIcon icon="wand-magic-sparkles" class="text-4xl text-gray-300 mb-3" />
                 <p class="text-gray-500 text-sm">
-                    No novel generators found
+                    No novels found
                 </p>
             </div>
         </div>
@@ -329,7 +321,7 @@ onUnmounted(() => {
                         leave-to-class="opacity-0 scale-95 translate-y-4">
                         <div v-if="showDeleteModal" class="bg-white rounded-xl shadow-lg w-[380px] p-6 space-y-4">
                             <h3 class="text-lg font-semibold text-red-600">
-                                Delete Novel Generator
+                                Delete Novel
                             </h3>
 
                             <p class="text-sm font-medium">
@@ -375,7 +367,7 @@ onUnmounted(() => {
                         <div v-if="showCreateForm"
                             class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-4 my-auto">
 
-                            <NovelGeneratorForm
+                            <NovelForm
                                 @close="handleFormClose"
                                 @success="handleFormSuccess"
                             />
@@ -396,7 +388,7 @@ onUnmounted(() => {
             <button v-if="canCreate() && showFloatingButton && !showCreateForm" type="button"
                 @click="openCreateForm"
                 class="fixed bottom-6 right-6 z-40 bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2 transition"
-                title="Create Novel Generator">
+                title="Create Novel">
                 <FontAwesomeIcon icon="wand-magic-sparkles" />
                 <span class="hidden sm:inline text-sm font-medium">New Generator</span>
             </button>

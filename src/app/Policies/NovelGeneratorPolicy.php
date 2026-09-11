@@ -2,11 +2,11 @@
 namespace App\Policies;
 
 use App\Helpers\UserPermissionHelper;
-use App\Models\NovelGenerator;
+use App\Models\Novel;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class NovelGeneratorPolicy
+class NovelPolicy
 {
     public function before(User $authUser, string $ability): bool | null
     {
@@ -19,15 +19,15 @@ class NovelGeneratorPolicy
 
     public function viewAny(User $authUser): Response
     {
-        $module = UserPermissionHelper::MODULE_NOVEL_GENERATOR;
+        $module = UserPermissionHelper::MODULE_NOVEL;
         $access = UserPermissionHelper::ACCESS_VIEW_ANY;
 
         return $authUser->hasUserPermission($module, $access) ? Response::allow() : Response::deny();
     }
 
-    public function view(User $authUser, NovelGenerator $novelGenerator): Response
+    public function view(User $authUser, Novel $novel): Response
     {
-        $module = UserPermissionHelper::MODULE_NOVEL_GENERATOR;
+        $module = UserPermissionHelper::MODULE_NOVEL;
         $access = UserPermissionHelper::ACCESS_VIEW;
 
         return $authUser->hasUserPermission($module, $access) ? Response::allow() : Response::deny();
@@ -35,15 +35,15 @@ class NovelGeneratorPolicy
 
     public function create(User $authUser): Response
     {
-        $module = UserPermissionHelper::MODULE_NOVEL_GENERATOR;
+        $module = UserPermissionHelper::MODULE_NOVEL;
         $access = UserPermissionHelper::ACCESS_CREATE;
 
         return $authUser->hasUserPermission($module, $access) ? Response::allow() : Response::deny();
     }
 
-    public function update(User $authUser, NovelGenerator $novelGenerator): Response
+    public function update(User $authUser, Novel $novel): Response
     {
-        $module = UserPermissionHelper::MODULE_NOVEL_GENERATOR;
+        $module = UserPermissionHelper::MODULE_NOVEL;
         $access = UserPermissionHelper::ACCESS_UPDATE;
 
         if ($authUser->hasUserPermission($module, $access)) {
@@ -53,10 +53,10 @@ class NovelGeneratorPolicy
         return Response::deny();
     }
 
-    public function delete(User $authUser, NovelGenerator $novelGenerator): Response
+    public function delete(User $authUser, Novel $novel): Response
     {
 
-        $module = UserPermissionHelper::MODULE_NOVEL_GENERATOR;
+        $module = UserPermissionHelper::MODULE_NOVEL;
         $access = UserPermissionHelper::ACCESS_DELETE;
 
         if ($authUser->hasUserPermission($module, $access)) {

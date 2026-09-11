@@ -3,7 +3,7 @@ namespace App\Services;
 
 use App\Helpers\ActivityLogHelper;
 use App\Helpers\DatatableHelper;
-use App\Helpers\NovelGeneratorHelper;
+use App\Helpers\NovelHelper;
 use App\Helpers\UserHelper;
 use App\Models\AiBrain;
 use App\Models\AiPrompt;
@@ -177,7 +177,7 @@ class SearchService
 
     public function novelContinuities(Request $request): array
     {
-        $options = NovelGeneratorHelper::continuities();
+        $options = NovelHelper::continuities();
 
         if ($request->filled('search')) {
             $search  = $request->input('search');
@@ -201,9 +201,9 @@ class SearchService
         ];
     }
 
-    public function novelGeneratorStatuses(Request $request): array
+    public function novelStatuses(Request $request): array
     {
-        $options = NovelGeneratorHelper::statuses();
+        $options = NovelHelper::statuses();
 
         if ($request->filled('search')) {
             $search  = $request->input('search');
@@ -227,9 +227,9 @@ class SearchService
         ];
     }
 
-    public function novelGeneratorStepStatuses(Request $request): array
+    public function novelStepStatuses(Request $request): array
     {
-        $options = NovelGeneratorHelper::stepStatuses();
+        $options = NovelHelper::stepStatuses();
 
         if ($request->filled('search')) {
             $search  = $request->input('search');

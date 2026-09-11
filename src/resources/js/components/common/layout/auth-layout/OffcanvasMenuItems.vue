@@ -175,12 +175,12 @@ const isSubMenuVisible = (key) => {
         </a>
 
         <a
-            :href="route('back-office.novel-generators.index')"
+            :href="route('back-office.novels.index')"
             class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
-            :class="isCurrentPage('/back-office/novel-generators/*') ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
+            :class="isCurrentPage('/back-office/novel/*') ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
         >
             <FontAwesomeIcon icon="book" />
-            Novel generators
+            Novels
         </a>
 
         <button

@@ -21,15 +21,15 @@ FontAwesomeLibrary.add(
 const emit = defineEmits(['close', 'success'])
 
 const props = defineProps({
-    novelGenerator: { type: Object, default: null },
+    novel: { type: Object, default: null },
 })
 
-const isUpdate = computed(() => !!props.novelGenerator?.slug)
+const isUpdate = computed(() => !!props.novel?.slug)
 
 const pageTitle = computed(() => {
     return isUpdate.value
-        ? `Edit ${props.novelGenerator?.name}`
-        : 'New Novel Generator'
+        ? `Edit ${props.novel?.name}`
+        : 'New Novel'
 })
 
 const STEP_DEFINITIONS = [
@@ -45,7 +45,6 @@ const completedSteps = ref(new Set())
 const submittingStep = ref(null)
 
 const step1Form = useForm({
-    main_character_gender: null,
     is_18_plus: false,
     enable_mature_content: false,
     additional_information: null,
@@ -75,11 +74,6 @@ function validateStep1() {
     step1Form.clearErrors()
 
     let valid = true
-
-    if (!step1Form.main_character_gender) {
-        step1Form.setError('main_character_gender', 'Main character gender is required')
-        valid = false
-    }
 
     if (!step1Form.ai_brain_id) {
         step1Form.setError('ai_brain_id', 'AI Brain selection is required')
@@ -121,7 +115,7 @@ function submitStep1() {
     submittingStep.value = 1
     step1Form.processing = true
 
-    step1Form.post(route('back-office.novel-generators.step-1-save'), {
+    step1Form.post(route('back-office.novels.save'), {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
@@ -247,31 +241,7 @@ onMounted(async () => {
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                        <div>
-                            <label class="block text-sm font-medium mb-1">
-                                Main Character Gender <span class="text-red-500">*</span>
-                            </label>
 
-                            <div class="flex gap-4">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" v-model="step1Form.main_character_gender"
-                                        value="Male"
-                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500" />
-                                    <span class="text-sm">Male</span>
-                                </label>
-
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" v-model="step1Form.main_character_gender"
-                                        value="Female"
-                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500" />
-                                    <span class="text-sm">Female</span>
-                                </label>
-                            </div>
-
-                            <p v-if="step1Form.errors.main_character_gender" class="text-red-500 text-sm mt-1">
-                                {{ step1Form.errors.main_character_gender }}
-                            </p>
-                        </div>
 
                         <div>
                             <label class="block text-sm font-medium mb-1">
