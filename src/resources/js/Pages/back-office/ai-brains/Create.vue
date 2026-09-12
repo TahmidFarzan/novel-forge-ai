@@ -66,18 +66,36 @@ function validateForm() {
         valid = false;
     }
 
-    if (saveForm.average_latency === null || saveForm.average_latency === "") {
-        saveForm.setError("average_latency", "Average latency is required");
+    if (
+        saveForm.average_latency === null ||
+        saveForm.average_latency === undefined ||
+        saveForm.average_latency === ""
+    ) {
+        saveForm.setError("average_latency", "Average latency is required.");
+
         valid = false;
     }
 
-    if (!saveForm.minimum_wait_time) {
-        saveForm.setError("minimum_wait_time", "Minimum wait time is required");
+    if (
+        saveForm.minimum_wait_time === null ||
+        saveForm.minimum_wait_time === undefined ||
+        saveForm.minimum_wait_time === ""
+    ) {
+        saveForm.setError(
+            "minimum_wait_time",
+            "Minimum wait time is required.",
+        );
+
         valid = false;
     }
 
-    if (!saveForm.timeout_seconds) {
-        saveForm.setError("timeout_seconds", "Timeout seconds is required");
+    if (
+        saveForm.timeout_seconds === null ||
+        saveForm.timeout_seconds === undefined ||
+        saveForm.timeout_seconds === ""
+    ) {
+        saveForm.setError("timeout_seconds", "Timeout seconds is required.");
+
         valid = false;
     }
 
@@ -125,7 +143,10 @@ onMounted(async () => {
     window.dispatchEvent(
         new CustomEvent("set-breadcrumb", {
             detail: [
-                { text: "Ai Brains", href: route("back-office.ai-brains.index") },
+                {
+                    text: "Ai Brains",
+                    href: route("back-office.ai-brains.index"),
+                },
                 { text: pageTitle.value, active: true },
             ],
         }),
