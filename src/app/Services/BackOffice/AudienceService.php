@@ -32,7 +32,7 @@ class AudienceService
 
     public function findById(string|int $id): Audience
     {
-        return Audience::whereIn('id', $id)->firstOrFail();
+        return Audience::where('id', $id)->firstOrFail();
     }
 
     public function search(Request $request)
