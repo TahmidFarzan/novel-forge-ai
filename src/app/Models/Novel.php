@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Observers\NovelObserver;
@@ -22,9 +23,19 @@ use Spatie\Sluggable\SlugOptions;
 
 #[Table('novels')]
 #[Fillable([
-        'name', 'datetime', 'slug', 'status',
-        'created_by_id',
-    ])]
+    'title',
+    'sub_title',
+    'datetime',
+    'slug',
+    'status',
+    "audience_id",
+    "novel_type_id",
+    'language_id',
+    'ai_prompt',
+    'received_inputs',
+    'plot',
+    'created_by_id',
+])]
 #[UsePolicy(NovelPolicy::class)]
 #[ObservedBy([NovelObserver::class])]
 class Novel extends Model
@@ -36,6 +47,7 @@ class Novel extends Model
     protected function casts(): array
     {
         return [
+            'received_inputs'   => 'array',
             'datetime'   => 'datetime',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
@@ -46,7 +58,17 @@ class Novel extends Model
     {
         return LogOptions::defaults()
             ->logOnly([
-                'name', 'datetime', 'status', 'slug',
+                'title',
+                'sub_title',
+                'datetime',
+                'slug',
+                'status',
+                "audience_id",
+                "novel_type_id",
+                'language_id',
+                'ai_prompt',
+                'received_inputs',
+                'plot',
             ])
             ->useLogName('Novel')
             ->setDescriptionForEvent(fn(string $eventName) => "The record has been {$eventName}.")

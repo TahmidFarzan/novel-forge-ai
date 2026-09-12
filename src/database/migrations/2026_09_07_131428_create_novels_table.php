@@ -21,6 +21,8 @@ return new class extends Migration
             $table->foreignId('language_id')->constrained('languages')->cascadeOnDelete();
 
             $table->longText('ai_prompt')->nullable();
+            $table->jsonb('received_inputs')->nullable();
+
             $table->longText('plot')->nullable();
 
             $table->string('status', 50)->nullable();

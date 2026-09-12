@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\BackOffice;
 
 use App\Helpers\NovelHelper;
@@ -38,7 +39,7 @@ class NovelService
         $this->languageService  = $languageService;
     }
 
-    public function new (): Novel
+    public function new(): Novel
     {
         return new Novel();
     }
@@ -132,6 +133,17 @@ class NovelService
                 $genrePromptInstruction .= $gInstruction;
             }
 
+            $receivedInputs = [
+                "is_18_plus" => $is18Plus,
+                "enable_mature_content" => $enableMatureContent,
+                "language" => $language?->name,
+                "novel_continuity" => $novelContinuity,
+                "additional_information" => $additionalInformation,
+                "genre_prompt_instruction" => $genrePromptInstruction,
+                "audience_instruction" => $audience->prompt_instruction,
+                "novel_type_instruction" => $novelType->prompt_instruction,
+            ];
+
             $prompt = str_replace(
                 [
                     '{{is_18_plus}}',
@@ -160,12 +172,15 @@ class NovelService
 
             Log::info("Novel AI Response", ["apiResponse" => $apiResponse]);
 
-            $novel = DB::transaction(function () use ($request, $apiResponse, $novel, $isNew) {
+            $novel = DB::transaction(function () use ($request, $apiResponse, $receivedInputs, $prompt, $novel, $isNew) {
                 $apiResponseFormated = $this->extractNovelResponse($apiResponse);
 
                 $novel->title     = $apiResponseFormated['title'];
                 $novel->sub_title = $apiResponseFormated['subtitle'];
                 $novel->plot      = $apiResponseFormated['plot'];
+
+                $novel->received_inputs      = $receivedInputs;
+                $novel->ai_prompt      = $prompt;
 
                 $novel->audience_id   = $request->input("audience_id");
                 $novel->novel_type_id = $request->input("novel_type_id");
@@ -192,7 +207,6 @@ class NovelService
                     ? 'Novel created successfully.'
                     : 'Novel updated successfully.',
             ];
-
         } catch (Exception $exception) {
 
             Log::error("Failed to {$statusEvent} novel.", [
