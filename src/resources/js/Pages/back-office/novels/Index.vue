@@ -215,7 +215,7 @@ onUnmounted(() => {
                     placeholder="Created By" />
 
                 <InfiniteScrollApiSelect :form="filterForm" fieldName="status"
-                    :selectedItem="filterForm.status" :apiUrl="route('search.novel-generator-statuses')" :multiple="false"
+                    :selectedItem="filterForm.status" :apiUrl="route('search.novel-statuses')" :multiple="false"
                     placeholder="Status" />
 
                 <input type="date" v-model="filterForm.date"

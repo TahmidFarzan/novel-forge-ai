@@ -299,7 +299,7 @@ onMounted(async () => {
 
                         <div>
                             <label class="block text-sm font-medium mb-1">
-                                Audiences
+                                Audiences <span class="text-red-500">*</span>
                             </label>
 
                             <InfiniteScrollApiSelect :form="step1Form" fieldName="audience_id"

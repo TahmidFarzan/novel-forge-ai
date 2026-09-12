@@ -81,7 +81,7 @@ Route::prefix('search')->name('search.')->group(function () {
         Route::get('user-permissions-by-group', [SearchController::class, 'userPermissionsByGroup'])->name('user-permissions-by-group');
 
         Route::get('novel-continuities', [SearchController::class, 'novelContinuities'])->name('novel-continuities');
-        Route::get('novel-generator-statuses', [SearchController::class, 'novelStatuses'])->name('novel-generator-statuses');
+        Route::get('novel-statuses', [SearchController::class, 'novelStatuses'])->name('novel-statuses');
 
 
     });
