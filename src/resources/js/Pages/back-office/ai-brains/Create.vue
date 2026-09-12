@@ -71,7 +71,7 @@ function validateForm() {
         valid = false;
     }
 
-    if (!saveForm.minimum_wait_time && saveForm.minimum_wait_time !== 0) {
+    if (!saveForm.minimum_wait_time) {
         saveForm.setError("minimum_wait_time", "Minimum wait time is required");
         valid = false;
     }
