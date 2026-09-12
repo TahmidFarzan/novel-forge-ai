@@ -13,7 +13,7 @@ import {
     faCalendar, faHashtag, faWandMagicSparkles
 } from '@fortawesome/free-solid-svg-icons'
 
-import NovelForm from '@/components/back-office/novel-generator/NovelForm.vue'
+import NovelCreateForm from '@/components/back-office/novel/NovelCreateForm.vue'
 
 import { formatDateTime } from '@/composables/useDateTime'
 import { itemListFilterParameters } from '@/composables/useDataTable'
@@ -367,7 +367,7 @@ onUnmounted(() => {
                         <div v-if="showCreateForm"
                             class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-4 my-auto">
 
-                            <NovelForm
+                            <NovelCreateForm
                                 @close="handleFormClose"
                                 @success="handleFormSuccess"
                             />
