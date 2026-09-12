@@ -51,8 +51,8 @@ const step1Form = useForm({
     novel_continuity: null,
     language_id: null,
     genre_ids: [],
-    novel_type_ids: [],
-    audience_ids: [],
+    novel_type_id: [],
+    audience_id: [],
     ai_brain_id: null,
 })
 
@@ -95,8 +95,8 @@ function validateStep1() {
         valid = false
     }
 
-    if (!step1Form.novel_type_ids) {
-        step1Form.setError('novel_type_ids', 'Novel types is required')
+    if (!step1Form.novel_type_id) {
+        step1Form.setError('novel_type_id', 'Novel type is required')
         valid = false
     }
 
@@ -284,11 +284,11 @@ onMounted(async () => {
 
                         <div>
                             <label class="block text-sm font-medium mb-1">
-                                Novel Types <span class="text-red-500">*</span>
+                                Novel Type <span class="text-red-500">*</span>
                             </label>
 
-                            <InfiniteScrollApiSelect :form="step1Form" fieldName="novel_type_ids"
-                                :selectedItem="step1Form.novel_type_ids" :apiUrl="route('search.novel-types')"
+                            <InfiniteScrollApiSelect :form="step1Form" fieldName="novel_type_id"
+                                :selectedItem="step1Form.novel_type_id" :apiUrl="route('search.novel-types')"
                                 :multiple="true" placeholder="Select novel types" />
                         </div>
 
@@ -297,8 +297,8 @@ onMounted(async () => {
                                 Audiences
                             </label>
 
-                            <InfiniteScrollApiSelect :form="step1Form" fieldName="audience_ids"
-                                :selectedItem="step1Form.audience_ids" :apiUrl="route('search.audiences')"
+                            <InfiniteScrollApiSelect :form="step1Form" fieldName="audience_id"
+                                :selectedItem="step1Form.audience_id" :apiUrl="route('search.audiences')"
                                 :multiple="true" placeholder="Select audiences" />
                         </div>
 

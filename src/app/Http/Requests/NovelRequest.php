@@ -47,22 +47,14 @@ class NovelRequest extends FormRequest
                 'exists:genres,id',
             ],
 
-            'novel_type_ids'         => [
+            'novel_type_id'         => [
                 'required',
-                'array',
-            ],
-
-            'novel_type_ids.*'       => [
                 'integer',
                 'exists:novel_types,id',
             ],
 
-            'audience_ids'           => [
-                'nullable',
-                'array',
-            ],
-
-            'audience_ids.*'         => [
+            'audience_id'           => [
+                'required',
                 'integer',
                 'exists:audiences,id',
             ],
@@ -88,14 +80,10 @@ class NovelRequest extends FormRequest
 
             'genre_ids.*.exists'             => 'Selected genre does not exist.',
 
-            'novel_type_ids.required'        => 'Novel types must be required.',
-            'novel_type_ids.array'           => 'Novel types must be selected as an array.',
+            'novel_type_id.required'        => 'Novel types must be required.',
+            'novel_type_id.exists'        => 'Selected novel type does not exist.',
 
-            'novel_type_ids.*.exists'        => 'Selected novel type does not exist.',
-
-            'audience_ids.array'             => 'Audiences must be selected as an array.',
-
-            'audience_ids.*.exists'          => 'Selected audience does not exist.',
+            'audience_id.exists'          => 'Selected audience does not exist.',
 
             'ai_brain_id.required'           => 'Please select a ai brain.',
             'ai_brain_id.exists'             => 'Selected ai brain does not exist.',
