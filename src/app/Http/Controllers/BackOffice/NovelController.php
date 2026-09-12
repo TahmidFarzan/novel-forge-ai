@@ -30,6 +30,17 @@ class NovelController extends Controller
         ]);
     }
 
+    public function create(): InertiaResponse
+    {
+        $novel = $this->novelService->new();
+        Gate::authorize('view', $novel);
+
+        return Inertia::render('back-office/novels/Create', [
+            'novel' => $novel,
+        ]);
+    }
+
+
     public function save(NovelRequest $request): RedirectResponse
     {
         $novel = $this->novelService->new();

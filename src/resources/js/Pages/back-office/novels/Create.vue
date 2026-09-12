@@ -1,24 +1,40 @@
 <script setup>
+import Layout from '@/pages/layouts/AuthLayout.vue'
 import InfiniteScrollApiSelect from '@/components/common/multi-select/InfiniteScrollApiSelect.vue'
 
 import { ref, computed, onMounted, nextTick } from 'vue'
-import { useForm } from '@inertiajs/vue3'
+import { Head, useForm } from '@inertiajs/vue3'
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
 import { library as FontAwesomeLibrary } from '@fortawesome/fontawesome-svg-core'
 import {
-    faXmark, faSave, faSpinner, faCheck, faLock,
+    faSave, faSpinner, faCheck, faLock,
     faArrowRight, faArrowLeft, faWandMagicSparkles,
     faBrain, faUser, faGlobe, faBook, faCog
 } from '@fortawesome/free-solid-svg-icons'
 
 FontAwesomeLibrary.add(
-    faXmark, faSave, faSpinner, faCheck, faLock,
+    faSave, faSpinner, faCheck, faLock,
     faArrowRight, faArrowLeft, faWandMagicSparkles,
     faBrain, faUser, faGlobe, faBook, faCog
 )
 
-const emit = defineEmits(['close', 'success'])
+defineOptions({ layout: Layout })
+
+const createPageTitle = 'Create Novel'
+
+onMounted(async () => {
+    await nextTick()
+
+    window.dispatchEvent(
+        new CustomEvent('set-breadcrumb', {
+            detail: [
+                { text: 'Novels', href: route('back-office.novels.index') },
+                { text: createPageTitle, active: true },
+            ],
+        })
+    )
+})
 
 const props = defineProps({
     novel: { type: Object, default: null },
@@ -44,7 +60,7 @@ const activeStep = ref(1)
 const completedSteps = ref(new Set())
 const submittingStep = ref(null)
 
-const step1Form = useForm({
+const saveForm = useForm({
     is_18_plus: false,
     enable_mature_content: false,
     additional_information: null,
@@ -71,42 +87,42 @@ const getStepState = (stepId) => {
 }
 
 function validateStep1() {
-    step1Form.clearErrors()
+    saveForm.clearErrors()
 
     let valid = true
 
-    if (!step1Form.ai_brain_id) {
-        step1Form.setError('ai_brain_id', 'AI Brain selection is required')
+    if (!saveForm.ai_brain_id) {
+        saveForm.setError('ai_brain_id', 'AI Brain selection is required')
         valid = false
     }
 
-    if (!step1Form.novel_continuity) {
-        step1Form.setError('novel_continuity', 'Novel continuity is required')
+    if (!saveForm.novel_continuity) {
+        saveForm.setError('novel_continuity', 'Novel continuity is required')
         valid = false
     }
 
-    if (!step1Form.language_id) {
-        step1Form.setError('language_id', 'Language is required')
+    if (!saveForm.language_id) {
+        saveForm.setError('language_id', 'Language is required')
         valid = false
     }
 
-    if (!step1Form.genre_ids) {
-        step1Form.setError('genre_ids', 'Genres is required')
+    if (!saveForm.genre_ids) {
+        saveForm.setError('genre_ids', 'Genres is required')
         valid = false
     }
 
-    if (!step1Form.novel_type_id) {
-        step1Form.setError('novel_type_id', 'Novel type is required')
+    if (!saveForm.novel_type_id) {
+        saveForm.setError('novel_type_id', 'Novel type is required')
         valid = false
     }
 
-    if (!step1Form.audience_id) {
-        step1Form.setError('audience_id', 'Audience is required')
+    if (!saveForm.audience_id) {
+        saveForm.setError('audience_id', 'Audience is required')
         valid = false
     }
 
-    if (step1Form.enable_mature_content && !step1Form.is_18_plus) {
-        step1Form.setError('enable_mature_content', 'Mature content requires 18+ setting')
+    if (saveForm.enable_mature_content && !saveForm.is_18_plus) {
+        saveForm.setError('enable_mature_content', 'Mature content requires 18+ setting')
         valid = false
     }
 
@@ -114,27 +130,27 @@ function validateStep1() {
 }
 
 function submitStep1() {
-    if (step1Form.processing) return
+    if (saveForm.processing) return
     if (!validateStep1()) return
 
     submittingStep.value = 1
-    step1Form.processing = true
+    saveForm.processing = true
 
-    step1Form.post(route('back-office.novels.save'), {
+    saveForm.post(route('back-office.novels.save'), {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
             completedSteps.value.add(1)
             activeStep.value = 2
-            step1Form.clearErrors()
+            saveForm.clearErrors()
         },
         onError: (errors) => {
-            step1Form.clearErrors()
-            step1Form.setError(errors)
+            saveForm.clearErrors()
+            saveForm.setError(errors)
         },
         onFinish: () => {
             submittingStep.value = null
-            step1Form.processing = false
+            saveForm.processing = false
         }
     })
 }
@@ -157,26 +173,22 @@ const goPrev = () => {
     }
 }
 
-onMounted(async () => {
-    await nextTick()
-})
 </script>
 
 <template>
-    <div class="flex flex-col h-full">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+    <Head :title="createPageTitle" />
+
+    <div class="w-full">
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 md:p-6">
+            <div class="flex flex-col">
+        <div class="flex items-center px-0 py-4 border-b border-gray-200">
             <h2 class="text-lg font-semibold flex items-center gap-2">
                 <FontAwesomeIcon icon="wand-magic-sparkles" class="text-purple-600" />
                 {{ pageTitle }}
             </h2>
-
-            <button type="button" @click="emit('close')"
-                class="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition">
-                <FontAwesomeIcon icon="xmark" />
-            </button>
         </div>
 
-        <div class="px-6 pt-4 border-b border-gray-200">
+        <div class="px-0 pt-4 border-b border-gray-200">
             <nav class="hidden md:flex overflow-x-auto pb-px">
                 <button v-for="step in STEP_DEFINITIONS" :key="step.id" type="button"
                     @click="goToStep(step.id)"
@@ -206,7 +218,7 @@ onMounted(async () => {
                 </button>
             </nav>
 
-            <nav class="md:hidden max-h-48 overflow-y-auto -mx-2 px-2">
+            <nav class="md:hidden -mx-2 px-2">
                 <button v-for="step in STEP_DEFINITIONS" :key="step.id" type="button"
                     @click="goToStep(step.id)"
                     :disabled="!isStepAccessible(step.id) && !isStepCompleted(step.id)"
@@ -235,7 +247,7 @@ onMounted(async () => {
             </nav>
         </div>
 
-        <div class="flex-1 overflow-y-auto px-6 py-6">
+        <div class="px-0 py-6">
 
             <div v-if="activeStep === 1" class="space-y-6">
                 <div class="bg-white border rounded-xl p-5 shadow-sm space-y-4">
@@ -253,13 +265,13 @@ onMounted(async () => {
                                 Novel Continuity <span class="text-red-500">*</span>
                             </label>
 
-                            <InfiniteScrollApiSelect :form="step1Form" fieldName="novel_continuity"
-                                :selectedItem="step1Form.novel_continuity" :apiUrl="route('search.novel-continuities')"
+                            <InfiniteScrollApiSelect :form="saveForm" fieldName="novel_continuity"
+                                :selectedItem="saveForm.novel_continuity" :apiUrl="route('search.novel-continuities')"
                                 :multiple="false" placeholder="Select continuity"
-                                :error="step1Form.errors.novel_continuity" />
+                                :error="saveForm.errors.novel_continuity" />
 
-                            <p v-if="step1Form.errors.novel_continuity" class="text-red-500 text-sm mt-1">
-                                {{ step1Form.errors.novel_continuity }}
+                            <p v-if="saveForm.errors.novel_continuity" class="text-red-500 text-sm mt-1">
+                                {{ saveForm.errors.novel_continuity }}
                             </p>
                         </div>
 
@@ -268,12 +280,12 @@ onMounted(async () => {
                                 Language <span class="text-red-500">*</span>
                             </label>
 
-                            <InfiniteScrollApiSelect :form="step1Form" fieldName="language_id"
-                                :selectedItem="step1Form.language_id" :apiUrl="route('search.languages')"
+                            <InfiniteScrollApiSelect :form="saveForm" fieldName="language_id"
+                                :selectedItem="saveForm.language_id" :apiUrl="route('search.languages')"
                                 :multiple="false" placeholder="Select languages" />
 
-                            <p v-if="step1Form.errors.language_id" class="text-red-500 text-sm mt-1">
-                                {{ step1Form.errors.language_id }}
+                            <p v-if="saveForm.errors.language_id" class="text-red-500 text-sm mt-1">
+                                {{ saveForm.errors.language_id }}
                             </p>
                         </div>
 
@@ -282,8 +294,8 @@ onMounted(async () => {
                                 Genres <span class="text-red-500">*</span>
                             </label>
 
-                            <InfiniteScrollApiSelect :form="step1Form" fieldName="genre_ids"
-                                :selectedItem="step1Form.genre_ids" :apiUrl="route('search.genres')"
+                            <InfiniteScrollApiSelect :form="saveForm" fieldName="genre_ids"
+                                :selectedItem="saveForm.genre_ids" :apiUrl="route('search.genres')"
                                 :multiple="true" placeholder="Select genres" />
                         </div>
 
@@ -292,8 +304,8 @@ onMounted(async () => {
                                 Novel Type <span class="text-red-500">*</span>
                             </label>
 
-                            <InfiniteScrollApiSelect :form="step1Form" fieldName="novel_type_id"
-                                :selectedItem="step1Form.novel_type_id" :apiUrl="route('search.novel-types')"
+                            <InfiniteScrollApiSelect :form="saveForm" fieldName="novel_type_id"
+                                :selectedItem="saveForm.novel_type_id" :apiUrl="route('search.novel-types')"
                                 :multiple="false" placeholder="Select novel types" />
                         </div>
 
@@ -302,8 +314,8 @@ onMounted(async () => {
                                 Audiences <span class="text-red-500">*</span>
                             </label>
 
-                            <InfiniteScrollApiSelect :form="step1Form" fieldName="audience_id"
-                                :selectedItem="step1Form.audience_id" :apiUrl="route('search.audiences')"
+                            <InfiniteScrollApiSelect :form="saveForm" fieldName="audience_id"
+                                :selectedItem="saveForm.audience_id" :apiUrl="route('search.audiences')"
                                 :multiple="false" placeholder="Select audiences" />
                         </div>
 
@@ -312,7 +324,7 @@ onMounted(async () => {
                                 Additional Information
                             </label>
 
-                            <textarea v-model="step1Form.additional_information" rows="3"
+                            <textarea v-model="saveForm.additional_information" rows="3"
                                 placeholder="Any additional context or instructions for the AI..."
                                 class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none border-gray-300"></textarea>
                         </div>
@@ -321,21 +333,21 @@ onMounted(async () => {
 
                     <div class="flex flex-wrap gap-6 pt-2">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" v-model="step1Form.is_18_plus"
+                            <input type="checkbox" v-model="saveForm.is_18_plus"
                                 class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
                             <span class="text-sm">18+ Content</span>
                         </label>
 
                         <label class="flex items-center gap-2 cursor-pointer"
-                            :class="{ 'opacity-50': !step1Form.is_18_plus }">
-                            <input type="checkbox" v-model="step1Form.enable_mature_content"
-                                :disabled="!step1Form.is_18_plus"
+                            :class="{ 'opacity-50': !saveForm.is_18_plus }">
+                            <input type="checkbox" v-model="saveForm.enable_mature_content"
+                                :disabled="!saveForm.is_18_plus"
                                 class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
                             <span class="text-sm">Enable Mature Content</span>
                         </label>
 
-                        <p v-if="step1Form.errors.enable_mature_content" class="text-red-500 text-sm w-full">
-                            {{ step1Form.errors.enable_mature_content }}
+                        <p v-if="saveForm.errors.enable_mature_content" class="text-red-500 text-sm w-full">
+                            {{ saveForm.errors.enable_mature_content }}
                         </p>
                     </div>
                 </div>
@@ -351,15 +363,15 @@ onMounted(async () => {
                     </p>
 
                     <div class="border-2 border-dashed border-purple-200 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-blue-50">
-                        <InfiniteScrollApiSelect :form="step1Form" fieldName="ai_brain_id"
-                            :selectedItem="step1Form.ai_brain_id" :apiUrl="route('search.ai-brains')"
+                        <InfiniteScrollApiSelect :form="saveForm" fieldName="ai_brain_id"
+                            :selectedItem="saveForm.ai_brain_id" :apiUrl="route('search.ai-brains')"
                             :multiple="false" placeholder="Select AI Brain"
-                            :error="step1Form.errors.ai_brain_id"
+                            :error="saveForm.errors.ai_brain_id"
                             class="ai-brain-select" />
                     </div>
 
-                    <p v-if="step1Form.errors.ai_brain_id" class="text-red-500 text-sm">
-                        {{ step1Form.errors.ai_brain_id }}
+                    <p v-if="saveForm.errors.ai_brain_id" class="text-red-500 text-sm">
+                        {{ saveForm.errors.ai_brain_id }}
                     </p>
                 </div>
             </div>
@@ -393,7 +405,7 @@ onMounted(async () => {
             </div>
         </div>
 
-        <div class="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
+        <div class="px-0 py-4 border-t border-gray-200 flex justify-between items-center">
             <button type="button" @click="goPrev" :disabled="activeStep === 1"
                 class="px-4 py-2 text-sm rounded-md border border-gray-300 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
                 <FontAwesomeIcon icon="arrow-left" />
@@ -408,7 +420,7 @@ onMounted(async () => {
 
             <div>
                 <button v-if="activeStep === 1" type="button" @click="submitStep1"
-                    :disabled="step1Form.processing"
+                    :disabled="saveForm.processing"
                     class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed">
                     <FontAwesomeIcon v-if="submittingStep === 1" icon="spinner" spin />
                     <FontAwesomeIcon v-else icon="save" />
@@ -422,6 +434,8 @@ onMounted(async () => {
                     <FontAwesomeIcon icon="arrow-right" />
                 </button>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 </template>

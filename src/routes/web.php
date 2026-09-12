@@ -205,6 +205,7 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
 
     Route::prefix('novels')->name('novels.')->group(function () {
         Route::get('/', [NovelController::class, 'index'])->name('index');
+        Route::get('create', [NovelController::class, 'create'])->name('create');
         Route::post('save', [NovelController::class, 'save'])->name('save');
 
         Route::delete('delete/{slug}', [NovelController::class, 'delete'])->name('delete');
