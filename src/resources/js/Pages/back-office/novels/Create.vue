@@ -1,6 +1,7 @@
 <script setup>
 import Layout from '@/pages/layouts/AuthLayout.vue'
 import InfiniteScrollApiSelect from '@/components/common/multi-select/InfiniteScrollApiSelect.vue'
+import { AiBrainOutputTypes } from '@/composables/useAiBrain'
 
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
@@ -49,28 +50,51 @@ const pageTitle = computed(() => {
 })
 
 const STEP_DEFINITIONS = [
-    { id: 1, name: 'Configuration', icon: 'cog', description: 'Basic generation settings' },
-    { id: 2, name: 'World Building', icon: 'globe', description: 'World and setting details' },
-    { id: 3, name: 'Characters', icon: 'user', description: 'Character development' },
-    { id: 4, name: 'Plot & Outline', icon: 'book', description: 'Story structure' },
-    { id: 5, name: 'Review & Generate', icon: 'wand-magic-sparkles', description: 'Final review' },
+    { id: 1, name: 'Configuration', icon: 'cog', description: 'Basic generation settings', aiBrainOutputTypeCode: AiBrainOutputTypes.Text },
+    { id: 2, name: 'World Building', icon: 'globe', description: 'World and setting details', aiBrainOutputTypeCode: AiBrainOutputTypes.Text },
+    { id: 3, name: 'Characters', icon: 'user', description: 'Character development', aiBrainOutputTypeCode: null },
+    { id: 4, name: 'Plot & Outline', icon: 'book', description: 'Story structure', aiBrainOutputTypeCode: null },
+    { id: 5, name: 'Review & Generate', icon: 'wand-magic-sparkles', description: 'Final review', aiBrainOutputTypeCode: null },
 ]
 
 const activeStep = ref(1)
 const completedSteps = ref(new Set())
 const submittingStep = ref(null)
 
-const saveForm = useForm({
-    is_18_plus: false,
-    enable_mature_content: false,
-    additional_information: null,
-    novel_continuity: null,
-    language_id: null,
-    genre_ids: [],
-    novel_type_id: null,
-    audience_id: null,
+const plotGeneratorSaveForm = useForm({
+    is_18_plus: props.novel?.is_18_plus ?? false,
+    enable_mature_content: props.novel?.enable_mature_content ?? false,
+    additional_information: props.novel?.additional_information ?? null,
+    novel_continuity: props.novel?.novel_continuity ?? null,
+    language_id: props.novel?.language_id ?? null,
+    genre_ids: props.novel?.genres?.map((genre) => genre.id) ?? [],
+    novel_type_id: props.novel?.novel_type_id ?? null,
+    audience_id: props.novel?.audience_id ?? null,
     ai_brain_id: null,
 })
+
+const worldBuildingSaveForm = useForm({
+    ai_brain_id: null,
+})
+
+const charactersSaveForm = useForm({
+    ai_brain_id: null,
+})
+
+const plotOutlineSaveForm = useForm({
+    ai_brain_id: null,
+})
+
+const reviewGenerateSaveForm = useForm({
+    ai_brain_id: null,
+})
+
+
+const getAiBrainSearchUrl = (stepId) => {
+    const aiBrainOutputTypeCode = STEP_DEFINITIONS.find((step) => step.id === stepId)?.aiBrainOutputTypeCode
+
+    return buildAiBrainSearchUrl(aiBrainOutputTypeCode)
+}
 
 const isStepAccessible = (stepId) => {
     if (stepId === 1) return true
@@ -87,42 +111,42 @@ const getStepState = (stepId) => {
 }
 
 function validateStep1() {
-    saveForm.clearErrors()
+    plotGeneratorSaveForm.clearErrors()
 
     let valid = true
 
-    if (!saveForm.ai_brain_id) {
-        saveForm.setError('ai_brain_id', 'AI Brain selection is required')
+    if (!plotGeneratorSaveForm.ai_brain_id) {
+        plotGeneratorSaveForm.setError('ai_brain_id', 'AI Brain selection is required')
         valid = false
     }
 
-    if (!saveForm.novel_continuity) {
-        saveForm.setError('novel_continuity', 'Novel continuity is required')
+    if (!plotGeneratorSaveForm.novel_continuity) {
+        plotGeneratorSaveForm.setError('novel_continuity', 'Novel continuity is required')
         valid = false
     }
 
-    if (!saveForm.language_id) {
-        saveForm.setError('language_id', 'Language is required')
+    if (!plotGeneratorSaveForm.language_id) {
+        plotGeneratorSaveForm.setError('language_id', 'Language is required')
         valid = false
     }
 
-    if (!saveForm.genre_ids) {
-        saveForm.setError('genre_ids', 'Genres is required')
+    if (!Array.isArray(plotGeneratorSaveForm.genre_ids) || plotGeneratorSaveForm.genre_ids.length === 0) {
+        plotGeneratorSaveForm.setError('genre_ids', 'Genres is required')
         valid = false
     }
 
-    if (!saveForm.novel_type_id) {
-        saveForm.setError('novel_type_id', 'Novel type is required')
+    if (!plotGeneratorSaveForm.novel_type_id) {
+        plotGeneratorSaveForm.setError('novel_type_id', 'Novel type is required')
         valid = false
     }
 
-    if (!saveForm.audience_id) {
-        saveForm.setError('audience_id', 'Audience is required')
+    if (!plotGeneratorSaveForm.audience_id) {
+        plotGeneratorSaveForm.setError('audience_id', 'Audience is required')
         valid = false
     }
 
-    if (saveForm.enable_mature_content && !saveForm.is_18_plus) {
-        saveForm.setError('enable_mature_content', 'Mature content requires 18+ setting')
+    if (plotGeneratorSaveForm.enable_mature_content && !plotGeneratorSaveForm.is_18_plus) {
+        plotGeneratorSaveForm.setError('enable_mature_content', 'Mature content requires 18+ setting')
         valid = false
     }
 
@@ -130,30 +154,41 @@ function validateStep1() {
 }
 
 function submitStep1() {
-    if (saveForm.processing) return
+    if (plotGeneratorSaveForm.processing) return
     if (!validateStep1()) return
 
     submittingStep.value = 1
-    saveForm.processing = true
+    plotGeneratorSaveForm.processing = true
 
-    saveForm.post(route('back-office.novels.save'), {
+    plotGeneratorSaveForm.post(route('back-office.novels.save'), {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
             completedSteps.value.add(1)
             activeStep.value = 2
-            saveForm.clearErrors()
+            plotGeneratorSaveForm.clearErrors()
         },
         onError: (errors) => {
-            saveForm.clearErrors()
-            saveForm.setError(errors)
+            plotGeneratorSaveForm.clearErrors()
+            plotGeneratorSaveForm.setError(errors)
         },
         onFinish: () => {
             submittingStep.value = null
-            saveForm.processing = false
+            plotGeneratorSaveForm.processing = false
         }
     })
 }
+
+function buildAiBrainSearchUrl(aiBrainOutputTypeCode) {
+    if (!aiBrainOutputTypeCode) {
+        return route('search.ai-brains')
+    }
+
+    return route('search.ai-brains', {
+        ai_brain_output_type_code: aiBrainOutputTypeCode,
+    })
+}
+
 
 const goToStep = (stepId) => {
     if (isStepAccessible(stepId) || isStepCompleted(stepId)) {
@@ -265,13 +300,13 @@ const goPrev = () => {
                                 Novel Continuity <span class="text-red-500">*</span>
                             </label>
 
-                            <InfiniteScrollApiSelect :form="saveForm" fieldName="novel_continuity"
-                                :selectedItem="saveForm.novel_continuity" :apiUrl="route('search.novel-continuities')"
+                            <InfiniteScrollApiSelect :form="plotGeneratorSaveForm" fieldName="novel_continuity"
+                                :selectedItem="plotGeneratorSaveForm.novel_continuity" :apiUrl="route('search.novel-continuities')"
                                 :multiple="false" placeholder="Select continuity"
-                                :error="saveForm.errors.novel_continuity" />
+                                :error="plotGeneratorSaveForm.errors.novel_continuity" />
 
-                            <p v-if="saveForm.errors.novel_continuity" class="text-red-500 text-sm mt-1">
-                                {{ saveForm.errors.novel_continuity }}
+                            <p v-if="plotGeneratorSaveForm.errors.novel_continuity" class="text-red-500 text-sm mt-1">
+                                {{ plotGeneratorSaveForm.errors.novel_continuity }}
                             </p>
                         </div>
 
@@ -280,12 +315,12 @@ const goPrev = () => {
                                 Language <span class="text-red-500">*</span>
                             </label>
 
-                            <InfiniteScrollApiSelect :form="saveForm" fieldName="language_id"
-                                :selectedItem="saveForm.language_id" :apiUrl="route('search.languages')"
+                            <InfiniteScrollApiSelect :form="plotGeneratorSaveForm" fieldName="language_id"
+                                :selectedItem="plotGeneratorSaveForm.language_id" :apiUrl="route('search.languages')"
                                 :multiple="false" placeholder="Select languages" />
 
-                            <p v-if="saveForm.errors.language_id" class="text-red-500 text-sm mt-1">
-                                {{ saveForm.errors.language_id }}
+                            <p v-if="plotGeneratorSaveForm.errors.language_id" class="text-red-500 text-sm mt-1">
+                                {{ plotGeneratorSaveForm.errors.language_id }}
                             </p>
                         </div>
 
@@ -294,8 +329,8 @@ const goPrev = () => {
                                 Genres <span class="text-red-500">*</span>
                             </label>
 
-                            <InfiniteScrollApiSelect :form="saveForm" fieldName="genre_ids"
-                                :selectedItem="saveForm.genre_ids" :apiUrl="route('search.genres')"
+                            <InfiniteScrollApiSelect :form="plotGeneratorSaveForm" fieldName="genre_ids"
+                                :selectedItem="plotGeneratorSaveForm.genre_ids" :apiUrl="route('search.genres')"
                                 :multiple="true" placeholder="Select genres" />
                         </div>
 
@@ -304,8 +339,8 @@ const goPrev = () => {
                                 Novel Type <span class="text-red-500">*</span>
                             </label>
 
-                            <InfiniteScrollApiSelect :form="saveForm" fieldName="novel_type_id"
-                                :selectedItem="saveForm.novel_type_id" :apiUrl="route('search.novel-types')"
+                            <InfiniteScrollApiSelect :form="plotGeneratorSaveForm" fieldName="novel_type_id"
+                                :selectedItem="plotGeneratorSaveForm.novel_type_id" :apiUrl="route('search.novel-types')"
                                 :multiple="false" placeholder="Select novel types" />
                         </div>
 
@@ -314,8 +349,8 @@ const goPrev = () => {
                                 Audiences <span class="text-red-500">*</span>
                             </label>
 
-                            <InfiniteScrollApiSelect :form="saveForm" fieldName="audience_id"
-                                :selectedItem="saveForm.audience_id" :apiUrl="route('search.audiences')"
+                            <InfiniteScrollApiSelect :form="plotGeneratorSaveForm" fieldName="audience_id"
+                                :selectedItem="plotGeneratorSaveForm.audience_id" :apiUrl="route('search.audiences')"
                                 :multiple="false" placeholder="Select audiences" />
                         </div>
 
@@ -324,7 +359,7 @@ const goPrev = () => {
                                 Additional Information
                             </label>
 
-                            <textarea v-model="saveForm.additional_information" rows="3"
+                            <textarea v-model="plotGeneratorSaveForm.additional_information" rows="3"
                                 placeholder="Any additional context or instructions for the AI..."
                                 class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none border-gray-300"></textarea>
                         </div>
@@ -333,21 +368,21 @@ const goPrev = () => {
 
                     <div class="flex flex-wrap gap-6 pt-2">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" v-model="saveForm.is_18_plus"
+                            <input type="checkbox" v-model="plotGeneratorSaveForm.is_18_plus"
                                 class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
                             <span class="text-sm">18+ Content</span>
                         </label>
 
                         <label class="flex items-center gap-2 cursor-pointer"
-                            :class="{ 'opacity-50': !saveForm.is_18_plus }">
-                            <input type="checkbox" v-model="saveForm.enable_mature_content"
-                                :disabled="!saveForm.is_18_plus"
+                            :class="{ 'opacity-50': !plotGeneratorSaveForm.is_18_plus }">
+                            <input type="checkbox" v-model="plotGeneratorSaveForm.enable_mature_content"
+                                :disabled="!plotGeneratorSaveForm.is_18_plus"
                                 class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
                             <span class="text-sm">Enable Mature Content</span>
                         </label>
 
-                        <p v-if="saveForm.errors.enable_mature_content" class="text-red-500 text-sm w-full">
-                            {{ saveForm.errors.enable_mature_content }}
+                        <p v-if="plotGeneratorSaveForm.errors.enable_mature_content" class="text-red-500 text-sm w-full">
+                            {{ plotGeneratorSaveForm.errors.enable_mature_content }}
                         </p>
                     </div>
                 </div>
@@ -363,15 +398,15 @@ const goPrev = () => {
                     </p>
 
                     <div class="border-2 border-dashed border-purple-200 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-blue-50">
-                        <InfiniteScrollApiSelect :form="saveForm" fieldName="ai_brain_id"
-                            :selectedItem="saveForm.ai_brain_id" :apiUrl="route('search.ai-brains')"
+                        <InfiniteScrollApiSelect :form="plotGeneratorSaveForm" fieldName="ai_brain_id"
+                            :selectedItem="plotGeneratorSaveForm.ai_brain_id" :apiUrl="getAiBrainSearchUrl(activeStep)"
                             :multiple="false" placeholder="Select AI Brain"
-                            :error="saveForm.errors.ai_brain_id"
+                            :error="plotGeneratorSaveForm.errors.ai_brain_id"
                             class="ai-brain-select" />
                     </div>
 
-                    <p v-if="saveForm.errors.ai_brain_id" class="text-red-500 text-sm">
-                        {{ saveForm.errors.ai_brain_id }}
+                    <p v-if="plotGeneratorSaveForm.errors.ai_brain_id" class="text-red-500 text-sm">
+                        {{ plotGeneratorSaveForm.errors.ai_brain_id }}
                     </p>
                 </div>
             </div>
@@ -420,7 +455,7 @@ const goPrev = () => {
 
             <div>
                 <button v-if="activeStep === 1" type="button" @click="submitStep1"
-                    :disabled="saveForm.processing"
+                    :disabled="plotGeneratorSaveForm.processing"
                     class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed">
                     <FontAwesomeIcon v-if="submittingStep === 1" icon="spinner" spin />
                     <FontAwesomeIcon v-else icon="save" />
