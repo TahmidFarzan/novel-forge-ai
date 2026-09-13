@@ -38,6 +38,8 @@ class AiBrainRequest extends FormRequest
             'minimum_wait_time' => ['required', 'integer', 'min:0'],
             'timeout_seconds'   => ['required', 'integer', 'min:1'],
             'max_output_tokens' => ['nullable', 'integer', 'min:1'],
+            'ai_brain_output_type_ids' => ['nullable', 'array'],
+            'ai_brain_output_type_ids.*' => ['integer', 'exists:ai_brain_output_types,id'],
         ];
     }
 
@@ -68,6 +70,8 @@ class AiBrainRequest extends FormRequest
             'timeout_seconds.min'        => 'The timeout seconds must be at least 1.',
             'max_output_tokens.integer'  => 'The max output tokens must be an integer.',
             'max_output_tokens.min'      => 'The max output tokens must be at least 1.',
+            'ai_brain_output_type_ids.array' => 'Ai brain output types must be selected as an array.',
+            'ai_brain_output_type_ids.*.exists' => 'Selected ai brain output type does not exist.',
         ];
     }
 }

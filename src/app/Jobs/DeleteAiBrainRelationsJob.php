@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Jobs;
 
 use App\Models\AiBrain;
@@ -51,8 +52,11 @@ class DeleteAiBrainRelationsJob implements ShouldQueue, ShouldBeUnique
                     if ($aiBrain->activityLogs()->exists()) {
                         $aiBrain->activityLogs()->delete();
                     }
-                });
 
+                    if ($aiBrain->aiBrainOutputTypes()->exists()) {
+                        $aiBrain->aiBrainOutputTypes()->detach();
+                    }
+                });
             } catch (Exception $ex) {
                 Log::error("Fail to delete ai brain relations.", [
                     'exception' => $ex,

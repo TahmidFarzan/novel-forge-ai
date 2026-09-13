@@ -233,6 +233,31 @@ onMounted(async () => {
             class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4"
         >
             <h3 class="text-base font-semibold border-b pb-2">
+                Ai Brain Output Types
+            </h3>
+
+            <div class="flex flex-wrap gap-2">
+                <span
+                    v-for="aiBrainOutputType in aiBrain?.ai_brain_output_types"
+                    :key="aiBrainOutputType?.id"
+                    class="px-3 py-1 text-sm font-medium rounded-full bg-blue-50 text-blue-600 border border-blue-200"
+                >
+                    {{ aiBrainOutputType?.name }}
+                </span>
+
+                <span
+                    v-if="!aiBrain?.aiBrainOutputTypes?.length"
+                    class="text-sm text-gray-500"
+                >
+                    N/A
+                </span>
+            </div>
+        </div>
+
+        <div
+            class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4"
+        >
+            <h3 class="text-base font-semibold border-b pb-2">
                 System Information
             </h3>
 

@@ -20,6 +20,7 @@ class AiBrainService
     {
         return AiBrain::with([
             'createdBy',
+            'aiBrainOutputTypes',
 
             'activityLogs' => fn($query) => $query->latest()->limit(10),
             'activityLogs.causer',
@@ -33,6 +34,7 @@ class AiBrainService
     {
         return AiBrain::with([
             'createdBy',
+            'aiBrainOutputTypes',
 
             'activityLogs' => fn($query) => $query->latest()->limit(10),
             'activityLogs.causer',
@@ -56,6 +58,13 @@ class AiBrainService
             $date = $request->input('date');
             $date = is_string($date) ? new \DateTime($date) : $date;
             $query->whereDate('created_at', '<=', $date);
+        }
+
+        if ($request->filled('ai_brain_output_type_id')) {
+            $query->whereHas(
+                'aiBrainOutputTypes',
+                fn($query) => $query->where('ai_brain_output_types.id', $request->input('ai_brain_output_type_id'))
+            );
         }
 
         if ($request->filled('search')) {
@@ -84,6 +93,7 @@ class AiBrainService
 
             DB::transaction(function () use ($request, $aiBrain, $isNew) {
                 $aiBrain->name              = $request->input('name');
+                $aiBrain->model              = $request->input('model');
                 $aiBrain->api_url           = $request->input('api_url');
                 $aiBrain->api_key           = $request->input('api_key');
                 $aiBrain->brief             = $request->input('brief');
@@ -96,6 +106,10 @@ class AiBrainService
                 $aiBrain->created_by_id     = $isNew ? Auth::id() : $aiBrain->created_by_id;
 
                 $aiBrain->save();
+
+                if ($request->has('ai_brain_output_type_ids')) {
+                    $aiBrain->aiBrainOutputTypes()->sync((array) $request->input('ai_brain_output_type_ids', []));
+                }
             });
             return [
                 'status'  => 'success',

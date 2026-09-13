@@ -1,5 +1,6 @@
 <script setup>
 import Layout from "@/pages/layouts/AuthLayout.vue";
+import InfiniteScrollApiSelect from "@/components/common/multi-select/InfiniteScrollApiSelect.vue";
 
 import { computed, onMounted, nextTick } from "vue";
 import { Head, useForm, router as intertiaJsRoute } from "@inertiajs/vue3";
@@ -34,6 +35,9 @@ const saveForm = useForm({
     minimum_wait_time: aiBrain?.minimum_wait_time,
     timeout_seconds: aiBrain?.timeout_seconds,
     max_output_tokens: aiBrain?.max_output_tokens,
+    ai_brain_output_type_ids:
+        aiBrain?.ai_brain_output_types?.map((aiBrainOutputType) => aiBrainOutputType?.id) ??
+        [],
 });
 
 function validateForm() {
@@ -309,6 +313,28 @@ onMounted(async () => {
                                 class="text-red-500 text-sm mt-1"
                             >
                                 {{ saveForm.errors.brief }}
+                            </p>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium mb-1">
+                                Ai Brain Output Types
+                            </label>
+
+                            <InfiniteScrollApiSelect
+                                :form="saveForm"
+                                fieldName="ai_brain_output_type_ids"
+                                :selectedItem="aiBrain?.ai_brain_output_types ?? []"
+                                :apiUrl="route('search.ai-brain-output-types')"
+                                :multiple="true"
+                                placeholder="Select ai brain output types"
+                            />
+
+                            <p
+                                v-if="saveForm.errors.ai_brain_output_type_ids"
+                                class="text-red-500 text-sm mt-1"
+                            >
+                                {{ saveForm.errors.ai_brain_output_type_ids }}
                             </p>
                         </div>
                     </div>
