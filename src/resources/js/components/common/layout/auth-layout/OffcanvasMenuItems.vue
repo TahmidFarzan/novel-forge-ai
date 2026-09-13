@@ -20,6 +20,7 @@ import {
     faClipboardList,
     faLanguage,
     faBook,
+    faShapes,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -36,7 +37,8 @@ library.add(
     faFileLines,
     faClipboardList,
     faLanguage,
-    faBook
+    faBook,
+    faShapes
 );
 
 import {
@@ -49,6 +51,7 @@ import {
     canAccessKdpLayout,
     canAccessDocumentStyle,
     canAccessAiPrompt,
+    canAccessAiBrainOutputType,
 } from "@/composables/useUserPermissions";
 
 const { authUser } = defineProps({
@@ -72,7 +75,7 @@ const subMenus = ref({
 
 const routeMap = {
     UserManagement: ["/back-office/users/*"],
-    AiAttributes: ["/back-office/ai-brains/*"],
+    AiAttributes: ["/back-office/ai-brains/*", "/back-office/ai-brain-output-types/*"],
     NovelAttributes: ["/back-office/genres/*", "/back-office/audiences/*", "/back-office/novel-types/*", "/back-office/languages/*", "/back-office/kdp-layouts/*"],
     Configuration: ["/back-office/document-styles/*"],
     Reports: ["/reports/*"],
@@ -112,6 +115,10 @@ const canAccessDocumentStyleComputed = computed(() => {
 
 const canAccessAiPromptComputed = computed(() => {
     return canAccessAiPrompt(authUser);
+});
+
+const canAccessAiBrainOutputTypeComputed = computed(() => {
+    return canAccessAiBrainOutputType(authUser);
 });
 
 const toggleShowSubMenu = (key) => {
@@ -280,9 +287,9 @@ const isSubMenuVisible = (key) => {
         <Transition
             enter-active-class="transition-all duration-300 ease-out"
             enter-from-class="opacity-0 max-h-0"
-            enter-to-class="opacity-100 max-h-40"
+            enter-to-class="opacity-100 max-h-60"
             leave-active-class="transition-all duration-200 ease-in"
-            leave-from-class="opacity-100 max-h-40"
+            leave-from-class="opacity-100 max-h-60"
             leave-to-class="opacity-0 max-h-0"
         >
             <div
@@ -307,6 +314,16 @@ const isSubMenuVisible = (key) => {
                 >
                     <FontAwesomeIcon icon="clipboard-list" class="w-4" />
                     Ai Prompt
+                </a>
+
+                <a
+                    v-if="canAccessAiBrainOutputTypeComputed"
+                    :href="route('back-office.ai-brain-output-types.index')"
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--novel-forge-ai-ink-soft)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+                    :class="isCurrentPage('/back-office/ai-brain-output-types/*') ? 'bg-[var(--novel-forge-ai-primary-soft)] font-semibold text-[var(--novel-forge-ai-primary-strong)]' : ''"
+                >
+                    <FontAwesomeIcon icon="shapes" class="w-4" />
+                    Ai Brain Output Type
                 </a>
             </div>
         </Transition>

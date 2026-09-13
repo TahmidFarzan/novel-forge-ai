@@ -127,6 +127,13 @@ class SearchController extends Controller
         );
     }
 
+    public function aiBrainOutputTypes(Request $request): JsonResponse
+    {
+        return response()->json(
+            $this->searchService->aiBrainOutputTypes($request)
+        );
+    }
+
     public function documentStyles(Request $request): JsonResponse
     {
         return response()->json(

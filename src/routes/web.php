@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BackOffice\ActivityLogController;
 use App\Http\Controllers\BackOffice\AiBrainController;
+use App\Http\Controllers\BackOffice\AiBrainOutputTypeController;
 use App\Http\Controllers\BackOffice\AiPromptController;
 use App\Http\Controllers\BackOffice\DocumentStyleController;
 use App\Http\Controllers\BackOffice\GenreController;
@@ -95,6 +96,7 @@ Route::prefix('search')->name('search.')->group(function () {
         Route::get('kdp-layouts', [SearchController::class, 'kdpLayouts'])->name('kdp-layouts');
         Route::get('document-styles', [SearchController::class, 'documentStyles'])->name('document-styles');
         Route::get('ai-prompts', [SearchController::class, 'aiPrompts'])->name('ai-prompts');
+        Route::get('ai-brain-output-types', [SearchController::class, 'aiBrainOutputTypes'])->name('ai-brain-output-types');
         Route::get('users', [SearchController::class, 'users'])->name('users');
 
         Route::get('ai-brain/{slugOrId}', [SearchController::class, 'aiBrain'])->name('ai-brain');
@@ -183,6 +185,11 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
 
         Route::post('save', [AiPromptController::class, 'save'])->name('save');
         Route::patch('update/{slug}', [AiPromptController::class, 'update'])->name('update');
+    });
+
+    Route::prefix('ai-brain-output-types')->name('ai-brain-output-types.')->group(function () {
+        Route::get('/', [AiBrainOutputTypeController::class, 'index'])->name('index');
+        Route::get('details/{slug}', [AiBrainOutputTypeController::class, 'details'])->name('details');
     });
 
     Route::prefix('document-styles')->name('document-styles.')->group(function () {

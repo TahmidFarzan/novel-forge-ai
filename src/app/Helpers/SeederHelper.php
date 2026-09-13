@@ -332,4 +332,21 @@ class SeederHelper
 
         ]);
     }
+
+    public static function aiBrainOutputTypes()
+    {
+        return collect([
+            (object) [
+                'name'  => 'Image',
+                'code'  => 'Image',
+                'brief' => 'AI output type that generates image content.',
+            ],
+
+            (object) [
+                'name'  => 'Text',
+                'code'  => 'Text',
+                'brief' => 'AI output type that generates text content.',
+            ],
+        ]);
+    }
 }

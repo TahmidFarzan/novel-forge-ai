@@ -22,6 +22,7 @@ class UserPermissionHelper
     public const MODULE_KDP_LAYOUT = 'Kdp Layout';
     public const MODULE_DOCUMENT_STYLE = 'Document Style';
     public const MODULE_AI_PROMPT = 'Ai Prompt';
+    public const MODULE_AI_BRAIN_OUTPUT_TYPE = 'Ai Brain Output Type';
     public const MODULE_AUDIENCE = 'Audience';
     public const MODULE_NOVEL_TYPE = 'Novel Type';
     public const MODULE_NOVEL = 'Novel';
@@ -38,6 +39,7 @@ class UserPermissionHelper
             self::MODULE_KDP_LAYOUT,
             self::MODULE_DOCUMENT_STYLE,
             self::MODULE_AI_PROMPT,
+            self::MODULE_AI_BRAIN_OUTPUT_TYPE,
             self::MODULE_NOVEL,
         ]);
     }
@@ -79,6 +81,13 @@ class UserPermissionHelper
                 self::ACCESS_VIEW_ANY,
                 self::ACCESS_VIEW,
                 self::ACCESS_UPDATE,
+            ]);
+        }
+
+        if ($moduleName == self::MODULE_AI_BRAIN_OUTPUT_TYPE) {
+            return SystemHelper::toOptions([
+                self::ACCESS_VIEW_ANY,
+                self::ACCESS_VIEW,
             ]);
         }
 

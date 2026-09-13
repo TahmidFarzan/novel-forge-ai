@@ -6,6 +6,7 @@ use App\Helpers\DatatableHelper;
 use App\Helpers\NovelHelper;
 use App\Helpers\UserHelper;
 use App\Models\AiBrain;
+use App\Models\AiBrainOutputType;
 use App\Models\AiPrompt;
 use App\Models\Audience;
 use App\Models\DocumentStyle;
@@ -497,6 +498,37 @@ class SearchService
             'id'   => $aiPrompt->id,
             'name' => $aiPrompt->name,
             'slug' => $aiPrompt->slug,
+        ]);
+
+        return [
+            'items'        => $items,
+            'total'        => $records->total(),
+            'current_page' => $records->currentPage(),
+            'last_page'    => $records->lastPage(),
+        ];
+    }
+
+    public function aiBrainOutputTypes(Request $request): array
+    {
+        $query = AiBrainOutputType::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('brief', 'like', "%{$search}%");
+            });
+        }
+
+        $records = $query
+            ->orderByDesc('id')
+            ->paginate($request->input('per_page', 25));
+
+        $items = $records->map(fn($aiBrainOutputType) => [
+            'id'   => $aiBrainOutputType->id,
+            'name' => $aiBrainOutputType->name,
+            'slug' => $aiBrainOutputType->slug,
         ]);
 
         return [
