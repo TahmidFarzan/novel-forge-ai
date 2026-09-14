@@ -212,6 +212,9 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
     Route::prefix('novels')->name('novels.')->group(function () {
         Route::get('/', [NovelController::class, 'index'])->name('index');
         Route::get('create', [NovelController::class, 'create'])->name('create');
+
+        Route::get('{slug}/edit', [NovelController::class, 'edit'])->name('edit');
+
         Route::prefix('save')->name('save.')->group(function () {
             Route::post('plot', [NovelController::class, 'savePlot'])->name('plot');
         });

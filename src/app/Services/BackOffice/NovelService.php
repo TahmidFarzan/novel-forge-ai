@@ -147,35 +147,13 @@ class NovelService
                 "novel_type_instruction" => $novelType->prompt_instruction,
             ];
 
-            $prompt = str_replace(
-                [
-                    '{{is_18_plus}}',
-                    '{{enable_mature_content}}',
-                    '{{language}}',
-                    '{{novel_continuity}}',
-                    '{{additional_information}}',
-                    '{{genre_instructions}}',
-                    '{{audience_instruction}}',
-                    '{{novel_type_instruction}}',
-                ],
-                [
-                    $is18Plus,
-                    $enableMatureContent,
-                    $language?->name,
-                    $novelContinuity,
-                    $additionalInformation,
-                    $genrePromptInstruction,
-                    $audience->prompt_instruction,
-                    $novelType->prompt_instruction,
-                ],
-                $aiPrompt->prompt
-            );
+            $prompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $receivedInputs);
 
             $apiResponse = $this->openAiApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             Log::info("Novel AI Response", ["apiResponse" => $apiResponse]);
 
-            $novel = DB::transaction(function () use ($request, $apiResponse, $receivedInputs, $prompt, $novel, $isNew) {
+            $novel = DB::transaction(function () use ($request, $apiResponse, $receivedInputs, $novel, $isNew) {
                 $novelObject = $this->extractNovelFromResponse($apiResponse);
 
                 $novel->title     = $novelObject->title;
@@ -183,7 +161,6 @@ class NovelService
                 $novel->plot      = $novelObject->plot;
 
                 $novel->received_inputs      = $receivedInputs;
-                $novel->ai_prompt      = $prompt;
 
                 $novel->audience_id   = $request->input("audience_id");
                 $novel->novel_type_id = $request->input("novel_type_id");
@@ -205,6 +182,7 @@ class NovelService
             });
 
             return [
+                "novel" => $novel,
                 'status'  => 'success',
                 'message' => $isNew
                     ? 'Novel created successfully.'

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\BackOffice;
 
 use App\Http\Controllers\Controller;
@@ -40,6 +41,16 @@ class NovelController extends Controller
         ]);
     }
 
+    public function edit(string $slug): InertiaResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        return Inertia::render('back-office/novels/Create', [
+            'novel' => $novel,
+        ]);
+    }
+
 
     public function savePlot(NovelPlotRequest $request): RedirectResponse
     {
@@ -48,7 +59,7 @@ class NovelController extends Controller
 
         $result = $this->novelService->savePlot($request, $novel);
 
-        return to_route('back-office.novels.index')->with('flash_message', [
+        return to_route('back-office.novels.edit',["slug" => $result['novel']->slug])->with('flash_message', [
             'message' => $result['message'],
             'status'  => $result['status'],
         ]);
