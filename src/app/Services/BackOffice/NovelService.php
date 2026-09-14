@@ -12,7 +12,7 @@ use App\Services\BackOffice\AudienceService;
 use App\Services\BackOffice\GenreService;
 use App\Services\BackOffice\LanguageService;
 use App\Services\BackOffice\NovelTypeService;
-use App\Services\BackOffice\OpenAiApiService;
+use App\Services\BackOffice\HuggingFaceApiService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,17 +27,17 @@ class NovelService
     protected AudienceService $audienceService;
     protected GenreService $genreService;
     protected NovelTypeService $novelTypeService;
-    protected OpenAiApiService $openAiApiService;
+    protected HuggingFaceApiService $huggingFaceApiService;
     protected LanguageService $languageService;
 
-    public function __construct(AiBrainService $aiBrainService, AiPromptService $aiPromptService, AudienceService $audienceService, GenreService $genreService, NovelTypeService $novelTypeService, OpenAiApiService $openAiApiService, LanguageService $languageService)
+    public function __construct(AiBrainService $aiBrainService, AiPromptService $aiPromptService, AudienceService $audienceService, GenreService $genreService, NovelTypeService $novelTypeService, HuggingFaceApiService $huggingFaceApiService, LanguageService $languageService)
     {
         $this->aiBrainService   = $aiBrainService;
         $this->aiPromptService  = $aiPromptService;
         $this->audienceService  = $audienceService;
         $this->genreService     = $genreService;
         $this->novelTypeService = $novelTypeService;
-        $this->openAiApiService = $openAiApiService;
+        $this->huggingFaceApiService = $huggingFaceApiService;
         $this->languageService  = $languageService;
     }
 
@@ -149,7 +149,7 @@ class NovelService
 
             $prompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $receivedInputs);
 
-            $apiResponse = $this->openAiApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             Log::info("Novel AI Response", ["apiResponse" => $apiResponse]);
 
