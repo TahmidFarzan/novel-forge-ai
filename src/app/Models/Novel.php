@@ -85,7 +85,7 @@ class Novel extends Model
     {
         return SlugOptions::create()
             ->saveSlugsTo('slug')
-            ->generateSlugsFrom("name")
+            ->generateSlugsFrom(["title","sub_title"])
             ->doNotGenerateSlugsOnUpdate()
             ->slugsShouldBeNoLongerThan(255)
             ->usingSuffixGenerator(fn() => Str::lower(Str::random(5)));

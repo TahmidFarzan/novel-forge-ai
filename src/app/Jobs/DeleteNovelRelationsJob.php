@@ -43,12 +43,17 @@ class DeleteNovelRelationsJob implements ShouldQueue, ShouldBeUnique
     {
         $novel = Novel::find($this->novelId);
 
-        if ($novel && ($novel->activityLogs()->exists() )) {
+        if ($novel && ($novel->activityLogs()->exists() || $novel->genres()->exists())) {
 
             try {
                 DB::transaction(function () use ($novel) {
                     if ($novel->activityLogs()->exists()) {
                         $novel->activityLogs()->delete();
+                    }
+
+
+                    if ($novel->genres()->exists()) {
+                        $novel->genres()->detach();
                     }
                 });
 

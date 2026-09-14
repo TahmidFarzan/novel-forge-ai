@@ -78,7 +78,8 @@ class NovelService
             $likeSearch = "%{$search}%";
 
             $query->whereAny([
-                'name',
+                'title',
+                'sub_title',
             ], 'like', $likeSearch);
         }
 
