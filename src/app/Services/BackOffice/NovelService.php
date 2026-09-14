@@ -173,11 +173,11 @@ class NovelService
             Log::info("Novel AI Response", ["apiResponse" => $apiResponse]);
 
             $novel = DB::transaction(function () use ($request, $apiResponse, $receivedInputs, $prompt, $novel, $isNew) {
-                $apiResponseFormated = $this->extractNovelResponse($apiResponse);
+                $novelObject = $this->extractNovelFromResponse($apiResponse);
 
-                $novel->title     = $apiResponseFormated['title'];
-                $novel->sub_title = $apiResponseFormated['subtitle'];
-                $novel->plot      = $apiResponseFormated['plot'];
+                $novel->title     = $novelObject->title;
+                $novel->sub_title = $novelObject->subtitle;
+                $novel->plot      = $novelObject->plot;
 
                 $novel->received_inputs      = $receivedInputs;
                 $novel->ai_prompt      = $prompt;
@@ -246,7 +246,7 @@ class NovelService
         }
     }
 
-    private function extractNovelResponse($apiResponse): array
+    private function extractNovelFromResponse($apiResponse): object
     {
         $content = data_get(
             $apiResponse,
@@ -277,7 +277,7 @@ class NovelService
             throw new Exception("AI response is not valid JSON.");
         }
 
-        return [
+        return (object) [
             'title'    => $decoded['novel_title'] ?? null,
             'subtitle' => $decoded['novel_subtitle'] ?? null,
             'plot'     => $decoded['novel_plot'] ?? null,
