@@ -2,7 +2,7 @@
 namespace App\Http\Controllers\BackOffice;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\NovelRequest;
+use App\Http\Requests\NovelPlotRequest;
 use App\Services\BackOffice\NovelService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,12 +41,12 @@ class NovelController extends Controller
     }
 
 
-    public function save(NovelRequest $request): RedirectResponse
+    public function savePlot(NovelPlotRequest $request): RedirectResponse
     {
         $novel = $this->novelService->new();
         Gate::authorize('create', $novel);
 
-        $result = $this->novelService->save($request, $novel);
+        $result = $this->novelService->savePlot($request, $novel);
 
         return to_route('back-office.novels.index')->with('flash_message', [
             'message' => $result['message'],

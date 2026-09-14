@@ -160,7 +160,7 @@ function submitStep1() {
     submittingStep.value = 1
     plotGeneratorSaveForm.processing = true
 
-    plotGeneratorSaveForm.post(route('back-office.novels.save'), {
+    plotGeneratorSaveForm.post(route('back-office.novels.save.plot'), {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {

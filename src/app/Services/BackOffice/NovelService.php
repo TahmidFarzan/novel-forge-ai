@@ -3,7 +3,7 @@
 namespace App\Services\BackOffice;
 
 use App\Helpers\NovelHelper;
-use App\Http\Requests\NovelRequest;
+use App\Http\Requests\NovelPlotRequest;
 use App\Models\Novel;
 use App\Services\BackOffice\AiBrainService;
 use App\Services\BackOffice\AiPromptService;
@@ -97,7 +97,7 @@ class NovelService
             ->appends($request->all());
     }
 
-    public function save(NovelRequest $request, Novel $novel): array
+    public function savePlot(NovelPlotRequest $request, Novel $novel): array
     {
         $isNew       = empty($novel->id);
         $statusEvent = $isNew ? "save" : "update";
