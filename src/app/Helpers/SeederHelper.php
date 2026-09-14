@@ -303,12 +303,12 @@ class SeederHelper
 
             (object) [
                 'name'              => 'Google: Gemma 4 26B A4B',
-                "model"             => "google/gemma-4-26b-a4b-it:free",
+                'model'             => 'google/gemma-4-26B-A4B-it',
                 'api_url'           => 'https://router.huggingface.co/v1',
                 'api_key'           => null,
                 'brief'             => 'AI writing model for generating documents, workbooks, ebooks and structured educational content.',
                 'focus'             => 'Premium document generation, chapter writing, workbook creation, story generation, educational materials',
-                'context_window'    => 262000,
+                'context_window'    => 262144,
                 'average_latency'   => 0.90,
                 'minimum_wait_time' => 2,
                 'timeout_seconds'   => 60,

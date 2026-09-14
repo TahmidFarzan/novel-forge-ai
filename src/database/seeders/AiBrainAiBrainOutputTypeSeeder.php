@@ -31,6 +31,12 @@ class AiBrainAiBrainOutputTypeSeeder extends Seeder
             'google-gemma-4-26b-a4b' => [
                 'text',
             ],
+            'Qwen/Qwen3-8B' => [
+                'text',
+            ],
+            'mistralai/Mistral-Small-3.2-24B-Instruct-2506' => [
+                'text',
+            ],
         ];
 
         foreach ($mapping as $aiBrainSlug => $aiBrainOutputTypeSlugs) {
