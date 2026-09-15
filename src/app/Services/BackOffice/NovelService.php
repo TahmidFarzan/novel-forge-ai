@@ -138,28 +138,18 @@ class NovelService
                 $genrePromptInstruction .= $gInstruction;
             }
 
-            $receivedInputs = [
-                "language" => $language?->name,
-                "additional_information" => $additionalInformation,
-                "genre_prompt_instruction" => $genrePromptInstruction,
-                "audience_instruction" => $audience->prompt_instruction,
-                "novel_type_instruction" => $novelType->prompt_instruction,
-            ];
-
+            $receivedInputs = $this->receivedInputsFormatter($request->input("language_id"), $request->input("audience_id"), $request->input("novel_type_id"), $request->input("genre_ids"), $request->input("additional_information", "Auto"));
             $prompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $receivedInputs);
 
             $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
-            Log::info("Novel AI Response", ["apiResponse" => $apiResponse]);
-
-            $novel = DB::transaction(function () use ($request, $apiResponse, $receivedInputs, $novel, $isNew) {
+            $novel = DB::transaction(function () use ($request, $apiResponse, $novel, $isNew) {
                 $novelObject = $this->extractNovelPlotFromResponse($apiResponse);
 
                 $novel->title     = $novelObject->title;
                 $novel->sub_title = $novelObject->subtitle;
                 $novel->plot      = $novelObject->plot;
 
-                $novel->received_inputs      = $receivedInputs;
 
                 $novel->audience_id   = $request->input("audience_id");
                 $novel->novel_type_id = $request->input("novel_type_id");
@@ -266,9 +256,45 @@ class NovelService
         }
 
         return (object) [
-            'title' => $decoded['story_book_title'] ?? null,
-            'subtitle' => $decoded['story_book_subtitle'] ?? null,
-            'plot' => $decoded['story_book_plot'] ?? null,
+            'title' => $decoded['novel_title'] ?? null,
+            'subtitle' => $decoded['novel_subtitle'] ?? null,
+            'plot' => $decoded['novel_plot'] ?? null,
         ];
+    }
+
+    private function receivedInputsFormatter(int|string $languageId, int|string $audienceId, int|string $storyBookTypeId, array $genreIds, string $additionalInformation): array
+    {
+        $receivedInputs = array();
+
+        $language  = $this->languageService->findByIdsOrEnglish($languageId);
+        $audience  = $this->audienceService->findById($audienceId);
+        $storyBookType = $this->audienceService->findById($storyBookTypeId);
+        $genres    = $this->genreService->findByIdsOrRandom($genreIds);
+
+        $genrePromptInstruction = '';
+        foreach ($genres as $genre) {
+
+            $gInstruction = trim($genre->prompt_instruction);
+
+            if (! str_ends_with($gInstruction, '.')) {
+                $gInstruction .= '.';
+            }
+
+            if ($genrePromptInstruction !== '') {
+                $genrePromptInstruction .= ' ';
+            }
+
+            $genrePromptInstruction .= $gInstruction;
+        }
+
+        $receivedInputs = [
+            "language" => $language?->name,
+            "additional_information" => $additionalInformation,
+            "genre_prompt_instruction" => $genrePromptInstruction,
+            "audience_instruction" => $audience->prompt_instruction,
+            "novel_type_instruction" => $storyBookType->prompt_instruction,
+        ];
+
+        return $receivedInputs;
     }
 }

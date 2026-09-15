@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title', 255);
             $table->string('sub_title', 255);
-            
+
             $table->timestamp('datetime')->nullable();
 
             $table->foreignId('audience_id')->constrained('audiences')->cascadeOnDelete();
@@ -27,7 +27,6 @@ return new class extends Migration
             $table->boolean('enable_mature_content')->default(false);
             $table->longText('additional_information')->nullable();
 
-            $table->jsonb('received_inputs')->nullable();
 
             $table->jsonb('plot')->nullable();
             $table->jsonb('characters')->nullable();
