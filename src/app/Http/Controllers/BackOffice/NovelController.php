@@ -59,7 +59,13 @@ class NovelController extends Controller
 
         $result = $this->novelService->savePlot($request, $novel);
 
-        return to_route('back-office.novels.edit',["slug" => $result['novel']->slug])->with('flash_message', [
+        if ($result['novel']?->slug) {
+            return to_route('back-office.novels.edit', ["slug" => $result['novel']?->slug])->with('flash_message', [
+                'message' => $result['message'],
+                'status'  => $result['status'],
+            ]);
+        }
+        return to_route('back-office.novels.index')->with('flash_message', [
             'message' => $result['message'],
             'status'  => $result['status'],
         ]);

@@ -142,6 +142,11 @@ class Novel extends Model
         return $this->morphMany(Activity::class, 'subject');
     }
 
+    public function audience(): BelongsTo
+    {
+        return $this->belongsTo(Audience::class);
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by_id');
@@ -150,6 +155,11 @@ class Novel extends Model
     public function genres()
     {
         return $this->belongsToMany(Genre::class, 'genre_novel');
+    }
+
+    public function language(): BelongsTo
+    {
+        return $this->belongsTo(Language::class);
     }
 
     public function latestActivityLog(): MorphOne

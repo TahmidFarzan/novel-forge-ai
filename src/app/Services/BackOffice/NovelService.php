@@ -49,6 +49,12 @@ class NovelService
     public function find(string $slug): Novel
     {
         return Novel::with([
+            'language',
+            'novelType',
+            'audience',
+            'genres',
+
+
             'createdBy',
 
             'activityLogs' => fn($query) => $query->latest()->limit(10),
@@ -154,7 +160,7 @@ class NovelService
             Log::info("Novel AI Response", ["apiResponse" => $apiResponse]);
 
             $novel = DB::transaction(function () use ($request, $apiResponse, $receivedInputs, $novel, $isNew) {
-                $novelObject = $this->extractNovelFromResponse($apiResponse);
+                $novelObject = $this->extractNovelPlotFromResponse($apiResponse);
 
                 $novel->title     = $novelObject->title;
                 $novel->sub_title = $novelObject->subtitle;
@@ -165,6 +171,12 @@ class NovelService
                 $novel->audience_id   = $request->input("audience_id");
                 $novel->novel_type_id = $request->input("novel_type_id");
                 $novel->language_id   = $request->input("language_id");
+
+                $novel->novel_continuity   = $request->input("novel_continuity");
+                $novel->is_18_plus   = $request->input("is_18_plus");
+                $$novel->enable_mature_content   = $request->input("enable_mature_content");
+                $novel->additional_information   = $request->input("additional_information");
+
                 $novel->status        = NovelHelper::STATUS_ONGOING;
 
                 if ($isNew) {
@@ -195,6 +207,7 @@ class NovelService
             ]);
 
             return [
+                "novel" => null,
                 'status'  => 'error',
                 'message' => 'Failed to save novel. Please try again.',
             ];
@@ -227,41 +240,45 @@ class NovelService
         }
     }
 
-    private function extractNovelFromResponse($apiResponse): object
+    private function extractNovelPlotFromResponse($apiResponse): object
     {
         $content = data_get(
             $apiResponse,
             'choices.0.message.content'
         );
 
-        if (! $content) {
-            throw new Exception("Invalid AI response structure.");
+        if (! is_string($content) || trim($content) === '') {
+            throw new Exception('Invalid AI response structure.');
         }
 
         $content = trim($content);
 
-        $content = str_replace(
-            [
-                '```json',
-                '```',
-            ],
+        $content = preg_replace(
+            '/^```(?:json)?\s*|\s*```$/i',
             '',
             $content
         );
 
+        $content = trim($content);
+
         $decoded = json_decode(
-            trim($content),
+            $content,
             true
         );
 
-        if (! is_array($decoded)) {
-            throw new Exception("AI response is not valid JSON.");
+        if (
+            json_last_error() !== JSON_ERROR_NONE ||
+            ! is_array($decoded)
+        ) {
+            throw new Exception(
+                'AI response is not valid JSON: ' . json_last_error_msg()
+            );
         }
 
         return (object) [
-            'title'    => $decoded['novel_title'] ?? null,
-            'subtitle' => $decoded['novel_subtitle'] ?? null,
-            'plot'     => $decoded['novel_plot'] ?? null,
+            'title' => $decoded['story_book_title'] ?? null,
+            'subtitle' => $decoded['story_book_subtitle'] ?? null,
+            'plot' => $decoded['story_book_plot'] ?? null,
         ];
     }
 }
