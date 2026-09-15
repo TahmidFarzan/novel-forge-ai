@@ -4,7 +4,6 @@ import InfiniteScrollApiSelect from "@/components/common/multi-select/InfiniteSc
 
 import {
     AiBrainOutputTypes,
-    buildAiBrainSearchUrl,
 } from "@/composables/useAiBrain";
 
 import { ref, computed, onMounted, nextTick, watch } from "vue";
@@ -122,10 +121,7 @@ const completedSteps = ref(new Set());
 const submittingStep = ref(null);
 
 const plotGeneratorSaveForm = useForm({
-    is_18_plus: props.novel?.is_18_plus ?? false,
-    enable_mature_content: props.novel?.enable_mature_content ?? false,
     additional_information: props.novel?.additional_information ?? null,
-    novel_continuity: props.novel?.novel_continuity ?? null,
     language_id: props.novel?.language_id ?? null,
     genre_ids: props.novel?.genres?.map((genre) => genre.id) ?? [],
     novel_type_id: props.novel?.novel_type_id ?? null,
@@ -181,22 +177,16 @@ watch(
 
         audienceDependentFieldsReset.value = true;
 
-        plotGeneratorSaveForm.novel_continuity = null;
         plotGeneratorSaveForm.language_id = null;
         plotGeneratorSaveForm.genre_ids = [];
         plotGeneratorSaveForm.novel_type_id = null;
         plotGeneratorSaveForm.additional_information = null;
-        plotGeneratorSaveForm.is_18_plus = false;
-        plotGeneratorSaveForm.enable_mature_content = false;
 
         plotGeneratorSaveForm.clearErrors(
-            "novel_continuity",
             "language_id",
             "genre_ids",
             "novel_type_id",
             "additional_information",
-            "is_18_plus",
-            "enable_mature_content",
         );
 
         audienceDependentFieldsKey.value++;
@@ -231,6 +221,14 @@ const getStepState = (stepId) => {
     return "locked";
 };
 
+function buildAiBrainSearchUrl(outputTypeCode) {
+    if (!outputTypeCode) {
+        return route('search.ai-brains')
+    }
+
+    return route('search.ai-brains', { ai_brain_output_type_code: outputTypeCode })
+}
+
 const validateStep = (stepId) => {
     const step = getStepDefinition(stepId);
     const stepForm = STEP_FORMS[stepId];
@@ -245,14 +243,6 @@ const validateStep = (stepId) => {
     }
 
     if (stepId === 1) {
-        if (!stepForm.novel_continuity) {
-            stepForm.setError(
-                "novel_continuity",
-                "Novel continuity is required",
-            );
-            valid = false;
-        }
-
         if (!stepForm.language_id) {
             stepForm.setError("language_id", "Language is required");
             valid = false;
@@ -273,14 +263,6 @@ const validateStep = (stepId) => {
 
         if (!stepForm.audience_id) {
             stepForm.setError("audience_id", "Audience is required");
-            valid = false;
-        }
-
-        if (stepForm.enable_mature_content && !stepForm.is_18_plus) {
-            stepForm.setError(
-                "enable_mature_content",
-                "Mature content requires 18+ setting",
-            );
             valid = false;
         }
     }
@@ -544,48 +526,6 @@ const goPrev = () => {
                                     <label
                                         class="block text-sm font-medium mb-1"
                                     >
-                                        Novel Continuity
-                                        <span class="text-red-500">*</span>
-                                    </label>
-
-                                    <InfiniteScrollApiSelect
-                                        :key="`novel-continuity-${audienceDependentFieldsKey}`"
-                                        :form="plotGeneratorSaveForm"
-                                        fieldName="novel_continuity"
-                                        :selectedItem="
-                                            audienceDependentFieldsReset
-                                                ? null
-                                                : props.novel?.novel_continuity
-                                        "
-                                        :apiUrl="
-                                            route('search.novel-continuities')
-                                        "
-                                        :multiple="false"
-                                        placeholder="Select continuity"
-                                        :error="
-                                            plotGeneratorSaveForm.errors
-                                                .novel_continuity
-                                        "
-                                    />
-
-                                    <p
-                                        v-if="
-                                            plotGeneratorSaveForm.errors
-                                                .novel_continuity
-                                        "
-                                        class="text-red-500 text-sm mt-1"
-                                    >
-                                        {{
-                                            plotGeneratorSaveForm.errors
-                                                .novel_continuity
-                                        }}
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <label
-                                        class="block text-sm font-medium mb-1"
-                                    >
                                         Language
                                         <span class="text-red-500">*</span>
                                     </label>
@@ -718,56 +658,6 @@ const goPrev = () => {
                                         class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none border-gray-300"
                                     ></textarea>
                                 </div>
-                            </div>
-
-                            <div class="flex flex-wrap gap-6 pt-2">
-                                <label
-                                    class="flex items-center gap-2 cursor-pointer"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        v-model="
-                                            plotGeneratorSaveForm.is_18_plus
-                                        "
-                                        class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                    />
-                                    <span class="text-sm"> 18+ Content </span>
-                                </label>
-
-                                <label
-                                    class="flex items-center gap-2 cursor-pointer"
-                                    :class="{
-                                        'opacity-50':
-                                            !plotGeneratorSaveForm.is_18_plus,
-                                    }"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        v-model="
-                                            plotGeneratorSaveForm.enable_mature_content
-                                        "
-                                        :disabled="
-                                            !plotGeneratorSaveForm.is_18_plus
-                                        "
-                                        class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                    />
-                                    <span class="text-sm">
-                                        Enable Mature Content
-                                    </span>
-                                </label>
-
-                                <p
-                                    v-if="
-                                        plotGeneratorSaveForm.errors
-                                            .enable_mature_content
-                                    "
-                                    class="text-red-500 text-sm w-full"
-                                >
-                                    {{
-                                        plotGeneratorSaveForm.errors
-                                            .enable_mature_content
-                                    }}
-                                </p>
                             </div>
                         </div>
 

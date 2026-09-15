@@ -18,8 +18,6 @@ class NovelHelper
     public const STEP_STATUS_FAILED    = 'Failed';
     public const STEP_STATUS_CANCELLED    = 'Cancelled';
 
-    public const CONTINUITY_STANDALONE    = 'Standalone';
-
     public static function statuses(): Collection
     {
         return SystemHelper::toOptions([
@@ -39,13 +37,6 @@ class NovelHelper
             self::STEP_STATUS_FAILED,
             self::STEP_STATUS_CANCELLED,
             self::STEP_STATUS_COMPLETE,
-        ]);
-    }
-
-    public static function continuities(): Collection
-    {
-        return SystemHelper::toOptions([
-            self::CONTINUITY_STANDALONE,
         ]);
     }
 }

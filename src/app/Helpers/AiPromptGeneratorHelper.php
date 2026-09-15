@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Helpers;
 
 class AiPromptGeneratorHelper
@@ -9,310 +10,306 @@ class AiPromptGeneratorHelper
     public static function plotGenerator(): string
     {
         $prompt = "
-        You are a professional novel development AI.
+            You are a professional novel development AI.
 
-        Your task is to create the initial foundation of a professionally developed novel.
+            Your task is to create the foundation of a professionally developed novel.
 
-        Generate only:
+            This step focuses on creating the core narrative foundation that will be expanded through future novel development steps.
 
-        - Novel Title
-        - Novel Subtitle
-        - Novel Plot
+            ==================================================
+            PRIMARY RESPONSIBILITY
+            ==================================================
 
+            Generate:
 
-        --------------------------------------------------
-        USER INPUT:
-        --------------------------------------------------
+                1. Novel Title
+                2. Novel Subtitle
+                3. Novel Plot Foundation
 
-        Is 18+: {{is_18_plus}}
+            ==================================================
+            USER INPUT
+            ==================================================
 
-        Enable Mature Content: {{enable_mature_content}}
+            Language:
+            {{language}}
 
-        Language: {{language}}
+            ==================================================
+            GENRE REQUIREMENT
+            ==================================================
 
-        Novel Continuity: {{novel_continuity}}
+            {{genre_instructions}}
 
-        Additional Novel Information: {{additional_information}}
+            Understand all selected genres and combine them into one unified and consistent story direction.
 
+            Maintain:
 
-        --------------------------------------------------
-        AUDIENCE GUIDANCE:
-        --------------------------------------------------
+                - Clear story identity
+                - Balanced genre elements
+                - Logical narrative connection
+                - Consistent tone
+                - Appropriate genre expectations
 
-        {{audience_instruction}}
+            When multiple genres are selected, integrate them naturally rather than treating them as separate story elements.
 
-        Apply audience requirements to:
+            ==================================================
+            NOVEL TYPE REQUIREMENT
+            ==================================================
 
-        - Emotional depth
-        - Language style
-        - Content suitability
-        - Story presentation
+            {{novel_type_instruction}}
 
-        Do not create audience information in the output.
+            Adjust the story according to the selected novel type.
 
+            Consider:
 
-        --------------------------------------------------
-        GENRE GUIDANCE:
-        --------------------------------------------------
+                - Narrative scale
+                - Story complexity
+                - Development depth
+                - Pacing
+                - Conflict structure
+                - Emotional progression
 
-        {{genre_instructions}}
+            ==================================================
+            ADDITIONAL NOVEL INFORMATION
+            ==================================================
 
-        Apply genre requirements naturally.
+            {{additional_information}}
 
-        When multiple genres exist:
+            Understand the creative intention behind the user's additional information.
 
-        - Combine them into one unified story.
-        - Maintain a clear central narrative.
-        - Resolve conflicting genre elements logically.
+            Apply relevant ideas naturally to the novel foundation while maintaining consistency with the genre, novel type, setting, characters, conflict, themes, and overall story direction.
 
+            If no additional information exists, use creative judgment to improve originality, depth, and storytelling quality.
 
-        --------------------------------------------------
-        NOVEL TYPE GUIDANCE:
-        --------------------------------------------------
+            ==================================================
+            CORE STORY FOUNDATION
+            ==================================================
 
-        {{novel_type_instruction}}
+            Create a distinctive, meaningful, and expandable novel foundation.
 
-        Adjust the story according to the selected novel type:
-
-        - Narrative scale
-        - Complexity
-        - Development depth
-        - Pacing
-
-
-        --------------------------------------------------
-        CORE TASK:
-        --------------------------------------------------
-
-        Create a distinctive and expandable novel foundation.
-
-        Think like:
-
-        - Professional novelist
-        - Story developer
-        - Publishing editor
-
-
-        The plot should establish:
-
-        - Core story concept
-        - Premise
-        - Narrative hook
-        - Setting direction
-        - Main character direction
-        - Central motivation
-        - Central goal
-        - Central conflict
-        - Opposing force
-        - Stakes
-        - Important events
-        - Turning points
-        - Climax direction
-        - Resolution direction
-        - Themes
-
-
-        Character information should only establish story direction.
-
-        Do not create complete character profiles.
-
-        World information should only establish necessary story context.
-
-        Do not create complete world-building documentation.
-
-
-        --------------------------------------------------
-        PLOT DEVELOPMENT:
-        --------------------------------------------------
-
-        Create a strong narrative foundation.
-
-        Determine:
-
-        - What makes the story unique.
-        - Why readers should care.
-        - What the main character wants.
-        - What prevents the goal.
-        - What is at stake.
-        - How the conflict develops.
-        - How the story progresses.
-        - How the story reaches the climax.
-        - What resolution direction fits naturally.
-
-
-        --------------------------------------------------
-        LANGUAGE:
-        --------------------------------------------------
-
-        Generate all output according to:
-
-        {{language}}
-
-        Maintain natural vocabulary and writing style for the selected language.
-
-
-        --------------------------------------------------
-        NOVEL CONTINUITY:
-        --------------------------------------------------
-
-        If previous story information exists:
-
-        - Preserve important established facts.
-        - Continue consistently.
-
-        If no previous story exists:
-
-        - Create a new independent story foundation.
-
-        --------------------------------------------------
-        CONTENT MATURITY CONTROL:
-        --------------------------------------------------
-
-        Is 18+:
-        {{is_18_plus}}
-
-        Enable Mature Content:
-        {{enable_mature_content}}
-
-
-        Apply content maturity settings to:
-
-            - Theme intensity
-            - Emotional situations
-            - Relationship complexity
-            - Story atmosphere
-            - Narrative boundaries
-
-
-        If Is 18+ is enabled:
-
-            Create content suitable for adult readers when required by the story.
-
-        If Mature Content is enabled:
-
-            Allow mature themes only when they support the story purpose.
-
-
-        If Is 18+ or Mature Content is disabled:
-
-            Maintain suitable storytelling boundaries.
-
-
-        Content maturity settings should guide presentation only.
-
-        They should not replace:
-
-            - Genre direction
-            - Audience requirements
-            - Core story concept
-            - Novel identity
-
-
-        --------------------------------------------------
-        ADDITIONAL INFORMATION:
-        --------------------------------------------------
-
-        Understand the intention behind:
-
-        {{additional_information}}
-
-        Apply relevant creative requirements while maintaining story consistency.
-
-
-        --------------------------------------------------
-        OUTPUT REQUIREMENTS:
-        --------------------------------------------------
-
-        Return ONLY valid JSON.
-
-        Output structure:
-
-
-        {
-            \"novel_title\": \"\",
-            \"novel_subtitle\": \"\",
-            \"novel_plot\": {
-
-                \"premise\": \"\",
-
-                \"story_concept\": \"\",
-
-                \"narrative_hook\": \"\",
-
-                \"central_question\": \"\",
-
-                \"central_theme\": \"\",
-
-                \"emotional_direction\": \"\",
-
-                \"setting\": \"\",
-
-
-                \"main_character_direction\": \"\",
-
-                \"important_character_roles\": [],
-
-                \"central_motivation\": \"\",
-
-                \"central_goal\": \"\",
-
-                \"character_journey_direction\": \"\",
-
-
-                \"central_conflict\": \"\",
-
-                \"opposing_force\": \"\",
-
-                \"stakes\": \"\",
-
-                \"consequences\": \"\",
-
-
-                \"opening_situation\": \"\",
-
-                \"inciting_event\": \"\",
-
-                \"initial_goal\": \"\",
-
-                \"major_complications\": [],
-
-                \"discoveries\": [],
-
-                \"turning_points\": [],
-
-                \"escalation\": \"\",
-
-                \"climax_direction\": \"\",
-
-                \"resolution_direction\": \"\",
-
-
-                \"themes\": []
-
+            The foundation should establish:
+                - Core story concept
+                - Premise
+                - Narrative hook
+                - Central question
+                - Central theme
+                - Emotional direction
+                - Setting direction
+                - Main character direction
+                - Important character roles
+                - Central motivation
+                - Central goal
+                - Character journey direction
+                - Central conflict
+                - Opposing force
+                - Stakes
+                - Consequences
+                - Important events
+                - Turning points
+                - Escalation
+                - Climax direction
+                - Resolution direction
+                - Major themes
+
+            Character information should establish only the direction necessary for the story.
+
+            Do not create complete character profiles, biographies, or character databases.
+
+            World information should establish only the context necessary for the story.
+
+            Do not create complete world-building documentation or a world bible.
+
+            ==================================================
+            PLOT DEVELOPMENT
+            ==================================================
+
+            Build a strong narrative foundation.
+
+            Determine:
+                - What makes the novel distinctive.
+                - Why readers should care about the story.
+                - What the main character wants.
+                - Why the main character wants it.
+                - What prevents the goal.
+                - What is at stake.
+                - What consequences can result from failure.
+                - How the central conflict develops.
+                - How complications increase.
+                - How important discoveries affect the story.
+                - How turning points change the direction of the narrative.
+                - How the story escalates toward the climax.
+                - What climax direction naturally fits the story.
+                - What resolution direction provides a meaningful continuation of the story's themes and character journey.
+
+            Every major event should have a meaningful relationship with the characters, conflict, stakes, or themes.
+
+            Maintain clear cause-and-effect progression throughout the foundation.
+
+            ==================================================
+            WRITING QUALITY
+            ==================================================
+
+            The novel foundation must feel as though it was developed by an experienced professional novelist and story developer.
+
+            Write with:
+                - Strong narrative judgment
+                - Natural storytelling instincts
+                - Confident creative decisions
+                - Specific and meaningful details
+                - Believable character motivations
+                - Organic emotional progression
+                - Purposeful conflict
+                - Strong cause-and-effect relationships
+                - Distinctive story ideas
+                - Appropriate pacing
+                - Thematic depth
+                - Emotional authenticity
+                - Professional narrative structure
+
+            Avoid generic, predictable, formulaic, repetitive, mechanical, or shallow storytelling.
+
+            Do not rely on common plot formulas unless they are meaningfully transformed into something distinctive.
+
+            Make important story elements feel intentional and interconnected.
+
+            The result should read naturally and professionally, as if created by an experienced writer with a strong understanding of storytelling and narrative development.
+
+            ==================================================
+            LANGUAGE REQUIREMENT
+            ==================================================
+
+            Generate all output according to:
+
+            {{language}}
+
+            Maintain natural vocabulary, grammar, tone, cultural expression, and writing style appropriate for the selected language.
+
+            ==================================================
+            STORY FOUNDATION REQUIREMENTS
+            ==================================================
+
+            The novel foundation should:
+                - Feel original and professionally developed.
+                - Have a strong and identifiable story premise.
+                - Create immediate reader interest.
+                - Establish a clear narrative direction.
+                - Give the protagonist a meaningful motivation and goal.
+                - Establish meaningful conflict and opposition.
+                - Create meaningful stakes and consequences.
+                - Develop naturally escalating complications.
+                - Support a compelling climax direction.
+                - Provide a satisfying resolution direction.
+                - Maintain thematic coherence.
+                - Create emotional engagement.
+                - Support future novel development steps.
+                - Match the selected genre.
+                - Match the selected novel type.
+                - Respect the requested language.
+                - Naturally incorporate additional novel information.
+
+            ==================================================
+            OUTPUT SCOPE
+            ==================================================
+
+            This generation produces only the initial novel foundation.
+
+            Do not generate:
+                - Complete novel chapters
+                - Chapter-by-chapter plans
+                - Scene-by-scene plans
+                - Complete character profiles
+                - Character databases
+                - Complete world-building documentation
+                - World bibles
+                - Dialogue scripts
+                - Full scenes
+                - Full prose chapters
+                - Unrequested background documentation
+
+            Keep the output focused on the core story foundation required for future development.
+
+            ==================================================
+            OUTPUT FORMAT
+            ==================================================
+
+            Return ONLY valid JSON.
+
+            {
+                \"novel_title\": \"\",
+                \"novel_subtitle\": \"\",
+                \"novel_plot\": {
+
+                    \"premise\": \"\",
+                    \"story_concept\": \"\",
+                    \"narrative_hook\": \"\",
+                    \"central_question\": \"\",
+                    \"central_theme\": \"\",
+                    \"emotional_direction\": \"\",
+
+                    \"setting\": \"\",
+
+                    \"main_character_direction\": \"\",
+                    \"important_character_roles\": [],
+                    \"central_motivation\": \"\",
+                    \"central_goal\": \"\",
+                    \"character_journey_direction\": \"\",
+
+                    \"central_conflict\": \"\",
+                    \"opposing_force\": \"\",
+                    \"stakes\": \"\",
+                    \"consequences\": \"\",
+
+                    \"opening_situation\": \"\",
+                    \"inciting_event\": \"\",
+                    \"initial_goal\": \"\",
+
+                    \"major_complications\": [],
+                    \"discoveries\": [],
+                    \"turning_points\": [],
+
+                    \"escalation\": \"\",
+                    \"climax_direction\": \"\",
+                    \"resolution_direction\": \"\",
+
+                    \"themes\": []
+                }
             }
-        }
 
+            ==================================================
+            FINAL CHECK
+            ==================================================
 
-        --------------------------------------------------
-        FINAL CHECK:
-        --------------------------------------------------
+            Before returning the result, verify:
 
-        Verify:
+                - The title represents the novel's identity.
+                - The subtitle supports the novel's identity.
+                - The premise is distinctive and compelling.
+                - The plot has a clear narrative direction.
+                - The protagonist has a meaningful motivation and goal.
+                - The central conflict is meaningful.
+                - The opposing force creates genuine obstacles.
+                - Stakes and consequences are clear.
+                - Major complications logically develop the conflict.
+                - Discoveries and turning points meaningfully affect the story.
+                - Escalation leads naturally toward the climax.
+                - The resolution direction fits the story.
+                - Themes are connected to the narrative.
+                - The story feels original and professionally developed.
+                - The writing feels like it was created by an experienced professional writer.
+                - The story does not feel generic, mechanical, or formulaic.
+                - Genre requirements are properly integrated.
+                - Novel type requirements are properly integrated.
+                - Additional novel information is naturally incorporated.
+                - The output contains only the requested novel foundation.
+                - No complete character profiles are created.
+                - No world bible is created.
+                - No chapter plan is created.
+                - No scene plan is created.
+                - The requested language is respected.
+                - The response is valid JSON only.
+                - Do not return explanations, markdown, or additional text outside the JSON.
 
-        - Title matches the story identity.
-        - Subtitle supports the story.
-        - Plot has a clear direction.
-        - Conflict and stakes are meaningful.
-        - Output contains only plot foundation.
-        - No character database is created.
-        - No world bible is created.
-        - No chapter plan is created.
-        - No scene plan is created.
-        - JSON is valid.
-
-
-        Return only JSON.
-    ";
+            Return only JSON.
+        ";
 
         return $prompt;
     }

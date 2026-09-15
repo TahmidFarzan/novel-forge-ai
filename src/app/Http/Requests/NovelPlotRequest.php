@@ -13,25 +13,11 @@ class NovelPlotRequest extends FormRequest
     public function rules()
     {
         return [
-            'is_18_plus'             => [
-                'nullable',
-                'boolean',
-            ],
-
-            'enable_mature_content'  => [
-                'nullable',
-                'boolean',
-            ],
-
             'additional_information' => [
                 'nullable',
                 'string',
             ],
 
-            'novel_continuity'       => [
-                'required',
-                'string',
-            ],
             'language_id'            => [
                 'required',
                 'string',
@@ -71,8 +57,6 @@ class NovelPlotRequest extends FormRequest
     {
         return [
 
-
-            'novel_continuity.required'      => 'Please select a novel continuity.',
             'language_id.required'           => 'Please select a language.',
 
             'genre_ids.required'             => 'Genres must be required.',
@@ -88,24 +72,5 @@ class NovelPlotRequest extends FormRequest
             'ai_brain_id.required'           => 'Please select a ai brain.',
             'ai_brain_id.exists'             => 'Selected ai brain does not exist.',
         ];
-    }
-
-    public function withValidator($validator)
-    {
-
-        $validator->after(function ($validator) {
-            $aVData = $validator->getData();
-
-            if (isset($aVData['enable_mature_content']) && ($aVData['enable_mature_content'] == true)) {
-
-                if (! isset($aVData['is_18_plus']) || (isset($aVData['is_18_plus']) && ($aVData['is_18_plus'] == false))) {
-
-                    $validator->errors()->add(
-                        'enable_mature_content',
-                        'Enable mature content can not true as is 18+ is false'
-                    );
-                }
-            }
-        });
     }
 }

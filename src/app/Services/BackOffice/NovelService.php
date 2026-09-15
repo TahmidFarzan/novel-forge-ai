@@ -121,11 +121,7 @@ class NovelService
             $genres    = $this->genreService->findByIdsOrRandom($request->input("genre_ids"));
 
             $genrePromptInstruction = '';
-            $is18Plus               = $request->boolean("is_18_plus", false) ? "True" : "False";
-            $enableMatureContent    = $request->boolean("enable_mature_content", false) ? "True" : "False";
-
             $additionalInformation = $request->input("additional_information", "Auto");
-            $novelContinuity       = $request->input("novel_continuity", NovelHelper::CONTINUITY_STANDALONE);
 
             foreach ($genres as $genre) {
 
@@ -143,10 +139,7 @@ class NovelService
             }
 
             $receivedInputs = [
-                "is_18_plus" => $is18Plus,
-                "enable_mature_content" => $enableMatureContent,
                 "language" => $language?->name,
-                "novel_continuity" => $novelContinuity,
                 "additional_information" => $additionalInformation,
                 "genre_prompt_instruction" => $genrePromptInstruction,
                 "audience_instruction" => $audience->prompt_instruction,
@@ -172,9 +165,6 @@ class NovelService
                 $novel->novel_type_id = $request->input("novel_type_id");
                 $novel->language_id   = $request->input("language_id");
 
-                $novel->novel_continuity   = $request->input("novel_continuity");
-                $novel->is_18_plus   = $request->input("is_18_plus");
-                $$novel->enable_mature_content   = $request->input("enable_mature_content");
                 $novel->additional_information   = $request->input("additional_information");
 
                 $novel->status        = NovelHelper::STATUS_ONGOING;
