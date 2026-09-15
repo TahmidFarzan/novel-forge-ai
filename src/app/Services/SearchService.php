@@ -267,7 +267,7 @@ class SearchService
         }
 
         $records = $query
-            ->orderByDesc('id')
+            ->orderBy('name',"asc")
             ->paginate($request->input('per_page', 25));
 
         $items = $records->map(fn($novelType) => [
@@ -304,7 +304,7 @@ class SearchService
         }
 
         $records = $query
-            ->orderByDesc('id')
+            ->orderBy('name',"asc")
             ->paginate($request->input('per_page', 25));
 
         $items = $records->map(fn($genre) => [
@@ -341,7 +341,7 @@ class SearchService
         }
 
         $records = $query
-            ->orderByDesc('id')
+            ->orderBy('name',"asc")
             ->paginate($request->input('per_page', 25));
 
         $items = $records->map(fn($audience) => [
@@ -371,7 +371,7 @@ class SearchService
         }
 
         $records = $query
-            ->orderByDesc('id')
+            ->orderBy('name',"asc")
             ->paginate($request->input('per_page', 25));
 
         $items = $records->map(fn($language) => [
@@ -422,7 +422,7 @@ class SearchService
         }
 
         $records = $query
-            ->orderByDesc('id')
+            ->orderBy('name',"asc")
             ->paginate($request->input('per_page', 25));
 
         $items = $records->map(fn($aiBrain) => [
@@ -453,7 +453,7 @@ class SearchService
         }
 
         $records = $query
-            ->orderByDesc('id')
+            ->orderBy('name',"asc")
             ->paginate($request->input('per_page', 25));
 
         $items = $records->map(fn($kdpLayout) => [
@@ -512,7 +512,7 @@ class SearchService
         }
 
         $records = $query
-            ->orderByDesc('id')
+            ->orderBy('name',"asc")
             ->paginate($request->input('per_page', 25));
 
         $items = $records->map(fn($aiPrompt) => [
@@ -543,7 +543,7 @@ class SearchService
         }
 
         $records = $query
-            ->orderByDesc('id')
+            ->orderBy('name',"asc")
             ->paginate($request->input('per_page', 25));
 
         $items = $records->map(fn($aiBrainOutputType) => [
@@ -576,7 +576,7 @@ class SearchService
         }
 
         $records = $query
-            ->orderByDesc('id')
+            ->orderBy('name',"asc")
             ->paginate($request->input('per_page', 25));
 
         $items = $records->map(fn($user) => [
@@ -611,7 +611,7 @@ class SearchService
         }
 
         $records = $query
-            ->orderByDesc('id')
+            ->orderBy('name',"asc")
             ->paginate($request->input('per_page', 25));
 
         $items = $records->map(fn($user) => [
