@@ -5,6 +5,7 @@ import "vue-multiselect/dist/vue-multiselect.css"
 
 import { fetchFromApi } from '@/composables/useApiClient'
 import { apiCacheKey, apiCacheTTL } from '@/composables/useApiCache'
+
 const {
     selectedItem,
     fieldName,
@@ -49,6 +50,7 @@ const vselectRef = ref(null)
 const proxyModel = ref(multiple ? [] : null)
 
 let searchTimeout = null
+
 const getCacheParamsKey = (params = {}) => {
     return new URLSearchParams(
         Object.entries(params)
@@ -89,22 +91,31 @@ const formattedOptions = computed(() =>
 const normalizeItems = raw =>
     !raw ? [] : Array.isArray(raw) ? raw : Object.values(raw)
 
+const valuesDiffer = (a, b) => {
+    if (Array.isArray(a) && Array.isArray(b)) {
+        return a.length !== b.length || a.some((value, index) => value !== b[index])
+    }
+
+    return a !== b
+}
+
 const updateForm = val => {
     if (!form || !fieldName) return
 
+    let next
+
     if (multiple) {
-        const newVal = Array.isArray(val)
+        next = Array.isArray(val)
             ? val.map(v => v?.raw?.[selectedValueKey] ?? v?.value ?? v)
             : []
-        const currentVal = form[fieldName]
-        if (newVal.length === 0 && Array.isArray(currentVal) && currentVal.length === 0) {
-            return
-        }
-        form[fieldName] = newVal
     } else {
-        form[fieldName] = val
+        next = val
             ? val?.raw?.[selectedValueKey] ?? val?.value ?? val
             : null
+    }
+
+    if (valuesDiffer(form[fieldName], next)) {
+        form[fieldName] = next
     }
 }
 
@@ -130,19 +141,35 @@ const normalizeItem = async item => {
     return await fetchItemByValue(item)
 }
 
+const formatItem = item => ({
+    label: item?.[selectedLabelKey] ?? item?.[apiLabelKey] ?? defaultLabel,
+    value: item?.[selectedValueKey] ?? item?.[apiValueKey] ?? null,
+    raw: item,
+})
+
 const fetchItemByValue = async value => {
+    if (value === null || value === undefined || value === '') {
+        return multiple ? [] : null
+    }
+
+    const loadedMatch = options.value.find(item => item?.[apiValueKey] == value)
+
+    if (loadedMatch) {
+        return formatItem(loadedMatch)
+    }
+
     let found = null
     let p = 1
     let totalPages = 1
 
     do {
-        const params = { search: value, page: p }
+        const params = { page: p }
         const data = await fetchFromApi(apiUrl, params, getMultiSelectCacheOptions(params))
 
         const items = normalizeItems(data?.items)
 
         totalPages = data?.last_page || 1
-        found = items.find(i => i?.[apiValueKey] == value)
+        found = items.find(item => item?.[apiValueKey] == value)
 
         if (found) break
 
@@ -151,11 +178,7 @@ const fetchItemByValue = async value => {
 
     if (!found) return multiple ? [] : null
 
-    return {
-        label: found?.[selectedLabelKey] ?? found?.[apiLabelKey] ?? defaultLabel,
-        value: found?.[selectedValueKey] ?? found?.[apiValueKey] ?? null,
-        raw: found,
-    }
+    return formatItem(found)
 }
 
 const fetchPage = async (pageNumber = 1, reset = false) => {
@@ -205,13 +228,6 @@ const resetAndFetch = async () => {
     await fetchPage(1, true)
 }
 
-const translateNumerText = value => {
-    return String(value)
-        .split('')
-        .map(char => char)
-        .join('')
-}
-
 watch(proxyModel, val => {
     updateForm(val)
 }, { deep: true })
@@ -223,14 +239,36 @@ watch(
     }
 )
 
+const applySelectedItem = async newValue => {
+    const current = !multiple
+        ? proxyModel.value?.value ?? null
+        : Array.isArray(proxyModel.value)
+            ? proxyModel.value.map(item => item?.value ?? null)
+            : []
+
+    if (!valuesDiffer(current, newValue)) return
+
+    const normalized = await normalizeItem(newValue)
+
+    const sourceEmpty = multiple
+        ? !Array.isArray(newValue) || newValue.length === 0
+        : newValue === null || newValue === undefined || newValue === ''
+
+    const resolvedEmpty = multiple
+        ? !Array.isArray(normalized) || normalized.length === 0
+        : normalized === null
+
+    if (!sourceEmpty && resolvedEmpty) return
+
+    proxyModel.value = normalized
+
+    updateForm(proxyModel.value)
+}
+
 watch(
     () => selectedItem,
-    async newValue => {
-        const normalized = await normalizeItem(newValue)
-
-        proxyModel.value = normalized
-
-        updateForm(proxyModel.value)
+    newValue => {
+        applySelectedItem(newValue)
     },
     { deep: true }
 )
@@ -271,7 +309,6 @@ const handleScroll = e => {
     }
 }
 
-
 const onDropdownOpen = () => {
     nextTick(() => {
         const dropdown =
@@ -285,11 +322,7 @@ const onDropdownOpen = () => {
 }
 
 onMounted(async () => {
-    const normalized = await normalizeItem(selectedItem)
-
-    proxyModel.value = normalized
-
-    updateForm(proxyModel.value)
+    await applySelectedItem(selectedItem)
 
     await fetchPage(1, true)
 })
@@ -325,7 +358,7 @@ onMounted(async () => {
                     Loading...
                 </div>
                 <div v-else class="text-center py-1 text-xs text-gray-400">
-                    Page {{ translateNumerText(page) }} / {{ translateNumerText(lastPage) }}
+                    Page {{ page }} / {{ lastPage }}
                 </div>
             </template>
         </Multiselect>
