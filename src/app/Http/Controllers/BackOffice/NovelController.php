@@ -52,12 +52,12 @@ class NovelController extends Controller
     }
 
 
-    public function savePlot(NovelPlotRequest $request): RedirectResponse
+    public function generateFoundation(NovelPlotRequest $request): RedirectResponse
     {
         $novel = $this->novelService->new();
         Gate::authorize('create', $novel);
 
-        $result = $this->novelService->savePlot($request, $novel);
+        $result = $this->novelService->generateFoundation($request, $novel);
 
         if ($result['novel']?->slug) {
             return to_route('back-office.novels.edit', ["slug" => $result['novel']?->slug])->with('flash_message', [

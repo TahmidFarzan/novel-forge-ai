@@ -106,7 +106,7 @@ class NovelService
             ->appends($request->all());
     }
 
-    public function savePlot(NovelPlotRequest $request, Novel $novel): array
+    public function generateFoundation(NovelPlotRequest $request, Novel $novel): array
     {
         $isNew       = empty($novel->id);
         $statusEvent = $isNew ? "save" : "update";

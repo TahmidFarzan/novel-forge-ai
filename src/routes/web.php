@@ -214,8 +214,22 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
 
         Route::get('{slug}/edit', [NovelController::class, 'edit'])->name('edit');
 
-        Route::prefix('save')->name('save.')->group(function () {
-            Route::post('plot', [NovelController::class, 'savePlot'])->name('plot');
+        Route::prefix('generate')->name('generate.')->group(function () {
+            Route::post('foundation', [NovelController::class, 'generateFoundation'])->name('foundation');
+            Route::post('characters', [NovelController::class, 'generateCharacters'])->name('characters');
+            Route::post('world-vibe', [NovelController::class, 'generateWorldVibe'])->name('world-vibe');
+            Route::post('locations', [NovelController::class, 'generateLocations'])->name('locations');
+            Route::post('factions', [NovelController::class, 'generateFactions'])->name('factions');
+            Route::post('creature', [NovelController::class, 'generateCreature'])->name('creature');
+            Route::post('system', [NovelController::class, 'generateSystem'])->name('system');
+            Route::post('timeline', [NovelController::class, 'generateTimeline'])->name('timeline');
+            Route::post('story-structure', [NovelController::class, 'generateStoryStructure'])->name('story-structure');
+            Route::post('twists-and-foreshadowing', [NovelController::class, 'generateTwistsAndForeshadowing'])->name('twists-and-foreshadowing');
+            Route::post('scene-planner', [NovelController::class, 'generateScenePlanner'])->name('scene-planner');
+            Route::post('dialogue-planner', [NovelController::class, 'generateDialoguePlanner'])->name('dialogue-planner');
+            Route::post('chapter-planner', [NovelController::class, 'generateChapterPlanner'])->name('chapter-planner');
+            Route::post('page-planner', [NovelController::class, 'generatePagePlanner'])->name('page-planner');
+            Route::post('complete-novel', [NovelController::class, 'generateCompleteNovel'])->name('complete-novel');
         });
 
         Route::delete('{slug}/delete', [NovelController::class, 'delete'])->name('delete');

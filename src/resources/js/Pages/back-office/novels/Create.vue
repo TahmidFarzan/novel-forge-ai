@@ -12,47 +12,66 @@ import { Head, useForm } from "@inertiajs/vue3";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library as FontAwesomeLibrary } from "@fortawesome/fontawesome-svg-core";
 import {
-    faSave,
     faSpinner,
     faCheck,
     faLock,
-    faArrowRight,
     faArrowLeft,
     faWandMagicSparkles,
     faBrain,
+    faLightbulb,
     faUser,
     faGlobe,
-    faBook,
-    faCog,
+    faLocationDot,
+    faPeopleGroup,
+    faPaw,
+    faGear,
+    faTimeline,
+    faDiagramProject,
+    faShuffle,
+    faListCheck,
+    faComments,
+    faBookOpen,
+    faFileLines,
 } from "@fortawesome/free-solid-svg-icons";
 
 FontAwesomeLibrary.add(
-    faSave,
     faSpinner,
     faCheck,
     faLock,
-    faArrowRight,
     faArrowLeft,
     faWandMagicSparkles,
     faBrain,
+    faLightbulb,
     faUser,
     faGlobe,
-    faBook,
-    faCog,
+    faLocationDot,
+    faPeopleGroup,
+    faPaw,
+    faGear,
+    faTimeline,
+    faDiagramProject,
+    faShuffle,
+    faListCheck,
+    faComments,
+    faBookOpen,
+    faFileLines,
 );
 
 defineOptions({ layout: Layout });
 
 const createPageTitle = "Create Novel";
 
-const props = defineProps({
-    novel: { type: Object, default: null },
+const { novel } = defineProps({
+    novel: {
+        type: Object,
+        default: null,
+    },
 });
 
-const isUpdate = computed(() => !!props.novel?.slug);
+const isUpdate = computed(() => !!novel?.slug);
 
 const pageTitle = computed(() => {
-    return isUpdate.value ? `Edit ${props.novel?.name}` : "New Novel";
+    return isUpdate.value ? `Edit ${novel?.name}` : "New Novel";
 });
 
 onMounted(async () => {
@@ -77,38 +96,123 @@ onMounted(async () => {
 const STEP_DEFINITIONS = [
     {
         id: 1,
-        name: "Plot Generator",
-        icon: "cog",
-        description: "Basic generation settings",
+        name: "Foundation Generator",
+        icon: "lightbulb",
+        description: "Generate the title, subtitle, and initial plot foundation",
+        outputField: "plot",
         aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
     },
     {
         id: 2,
-        name: "World Building",
-        icon: "globe",
-        description: "World and setting details",
+        name: "Character Development",
+        icon: "user",
+        description: "Develop the novel's characters",
+        outputField: "characters",
         aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
     },
     {
         id: 3,
-        name: "Characters",
-        icon: "user",
-        description: "Character development",
-        aiBrainOutputTypeCode: null,
+        name: "World Bible Generator",
+        icon: "globe",
+        description: "Build the world bible and setting rules",
+        outputField: "world_bible",
+        aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
     },
     {
         id: 4,
-        name: "Plot & Outline",
-        icon: "book",
-        description: "Story structure",
-        aiBrainOutputTypeCode: null,
+        name: "Location Generator",
+        icon: "location-dot",
+        description: "Generate the story locations",
+        outputField: "locations",
+        aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
     },
     {
         id: 5,
-        name: "Review & Generate",
+        name: "Faction Generator",
+        icon: "people-group",
+        description: "Generate the story factions",
+        outputField: "factions",
+        aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
+    },
+    {
+        id: 6,
+        name: "Creature / Being Generator",
+        icon: "paw",
+        description: "Generate creatures and other beings",
+        outputField: "creatures",
+        aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
+    },
+    {
+        id: 7,
+        name: "Dynamic System Generator",
+        icon: "gear",
+        description: "Generate the novel's dynamic systems",
+        outputField: "systems",
+        aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
+    },
+    {
+        id: 8,
+        name: "Timeline Generator",
+        icon: "timeline",
+        description: "Generate the story timeline",
+        outputField: "timeline",
+        aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
+    },
+    {
+        id: 9,
+        name: "Story Structure Generator",
+        icon: "diagram-project",
+        description: "Generate the story structure",
+        outputField: "story_structure",
+        aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
+    },
+    {
+        id: 10,
+        name: "Twist & Foreshadowing Generator",
+        icon: "shuffle",
+        description: "Plan twists and foreshadowing",
+        outputField: "twists_and_foreshadowing",
+        aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
+    },
+    {
+        id: 11,
+        name: "Scene Planner",
+        icon: "list-check",
+        description: "Plan the novel's scenes",
+        outputField: "scene_plans",
+        aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
+    },
+    {
+        id: 12,
+        name: "Dialogue Planner",
+        icon: "comments",
+        description: "Plan character dialogue",
+        outputField: "dialogue_plans",
+        aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
+    },
+    {
+        id: 13,
+        name: "Chapter Planner",
+        icon: "book-open",
+        description: "Plan the novel's chapters",
+        outputField: "chapter_plan",
+        aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
+    },
+    {
+        id: 14,
+        name: "Page Planner",
+        icon: "file-lines",
+        description: "Plan the novel's pages",
+        outputField: "page_plan",
+        aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
+    },
+    {
+        id: 15,
+        name: "Complete Novel Generator",
         icon: "wand-magic-sparkles",
-        description: "Final review",
-        aiBrainOutputTypeCode: null,
+        description: "Generate the complete novel",
+        outputField: null,
+        aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
     },
 ];
 
@@ -121,37 +225,95 @@ const completedSteps = ref(new Set());
 const submittingStep = ref(null);
 
 const plotGeneratorSaveForm = useForm({
-    additional_information: props.novel?.additional_information ?? null,
-    language_id: props.novel?.language_id ?? null,
-    genre_ids: props.novel?.genres?.map((genre) => genre.id) ?? [],
-    novel_type_id: props.novel?.novel_type_id ?? null,
-    audience_id: props.novel?.audience_id ?? null,
-    ai_brain_id: props.novel?.ai_brain_id ?? null,
+    additional_information: novel?.additional_information ?? null,
+    language_id: novel?.language_id ?? null,
+    genre_ids: novel?.genres?.map((genre) => genre.id) ?? [],
+    novel_type_id: novel?.novel_type_id ?? null,
+    audience_id: novel?.audience_id ?? null,
+    ai_brain_id: novel?.ai_brain_id ?? null,
 });
 
-const worldBuildingSaveForm = useForm({
+const charactersForm = useForm({
     ai_brain_id: null,
 });
 
-const charactersSaveForm = useForm({
+const worldBibleForm = useForm({
     ai_brain_id: null,
 });
 
-const plotOutlineSaveForm = useForm({
+const locationForm = useForm({
     ai_brain_id: null,
 });
 
-const reviewGenerateSaveForm = useForm({
+const factionForm = useForm({
+    ai_brain_id: null,
+});
+
+const creatureForm = useForm({
+    ai_brain_id: null,
+});
+
+const systemForm = useForm({
+    ai_brain_id: null,
+});
+
+const timelineForm = useForm({
+    ai_brain_id: null,
+});
+
+const storyStructureForm = useForm({
+    ai_brain_id: null,
+});
+
+const twistsAndForeshadowingForm = useForm({
+    ai_brain_id: null,
+});
+
+const scenePlannerForm = useForm({
+    ai_brain_id: null,
+});
+
+const dialoguePlannerForm = useForm({
+    ai_brain_id: null,
+});
+
+const chapterPlannerForm = useForm({
+    ai_brain_id: null,
+});
+
+const pagePlannerForm = useForm({
+    ai_brain_id: null,
+});
+
+const completeNovelForm = useForm({
     ai_brain_id: null,
 });
 
 const STEP_FORMS = {
     1: plotGeneratorSaveForm,
-    2: worldBuildingSaveForm,
-    3: charactersSaveForm,
-    4: plotOutlineSaveForm,
-    5: reviewGenerateSaveForm,
+    2: charactersForm,
+    3: worldBibleForm,
+    4: locationForm,
+    5: factionForm,
+    6: creatureForm,
+    7: systemForm,
+    8: timelineForm,
+    9: storyStructureForm,
+    10: twistsAndForeshadowingForm,
+    11: scenePlannerForm,
+    12: dialoguePlannerForm,
+    13: chapterPlannerForm,
+    14: pagePlannerForm,
+    15: completeNovelForm,
 };
+
+const activeStepDefinition = computed(() => {
+    return getStepDefinition(activeStep.value);
+});
+
+const activeStepForm = computed(() => {
+    return STEP_FORMS[activeStep.value];
+});
 
 const genresApiUrl = computed(() => {
     const audienceId = plotGeneratorSaveForm.audience_id;
@@ -223,10 +385,12 @@ const getStepState = (stepId) => {
 
 function buildAiBrainSearchUrl(outputTypeCode) {
     if (!outputTypeCode) {
-        return route('search.ai-brains')
+        return route("search.ai-brains");
     }
 
-    return route('search.ai-brains', { ai_brain_output_type_code: outputTypeCode })
+    return route("search.ai-brains", {
+        ai_brain_output_type_code: outputTypeCode,
+    });
 }
 
 const validateStep = (stepId) => {
@@ -281,51 +445,54 @@ function submitStep1() {
 
     submittingStep.value = 1;
 
-    plotGeneratorSaveForm.post(route("back-office.novels.save.plot"), {
-        preserveScroll: true,
-        preserveState: true,
-        onSuccess: () => {
-            completedSteps.value.add(1);
-            activeStep.value = 2;
-            plotGeneratorSaveForm.clearErrors();
+    plotGeneratorSaveForm.post(
+        route("back-office.novels.generate.foundation"),
+        {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                completedSteps.value.add(1);
+                activeStep.value = 2;
+                plotGeneratorSaveForm.clearErrors();
+            },
+            onError: (errors) => {
+                plotGeneratorSaveForm.clearErrors();
+                plotGeneratorSaveForm.setError(errors);
+            },
+            onFinish: () => {
+                submittingStep.value = null;
+            },
         },
-        onError: (errors) => {
-            plotGeneratorSaveForm.clearErrors();
-            plotGeneratorSaveForm.setError(errors);
-        },
-        onFinish: () => {
-            submittingStep.value = null;
-        },
-    });
+    );
 }
 
-function submitStep2() {
-    if (worldBuildingSaveForm.processing) {
+function submitFutureStep() {
+    const stepId = activeStep.value;
+    const stepForm = STEP_FORMS[stepId];
+
+    if (!stepForm || stepForm.processing) {
         return;
     }
 
-    if (!validateStep(2)) {
+    if (!validateStep(stepId)) {
         return;
     }
 
-    submittingStep.value = 2;
+    submittingStep.value = stepId;
 
-    completedSteps.value.add(2);
-    activeStep.value = 3;
+    completedSteps.value.add(stepId);
 
-    worldBuildingSaveForm.clearErrors();
+    if (stepId < STEP_DEFINITIONS.length) {
+        activeStep.value = stepId + 1;
+    }
+
+    stepForm.clearErrors();
     submittingStep.value = null;
 }
 
 const goToStep = (stepId) => {
     if (isStepAccessible(stepId) || isStepCompleted(stepId)) {
         activeStep.value = stepId;
-    }
-};
-
-const goNext = () => {
-    if (activeStep.value < 5 && isStepAccessible(activeStep.value + 1)) {
-        activeStep.value++;
     }
 };
 
@@ -357,7 +524,7 @@ const goPrev = () => {
                 </div>
 
                 <div class="px-0 pt-4 border-b border-gray-200">
-                    <nav class="hidden md:flex overflow-x-auto pb-px">
+                    <nav class="hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-x-2 pb-px">
                         <button
                             v-for="step in STEP_DEFINITIONS"
                             :key="step.id"
@@ -367,7 +534,7 @@ const goPrev = () => {
                                 !isStepAccessible(step.id) &&
                                 !isStepCompleted(step.id)
                             "
-                            class="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            class="flex items-center justify-center gap-2 px-3 py-3 text-sm font-medium text-center border-b-2 transition disabled:opacity-40 disabled:cursor-not-allowed"
                             :class="{
                                 'border-blue-600 text-blue-600':
                                     getStepState(step.id) === 'active',
@@ -480,10 +647,10 @@ const goPrev = () => {
                                 class="text-base font-semibold flex items-center gap-2"
                             >
                                 <FontAwesomeIcon
-                                    icon="cog"
+                                    icon="lightbulb"
                                     class="text-blue-600"
                                 />
-                                Generation Configuration
+                                Foundation Configuration
                             </h3>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -498,7 +665,7 @@ const goPrev = () => {
                                     <InfiniteScrollApiSelect
                                         :form="plotGeneratorSaveForm"
                                         fieldName="audience_id"
-                                        :selectedItem="props.novel?.audience"
+                                        :selectedItem="novel?.audience"
                                         :apiUrl="route('search.audiences')"
                                         :multiple="false"
                                         placeholder="Select audiences"
@@ -537,7 +704,7 @@ const goPrev = () => {
                                         :selectedItem="
                                             audienceDependentFieldsReset
                                                 ? null
-                                                : props.novel?.language
+                                                : novel?.language
                                         "
                                         :apiUrl="route('search.languages')"
                                         :multiple="false"
@@ -577,7 +744,7 @@ const goPrev = () => {
                                         :selectedItem="
                                             audienceDependentFieldsReset
                                                 ? null
-                                                : props.novel?.genres
+                                                : novel?.genres
                                         "
                                         :apiUrl="genresApiUrl"
                                         :multiple="true"
@@ -617,7 +784,7 @@ const goPrev = () => {
                                         :selectedItem="
                                             audienceDependentFieldsReset
                                                 ? null
-                                                : props.novel?.novel_type
+                                                : novel?.novel_type
                                         "
                                         :apiUrl="route('search.novel-types')"
                                         :multiple="false"
@@ -685,7 +852,7 @@ const goPrev = () => {
                                 <InfiniteScrollApiSelect
                                     :form="plotGeneratorSaveForm"
                                     fieldName="ai_brain_id"
-                                    :selectedItem="props.novel?.ai_brain"
+                                    :selectedItem="novel?.ai_brain"
                                     :apiUrl="
                                         buildAiBrainSearchUrl(
                                             getStepDefinition(1)
@@ -710,7 +877,7 @@ const goPrev = () => {
                         </div>
                     </div>
 
-                    <div v-if="activeStep === 2" class="space-y-6">
+                    <div v-if="activeStep > 1" class="space-y-6">
                         <div
                             class="bg-white border rounded-xl p-5 shadow-sm space-y-4"
                         >
@@ -718,91 +885,41 @@ const goPrev = () => {
                                 class="text-base font-semibold flex items-center gap-2"
                             >
                                 <FontAwesomeIcon
-                                    icon="globe"
+                                    :icon="activeStepDefinition.icon"
                                     class="text-blue-600"
                                 />
-                                World Building
+                                {{ activeStepDefinition.name }}
                             </h3>
 
                             <p class="text-sm text-gray-500">
-                                Define the world, setting, and rules that will
-                                shape your novel.
+                                {{ activeStepDefinition.description }}
                             </p>
 
                             <div
                                 class="border-2 border-dashed border-purple-200 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-blue-50"
                             >
                                 <InfiniteScrollApiSelect
-                                    :form="worldBuildingSaveForm"
+                                    :key="activeStep"
+                                    :form="activeStepForm"
                                     fieldName="ai_brain_id"
-                                    :selectedItem="
-                                        worldBuildingSaveForm.ai_brain_id
-                                    "
+                                    :selectedItem="activeStepForm.ai_brain_id"
                                     :apiUrl="
                                         buildAiBrainSearchUrl(
-                                            getStepDefinition(2)
-                                                .aiBrainOutputTypeCode,
+                                            activeStepDefinition.aiBrainOutputTypeCode,
                                         )
                                     "
                                     :multiple="false"
                                     placeholder="Select AI Brain"
-                                    :error="
-                                        worldBuildingSaveForm.errors.ai_brain_id
-                                    "
+                                    :error="activeStepForm.errors.ai_brain_id"
                                     class="ai-brain-select"
                                 />
                             </div>
 
                             <p
-                                v-if="worldBuildingSaveForm.errors.ai_brain_id"
+                                v-if="activeStepForm.errors.ai_brain_id"
                                 class="text-red-500 text-sm"
                             >
-                                {{ worldBuildingSaveForm.errors.ai_brain_id }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div
-                        v-if="activeStep === 3"
-                        class="flex items-center justify-center h-64"
-                    >
-                        <div class="text-center space-y-3">
-                            <FontAwesomeIcon
-                                icon="user"
-                                class="text-4xl text-gray-300"
-                            />
-                            <p class="text-gray-400 text-sm">
-                                Characters - Coming Soon
-                            </p>
-                        </div>
-                    </div>
-
-                    <div
-                        v-if="activeStep === 4"
-                        class="flex items-center justify-center h-64"
-                    >
-                        <div class="text-center space-y-3">
-                            <FontAwesomeIcon
-                                icon="book"
-                                class="text-4xl text-gray-300"
-                            />
-                            <p class="text-gray-400 text-sm">
-                                Plot & Outline - Coming Soon
-                            </p>
-                        </div>
-                    </div>
-
-                    <div
-                        v-if="activeStep === 5"
-                        class="flex items-center justify-center h-64"
-                    >
-                        <div class="text-center space-y-3">
-                            <FontAwesomeIcon
-                                icon="wand-magic-sparkles"
-                                class="text-4xl text-gray-300"
-                            />
-                            <p class="text-gray-400 text-sm">
-                                Review & Generate - Coming Soon
+                                {{ activeStepForm.errors.ai_brain_id }}
                             </p>
                         </div>
                     </div>
@@ -841,46 +958,36 @@ const goPrev = () => {
                                 icon="spinner"
                                 spin
                             />
-                            <FontAwesomeIcon v-else icon="save" />
+                            <FontAwesomeIcon v-else icon="wand-magic-sparkles" />
 
                             {{
                                 submittingStep === 1
-                                    ? "Saving..."
-                                    : "Save & Continue"
-                            }}
-                        </button>
-
-                        <button
-                            v-else-if="activeStep === 2"
-                            type="button"
-                            @click="submitStep2"
-                            :disabled="worldBuildingSaveForm.processing"
-                            class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                            <FontAwesomeIcon
-                                v-if="submittingStep === 2"
-                                icon="spinner"
-                                spin
-                            />
-                            <FontAwesomeIcon v-else icon="check" />
-
-                            {{
-                                submittingStep === 2 ? "Saving..." : "Continue"
+                                    ? "Generating..."
+                                    : "Generate Foundation"
                             }}
                         </button>
 
                         <button
                             v-else
                             type="button"
-                            @click="goNext"
-                            :disabled="
-                                !isStepAccessible(activeStep + 1) ||
-                                activeStep === 5
-                            "
-                            class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            @click="submitFutureStep"
+                            :disabled="activeStepForm.processing"
+                            class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                            Next
-                            <FontAwesomeIcon icon="arrow-right" />
+                            <FontAwesomeIcon
+                                v-if="submittingStep === activeStep"
+                                icon="spinner"
+                                spin
+                            />
+                            <FontAwesomeIcon v-else icon="check" />
+
+                            {{
+                                submittingStep === activeStep
+                                    ? "Saving..."
+                                    : activeStep === STEP_DEFINITIONS.length
+                                      ? "Complete"
+                                      : "Continue"
+                            }}
                         </button>
                     </div>
                 </div>
