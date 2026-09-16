@@ -3,7 +3,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class NovelPlotRequest extends FormRequest
+class NovelFoundationRequest extends FormRequest
 {
     public function authorize(): bool
     {

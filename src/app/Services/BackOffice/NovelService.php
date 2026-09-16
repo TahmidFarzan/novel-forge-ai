@@ -4,7 +4,7 @@ namespace App\Services\BackOffice;
 
 use App\Helpers\AiPromptGeneratorHelper;
 use App\Helpers\NovelHelper;
-use App\Http\Requests\NovelPlotRequest;
+use App\Http\Requests\NovelFoundationRequest;
 use App\Models\Novel;
 use App\Services\BackOffice\AiBrainService;
 use App\Services\BackOffice\AiPromptService;
@@ -106,7 +106,7 @@ class NovelService
             ->appends($request->all());
     }
 
-    public function generateFoundation(NovelPlotRequest $request, Novel $novel): array
+    public function generateFoundation(NovelFoundationRequest $request, Novel $novel): array
     {
         $isNew       = empty($novel->id);
         $statusEvent = $isNew ? "save" : "update";

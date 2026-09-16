@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\BackOffice;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\NovelPlotRequest;
+use App\Http\Requests\NovelFoundationRequest;
 use App\Services\BackOffice\NovelService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,7 +52,7 @@ class NovelController extends Controller
     }
 
 
-    public function generateFoundation(NovelPlotRequest $request): RedirectResponse
+    public function generateFoundation(NovelFoundationRequest $request): RedirectResponse
     {
         $novel = $this->novelService->new();
         Gate::authorize('create', $novel);
