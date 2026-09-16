@@ -53,7 +53,7 @@ const closeMobileMenu = () => {
 <template>
     <template v-if="isTriggerMode">
         <button type="button" @click="toggleMenu"
-            class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-[var(--novel-forge-ai-border)] bg-[var(--novel-forge-ai-surface)] text-[var(--novel-forge-ai-ink-soft)] shadow-[var(--novel-forge-ai-shadow-sm)] transition-colors duration-150 hover:border-[var(--novel-forge-ai-primary)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+            class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--ink-soft)] shadow-[var(--shadow-sm)] transition-colors duration-150 hover:border-[var(--primary)] hover:text-[var(--primary-strong)]"
             :aria-expanded="isOpen ? 'true' : 'false'"
             :aria-label="(isMobile && isMobileOpen) ? 'Close sidebar menu' : 'Toggle sidebar menu'">
             <FontAwesomeIcon :icon="isMobile && isMobileOpen ? 'xmark' : 'bars'" />
@@ -72,10 +72,10 @@ const closeMobileMenu = () => {
                 leave-active-class="transition transform duration-200 ease-in" leave-from-class="translate-x-0"
                 leave-to-class="-translate-x-full">
                 <aside v-if="isMobileOpen"
-                    class="fixed top-0 left-0 z-50 flex h-full w-72 max-w-[85vw] flex-col overflow-hidden bg-[var(--novel-forge-ai-surface)] p-3 shadow-[var(--novel-forge-ai-shadow-lg)] md:hidden">
+                    class="fixed top-0 left-0 z-50 flex h-full w-72 max-w-[85vw] flex-col overflow-hidden bg-[var(--surface)] p-3 shadow-[var(--shadow-lg)] md:hidden">
                     <div class="mb-3 flex items-center justify-end">
                         <button type="button" @click="closeMobileMenu"
-                            class="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--novel-forge-ai-muted)] transition-colors duration-150 hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+                            class="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] transition-colors duration-150 hover:bg-[var(--primary-soft)] hover:text-[var(--primary-strong)]"
                             aria-label="Close sidebar menu">
                             <FontAwesomeIcon icon="xmark" />
                         </button>
@@ -90,7 +90,7 @@ const closeMobileMenu = () => {
     </template>
 
     <aside v-if="isSidebarMode"
-        class="hidden md:block flex-shrink-0 overflow-hidden border-r border-[var(--novel-forge-ai-border)] bg-[var(--novel-forge-ai-surface)] transition-all duration-300 ease-in-out"
+        class="hidden md:block flex-shrink-0 overflow-hidden border-r border-[var(--border)] bg-[var(--surface)] transition-all duration-300 ease-in-out"
         :class="isDesktopCollapsed ? 'w-0' : 'w-64'"
         :aria-expanded="isDesktopCollapsed ? 'false' : 'true'"
         aria-label="Sidebar menu">

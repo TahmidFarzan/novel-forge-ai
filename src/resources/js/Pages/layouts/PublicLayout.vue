@@ -65,12 +65,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="flex min-h-screen flex-col bg-[var(--novel-forge-ai-canvas)] text-[var(--novel-forge-ai-ink)]">
-        <header class="sticky top-0 z-50 border-b border-[var(--novel-forge-ai-border)] bg-white/90 backdrop-blur-xl">
+    <div class="flex min-h-screen flex-col bg-[var(--canvas)] text-[var(--ink)]">
+        <header class="sticky top-0 z-50 border-b border-[var(--border)] bg-white/90 backdrop-blur-xl">
             <div class="ai-container flex h-[4.5rem] items-center justify-between gap-4">
                 <a :href="route('home')" class="flex min-w-0 items-center gap-3" aria-label="Go to homepage">
                     <img :src="appLogo" :alt="appName" class="h-10 w-10 shrink-0 rounded-xl object-cover shadow-[0_8px_18px_rgb(46_196_230_/_16%)]" />
-                    <span class="truncate text-base font-bold tracking-[-0.02em] text-[var(--novel-forge-ai-ink)] sm:text-lg">
+                    <span class="truncate text-base font-bold tracking-[-0.02em] text-[var(--ink)] sm:text-lg">
                         {{ appName }}
                     </span>
                 </a>
@@ -79,7 +79,7 @@ onBeforeUnmount(() => {
                     <a
                         v-if="!authUser"
                         :href="route('login')"
-                        class="inline-flex min-h-10 items-center justify-center rounded-xl border border-[var(--novel-forge-ai-border)] bg-white px-4 py-2 text-sm font-bold text-[var(--novel-forge-ai-ink)] shadow-[var(--novel-forge-ai-shadow-sm)] hover:-translate-y-px hover:border-[var(--novel-forge-ai-primary)] hover:text-[var(--novel-forge-ai-primary-strong)]"
+                        class="inline-flex min-h-10 items-center justify-center rounded-xl border border-[var(--border)] bg-white px-4 py-2 text-sm font-bold text-[var(--ink)] shadow-[var(--shadow-sm)] hover:-translate-y-px hover:border-[var(--primary)] hover:text-[var(--primary-strong)]"
                     >
                         Login
                     </a>
@@ -87,18 +87,18 @@ onBeforeUnmount(() => {
                     <div v-else ref="menuRef" class="relative">
                         <button
                             type="button"
-                            class="flex min-h-10 items-center gap-2 rounded-xl border border-[var(--novel-forge-ai-border)] bg-white px-2.5 py-1.5 text-left shadow-[var(--novel-forge-ai-shadow-sm)] hover:border-[var(--novel-forge-ai-primary)]"
+                            class="flex min-h-10 items-center gap-2 rounded-xl border border-[var(--border)] bg-white px-2.5 py-1.5 text-left shadow-[var(--shadow-sm)] hover:border-[var(--primary)]"
                             aria-label="Open account menu"
                             :aria-expanded="menuOpen"
                             @click.stop="menuOpen = !menuOpen"
                         >
-                            <span class="public-profile-avatar flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold text-white">
+                            <span class="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold text-white [background:var(--gradient-brand)]">
                                 {{ initials }}
                             </span>
-                            <span class="hidden max-w-28 truncate text-sm font-semibold text-[var(--novel-forge-ai-ink)] sm:block">
+                            <span class="hidden max-w-28 truncate text-sm font-semibold text-[var(--ink)] sm:block">
                                 {{ authUser.name || 'Account' }}
                             </span>
-                            <FontAwesomeIcon icon="chevron-down" class="text-xs text-[var(--novel-forge-ai-muted)]" />
+                            <FontAwesomeIcon icon="chevron-down" class="text-xs text-[var(--muted)]" />
                         </button>
 
                         <Transition
@@ -109,24 +109,24 @@ onBeforeUnmount(() => {
                             leave-from-class="translate-y-0 scale-100 opacity-100"
                             leave-to-class="translate-y-1 scale-95 opacity-0"
                         >
-                            <div v-if="menuOpen" class="absolute right-0 top-[calc(100%+0.6rem)] w-56 origin-top-right overflow-hidden rounded-2xl border border-[var(--novel-forge-ai-border)] bg-white p-1.5 text-sm shadow-[var(--novel-forge-ai-shadow-lg)]">
-                                <div class="border-b border-[var(--novel-forge-ai-border)] px-3 py-2.5">
-                                    <p class="truncate font-bold text-[var(--novel-forge-ai-ink)]">{{ authUser.name || 'Your account' }}</p>
-                                    <p class="truncate text-xs text-[var(--novel-forge-ai-muted)]">{{ authUser.email }}</p>
+                            <div v-if="menuOpen" class="absolute right-0 top-[calc(100%+0.6rem)] w-56 origin-top-right overflow-hidden rounded-2xl border border-[var(--border)] bg-white p-1.5 text-sm shadow-[var(--shadow-lg)]">
+                                <div class="border-b border-[var(--border)] px-3 py-2.5">
+                                    <p class="truncate font-bold text-[var(--ink)]">{{ authUser.name || 'Your account' }}</p>
+                                    <p class="truncate text-xs text-[var(--muted)]">{{ authUser.email }}</p>
                                 </div>
-                                <a :href="route('auth-user.dashboard.index')" class="mt-1 flex items-center gap-2 rounded-xl px-3 py-2.5 font-semibold text-[var(--novel-forge-ai-ink-soft)] hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]" @click="closeMenu">
-                                    <FontAwesomeIcon icon="gauge-high" class="w-4 text-[var(--novel-forge-ai-primary)]" />
+                                <a :href="route('auth-user.dashboard.index')" class="mt-1 flex items-center gap-2 rounded-xl px-3 py-2.5 font-semibold text-[var(--ink-soft)] hover:bg-[var(--primary-soft)] hover:text-[var(--primary-strong)]" @click="closeMenu">
+                                    <FontAwesomeIcon icon="gauge-high" class="w-4 text-[var(--primary)]" />
                                     Dashboard
                                 </a>
-                                <a :href="route('auth-user.profile.index')" class="flex items-center gap-2 rounded-xl px-3 py-2.5 font-semibold text-[var(--novel-forge-ai-ink-soft)] hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]" @click="closeMenu">
-                                    <FontAwesomeIcon icon="user" class="w-4 text-[var(--novel-forge-ai-primary)]" />
+                                <a :href="route('auth-user.profile.index')" class="flex items-center gap-2 rounded-xl px-3 py-2.5 font-semibold text-[var(--ink-soft)] hover:bg-[var(--primary-soft)] hover:text-[var(--primary-strong)]" @click="closeMenu">
+                                    <FontAwesomeIcon icon="user" class="w-4 text-[var(--primary)]" />
                                     Profile
                                 </a>
-                                <a :href="route('auth-user.account.index')" class="flex items-center gap-2 rounded-xl px-3 py-2.5 font-semibold text-[var(--novel-forge-ai-ink-soft)] hover:bg-[var(--novel-forge-ai-primary-soft)] hover:text-[var(--novel-forge-ai-primary-strong)]" @click="closeMenu">
-                                    <FontAwesomeIcon icon="user-gear" class="w-4 text-[var(--novel-forge-ai-primary)]" />
+                                <a :href="route('auth-user.account.index')" class="flex items-center gap-2 rounded-xl px-3 py-2.5 font-semibold text-[var(--ink-soft)] hover:bg-[var(--primary-soft)] hover:text-[var(--primary-strong)]" @click="closeMenu">
+                                    <FontAwesomeIcon icon="user-gear" class="w-4 text-[var(--primary)]" />
                                     Account settings
                                 </a>
-                                <button type="button" class="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left font-semibold text-[var(--novel-forge-ai-danger)] hover:bg-red-50" @click="logout">
+                                <button type="button" class="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left font-semibold text-[var(--danger)] hover:bg-red-50" @click="logout">
                                     <FontAwesomeIcon icon="right-from-bracket" class="w-4" />
                                     Log out
                                 </button>
@@ -141,8 +141,8 @@ onBeforeUnmount(() => {
             <slot />
         </main>
 
-        <footer class="border-t border-[var(--novel-forge-ai-border)] bg-white">
-            <div class="ai-container flex flex-col items-center justify-between gap-3 py-6 text-center text-sm text-[var(--novel-forge-ai-muted)] sm:flex-row sm:text-left">
+        <footer class="border-t border-[var(--border)] bg-white">
+            <div class="ai-container flex flex-col items-center justify-between gap-3 py-6 text-center text-sm text-[var(--muted)] sm:flex-row sm:text-left">
                 <div class="flex items-center gap-2.5">
                     <img :src="appLogo" :alt="appName" class="h-7 w-7 rounded-lg object-cover" />
                     <span>© {{ currentYear }} {{ appName }}</span>
@@ -156,58 +156,37 @@ onBeforeUnmount(() => {
 </template>
 
 <style>
-* {
-    box-sizing: border-box;
-}
-
 html {
     scroll-behavior: smooth;
 }
 
 body {
     min-width: 320px;
-    margin: 0;
-    background: var(--novel-forge-ai-canvas);
-    color: var(--novel-forge-ai-ink);
-    font-family: var(--novel-forge-ai-font-sans);
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
 }
 
-button,
-input,
-textarea,
-select {
-    font: inherit;
-}
-
 a,
 button {
-    transition: color var(--novel-forge-ai-transition), background-color var(--novel-forge-ai-transition), border-color var(--novel-forge-ai-transition), box-shadow var(--novel-forge-ai-transition), transform var(--novel-forge-ai-transition), opacity var(--novel-forge-ai-transition);
-}
-
-a {
-    color: inherit;
-    text-decoration: none;
+    transition: color var(--transition), background-color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
 }
 
 ::selection {
     background: rgb(91 92 240 / 18%);
-    color: var(--novel-forge-ai-primary-strong);
+    color: var(--primary-strong);
 }
 
 :focus-visible {
     outline: 0;
-    box-shadow: var(--novel-forge-ai-focus-ring);
+    box-shadow: var(--focus-ring);
 }
 
 .ai-container {
     width: min(100% - 2rem, 1160px);
     margin-inline: auto;
-}
-
-.public-profile-avatar {
-    background: var(--novel-forge-ai-gradient-brand);
 }
 
 @media (min-width: 768px) {
@@ -222,3 +201,5 @@ a {
     }
 }
 </style>
+
+

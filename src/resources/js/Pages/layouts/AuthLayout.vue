@@ -20,19 +20,19 @@ provide('authUser', authUser)
 
 
 <template>
-    <div class="auth-layout flex min-h-screen flex-col">
+    <div class="auth-layout flex min-h-screen flex-col bg-[var(--canvas)] text-[var(--ink)] [font-family:var(--font-sans)]">
 
-        <header class="fixed top-0 left-0 z-50 w-full bg-[var(--novel-forge-ai-surface)]/90 backdrop-blur-xl">
+        <header class="fixed top-0 left-0 z-50 w-full border-b border-[var(--border)] bg-[var(--surface)]/90 shadow-[var(--shadow-sm)] backdrop-blur-xl">
             <div class="flex h-14 items-center justify-between gap-3 px-4">
 
                 <a :href="route('home')" class="group flex min-w-0 items-center gap-2.5">
                     <span v-if="appLogo"
-                        class="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[var(--novel-forge-ai-primary-soft)] shadow-[var(--novel-forge-ai-shadow-sm)] transition-shadow duration-150 group-hover:shadow-[var(--novel-forge-ai-shadow-primary)]">
+                        class="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[var(--primary-soft)] shadow-[var(--shadow-sm)] transition-shadow duration-150 group-hover:shadow-[var(--shadow-primary)]">
                         <img v-if="appLogo" :src="appLogo" :alt="appName" class="h-full w-full object-contain">
                     </span>
 
                     <span
-                        class="truncate text-base font-bold tracking-[-0.02em] text-[var(--novel-forge-ai-ink)]">
+                        class="truncate text-base font-bold tracking-[-0.02em] text-[var(--ink)]">
                         {{ appName }}
                     </span>
                 </a>
@@ -51,7 +51,7 @@ provide('authUser', authUser)
 
             <OffCanvasMenu mode="sidebar" :auth-user="authUser" />
 
-            <div class="min-w-0 flex-1 p-4">
+            <div class="min-w-0 flex-1 bg-[var(--canvas)] p-4">
 
                 <Breadcrumbs />
 
@@ -65,7 +65,7 @@ provide('authUser', authUser)
             </div>
         </main>
 
-        <footer class="border-t border-[var(--novel-forge-ai-border)] bg-[var(--novel-forge-ai-surface)]/90 py-3 text-sm">
+        <footer class="border-t border-[var(--border)] bg-[var(--surface)]/90 py-3 text-sm text-[var(--muted)]">
 
             <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 md:flex-row">
 
@@ -76,7 +76,7 @@ provide('authUser', authUser)
                 <span class="w-full text-center md:w-auto md:text-right">
                     Developed by
                     <a href="https://www.linkedin.com/in/sk-md-tahmid-farzan/" target="_blank" rel="noopener noreferrer"
-                        class="font-medium text-[var(--novel-forge-ai-primary-strong)] transition-colors duration-150 hover:underline">
+                        class="font-medium text-[var(--primary-strong)] transition-colors duration-150 hover:underline">
                         Sk Md Tahmid Farzan
                     </a>
                 </span>
@@ -89,33 +89,13 @@ provide('authUser', authUser)
     </div>
 </template>
 
-
 <style scoped>
-.auth-layout {
-    background: var(--novel-forge-ai-canvas);
-    color: var(--novel-forge-ai-ink);
-    font-family: var(--novel-forge-ai-font-sans);
-}
-
 .auth-layout :deep(a:focus-visible),
 .auth-layout :deep(button:focus-visible),
 .auth-layout :deep(input:focus-visible),
 .auth-layout :deep(select:focus-visible),
 .auth-layout :deep(textarea:focus-visible) {
     outline: 0;
-    box-shadow: var(--novel-forge-ai-focus-ring);
-}
-
-.auth-layout header {
-    border-bottom: 1px solid var(--novel-forge-ai-border);
-    box-shadow: var(--novel-forge-ai-shadow-sm);
-}
-
-.auth-layout main > div:last-child {
-    background: var(--novel-forge-ai-canvas);
-}
-
-.auth-layout footer {
-    color: var(--novel-forge-ai-muted);
+    box-shadow: var(--focus-ring);
 }
 </style>

@@ -1,5 +1,6 @@
 <script setup>
-import Layout from "@/pages/layouts/AuthLayout.vue";
+import layout from "@/pages/layouts/PublicLayout.vue";
+import AuthCard from "@/components/common/layout/public-layout/AuthCard.vue";
 
 import { ref } from "vue";
 import { Head, router as inertiaJsRoute } from "@inertiajs/vue3";
@@ -10,7 +11,10 @@ import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faSpinner);
 
-defineOptions({ layout: Layout });
+defineOptions({ layout: layout });
+
+const appName = import.meta.env.VITE_APP_NAME || "Novel Forge AI";
+const appFavicon = import.meta.env.VITE_APP_FAVICON || "/uploads/icons/app/favicon.png";
 
 const resending = ref(false);
 
@@ -34,58 +38,38 @@ function handleResendVerification() {
 <template>
     <Head title="Email Verification" />
 
-    <div
-        class="email-verification-page w-full min-h-[70vh] flex flex-col md:flex-row items-center justify-center gap-6 p-4"
+    <AuthCard
+        :logo="appFavicon"
+        :alt="appName"
+        eyebrow="Email verification"
+        :subtitle="`Secure your ${appName} workspace`"
+        title="Verify Your Email"
+        description="Please verify your email address to continue."
     >
-        <div
-            class="hidden md:flex items-center justify-center bg-blue-100 rounded-2xl p-6 w-full md:w-1/2"
-        >
-            <img
-                :src="'/uploads/icons/auth/user-check.png'"
-                alt="User verification"
-                class="w-3/4 max-w-xs object-contain"
-            />
-        </div>
-
-        <div class="w-full md:w-1/2">
-            <div
-                class="verification-card bg-white border border-gray-200 rounded-2xl shadow-sm p-6 text-center"
-            >
-                <h2 class="text-xl font-semibold text-blue-600 mb-2">
-                    Verify Your Email
-                </h2>
-
-                <p class="text-gray-600 text-sm mb-4">
-                    Please verify your email address to continue.
-                </p>
-
-                <form @submit.prevent="handleResendVerification">
-                    <button
-                        type="submit"
-                        :disabled="resending"
-                        class="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded flex items-center justify-center gap-2"
-                    >
-                        <FontAwesomeIcon v-if="resending" icon="spinner" spin />
-
-                        {{
-                            resending
-                                ? "Sending..."
-                                : "Resend Verification Email"
-                        }}
-                    </button>
-                </form>
+        <template #story>
+            <div class="flex items-center justify-center rounded-2xl bg-blue-100 p-6">
+                <img
+                    :src="'/uploads/icons/auth/user-check.png'"
+                    alt="User verification"
+                    class="w-3/4 max-w-xs object-contain"
+                />
             </div>
-        </div>
-    </div>
+        </template>
+
+        <form class="mt-8" @submit.prevent="handleResendVerification">
+            <button
+                type="submit"
+                :disabled="resending"
+                class="flex w-full items-center justify-center gap-2 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+            >
+                <FontAwesomeIcon v-if="resending" icon="spinner" spin />
+
+                {{
+                    resending
+                        ? "Sending..."
+                        : "Resend Verification Email"
+                }}
+            </button>
+        </form>
+    </AuthCard>
 </template>
-
-<style scoped>
-.email-verification-page {
-    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 70%, #dbeafe 140%);
-}
-
-.verification-card {
-    border-color: var(--novel-forge-ai-border);
-    box-shadow: var(--novel-forge-ai-shadow-sm);
-}
-</style>

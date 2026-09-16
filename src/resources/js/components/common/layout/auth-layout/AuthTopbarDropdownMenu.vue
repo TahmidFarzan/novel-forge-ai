@@ -133,9 +133,9 @@ onBeforeUnmount(() => {
         >
             <div
                 v-if="showUserDropdown"
-                class="absolute right-0 mt-2 w-52 bg-[var(--novel-forge-ai-surface)] border border-[var(--novel-forge-ai-border)] rounded-xl shadow-[var(--novel-forge-ai-shadow-md)] z-50 origin-top-right overflow-hidden"
+                class="absolute right-0 mt-2 w-52 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-[var(--shadow-md)] z-50 origin-top-right overflow-hidden"
             >
-                <div class="px-3 py-2 border-b border-[var(--novel-forge-ai-border)]">
+                <div class="px-3 py-2 border-b border-[var(--border)]">
                     <div class="font-medium">
                         {{ authUser?.name }}
                     </div>
@@ -144,18 +144,18 @@ onBeforeUnmount(() => {
                 <a
                     :href="route('auth-user.profile.index')"
                     @click="closeUserDropdown"
-                    class="flex items-center gap-2 px-3 py-2 hover:bg-[var(--novel-forge-ai-primary-soft)]"
+                    class="flex items-center gap-2 px-3 py-2 hover:bg-[var(--primary-soft)]"
                 >
-                    <FontAwesomeIcon icon="user" class="text-[var(--novel-forge-ai-muted)]" />
+                    <FontAwesomeIcon icon="user" class="text-[var(--muted)]" />
                     <span>Profile</span>
                 </a>
 
                 <a
                     :href="route('auth-user.account.index')"
                     @click="closeUserDropdown"
-                    class="flex items-center gap-2 px-3 py-2 hover:bg-[var(--novel-forge-ai-primary-soft)]"
+                    class="flex items-center gap-2 px-3 py-2 hover:bg-[var(--primary-soft)]"
                 >
-                    <FontAwesomeIcon icon="user-gear" class="text-[var(--novel-forge-ai-muted)]" />
+                    <FontAwesomeIcon icon="user-gear" class="text-[var(--muted)]" />
                     <span>Account</span>
                 </a>
 
@@ -163,9 +163,9 @@ onBeforeUnmount(() => {
                     v-if="canAccessActivityLogComputed"
                     :href="route('back-office.activity-logs.index')"
                     @click="closeUserDropdown"
-                    class="flex items-center gap-2 px-3 py-2 hover:bg-[var(--novel-forge-ai-primary-soft)]"
+                    class="flex items-center gap-2 px-3 py-2 hover:bg-[var(--primary-soft)]"
                 >
-                    <FontAwesomeIcon icon="chart-line" class="text-[var(--novel-forge-ai-muted)]" />
+                    <FontAwesomeIcon icon="chart-line" class="text-[var(--muted)]" />
                     <span>Activity Logs</span>
                 </a>
 
@@ -173,9 +173,9 @@ onBeforeUnmount(() => {
                     v-if="canAccessLogViewerComputed"
                     :href="route('log-viewer.index')"
                     @click="closeUserDropdown"
-                    class="flex items-center gap-2 px-3 py-2 hover:bg-[var(--novel-forge-ai-primary-soft)]"
+                    class="flex items-center gap-2 px-3 py-2 hover:bg-[var(--primary-soft)]"
                 >
-                    <FontAwesomeIcon icon="chart-line" class="text-[var(--novel-forge-ai-muted)]" />
+                    <FontAwesomeIcon icon="chart-line" class="text-[var(--muted)]" />
                     <span>Log Viewer</span>
                 </a>
 
@@ -183,16 +183,16 @@ onBeforeUnmount(() => {
                     v-if="canAccessQueueMonitorComputed"
                     :href="route('back-office.queue-monitor.index')"
                     @click="closeUserDropdown"
-                    class="flex items-center gap-2 px-3 py-2 hover:bg-[var(--novel-forge-ai-primary-soft)]"
+                    class="flex items-center gap-2 px-3 py-2 hover:bg-[var(--primary-soft)]"
                 >
-                    <FontAwesomeIcon icon="chart-line" class="text-[var(--novel-forge-ai-muted)]" />
+                    <FontAwesomeIcon icon="chart-line" class="text-[var(--muted)]" />
                     <span>Queue Monitor</span>
                 </a>
 
                 <button
                     type="button"
                     @click="openLogoutModal"
-                    class="flex items-center gap-2 w-full text-left px-3 py-2 text-[var(--novel-forge-ai-danger)] hover:bg-red-50"
+                    class="flex items-center gap-2 w-full text-left px-3 py-2 text-[var(--danger)] hover:bg-red-50"
                 >
                     <FontAwesomeIcon icon="right-from-bracket" />
                     <span>Logout</span>
@@ -223,8 +223,8 @@ onBeforeUnmount(() => {
                     leave-from-class="opacity-100 scale-100 translate-y-0"
                     leave-to-class="opacity-0 scale-95 translate-y-2"
                 >
-                    <div class="bg-[var(--novel-forge-ai-surface)] p-5 rounded-xl shadow-[var(--novel-forge-ai-shadow-lg)] w-80">
-                        <div class="flex items-center gap-2 mb-3 text-[var(--novel-forge-ai-danger)]">
+                    <div class="bg-[var(--surface)] p-5 rounded-xl shadow-[var(--shadow-lg)] w-80">
+                        <div class="flex items-center gap-2 mb-3 text-[var(--danger)]">
                             <FontAwesomeIcon icon="right-from-bracket" />
 
                             <span class="font-semibold text-gray-800">
