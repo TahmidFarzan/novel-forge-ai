@@ -107,67 +107,78 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
 
     Route::prefix('medias')->name('medias.')->group(function () {
         Route::get('/', [MediaController::class, 'index'])->name('index');
-        Route::get('{slug}/details', [MediaController::class, 'details'])->name('details');
-        Route::delete('{slug}/delete', [MediaController::class, 'delete'])->name('delete');
-
         Route::post('quick-save', [MediaController::class, 'quickSave'])->name('quick-save');
-        Route::patch('{slug}/quick-update', [MediaController::class, 'quickUpdate'])->name('quick-update');
+
+        Route::prefix('{slug}')->group(function () {
+            Route::get('details', [MediaController::class, 'details'])->name('details');
+            Route::delete('delete', [MediaController::class, 'delete'])->name('delete');
+            Route::patch('quick-update', [MediaController::class, 'quickUpdate'])->name('quick-update');
+        });
     });
 
     Route::prefix('genres')->name('genres.')->group(function () {
         Route::get('/', [GenreController::class, 'index'])->name('index');
         Route::get('create', [GenreController::class, 'create'])->name('create');
-        Route::get('{slug}/edit', [GenreController::class, 'edit'])->name('edit');
-        Route::get('{slug}/details', [GenreController::class, 'details'])->name('details');
-
         Route::post('save', [GenreController::class, 'save'])->name('save');
-        Route::patch('{slug}/update', [GenreController::class, 'update'])->name('update');
-        Route::delete('{slug}/delete', [GenreController::class, 'delete'])->name('delete');
+
+        Route::prefix('{slug}')->group(function () {
+            Route::get('edit', [GenreController::class, 'edit'])->name('edit');
+            Route::get('details', [GenreController::class, 'details'])->name('details');
+            Route::patch('update', [GenreController::class, 'update'])->name('update');
+            Route::delete('delete', [GenreController::class, 'delete'])->name('delete');
+        });
     });
 
     Route::prefix('audiences')->name('audiences.')->group(function () {
         Route::get('/', [AudienceController::class, 'index'])->name('index');
         Route::get('create', [AudienceController::class, 'create'])->name('create');
-        Route::get('{slug}/edit', [AudienceController::class, 'edit'])->name('edit');
-        Route::get('{slug}/details', [AudienceController::class, 'details'])->name('details');
-
         Route::post('save', [AudienceController::class, 'save'])->name('save');
-        Route::patch('{slug}/update', [AudienceController::class, 'update'])->name('update');
-        Route::delete('{slug}/delete', [AudienceController::class, 'delete'])->name('delete');
+
+        Route::prefix('{slug}')->group(function () {
+            Route::get('edit', [AudienceController::class, 'edit'])->name('edit');
+            Route::get('details', [AudienceController::class, 'details'])->name('details');
+            Route::patch('update', [AudienceController::class, 'update'])->name('update');
+            Route::delete('delete', [AudienceController::class, 'delete'])->name('delete');
+        });
     });
 
     Route::prefix('novel-types')->name('novel-types.')->group(function () {
         Route::get('/', [NovelTypeController::class, 'index'])->name('index');
         Route::get('create', [NovelTypeController::class, 'create'])->name('create');
-        Route::get('{slug}/edit', [NovelTypeController::class, 'edit'])->name('edit');
-        Route::get('{slug}/details', [NovelTypeController::class, 'details'])->name('details');
-
         Route::post('save', [NovelTypeController::class, 'save'])->name('save');
-        Route::patch('{slug}/update', [NovelTypeController::class, 'update'])->name('update');
-        Route::delete('{slug}/delete', [NovelTypeController::class, 'delete'])->name('delete');
+
+        Route::prefix('{slug}')->group(function () {
+            Route::get('edit', [NovelTypeController::class, 'edit'])->name('edit');
+            Route::get('details', [NovelTypeController::class, 'details'])->name('details');
+            Route::patch('update', [NovelTypeController::class, 'update'])->name('update');
+            Route::delete('delete', [NovelTypeController::class, 'delete'])->name('delete');
+        });
     });
 
     Route::prefix('languages')->name('languages.')->group(function () {
         Route::get('/', [LanguageController::class, 'index'])->name('index');
         Route::get('create', [LanguageController::class, 'create'])->name('create');
-        Route::get('{slug}/edit', [LanguageController::class, 'edit'])->name('edit');
-        Route::get('{slug}/details', [LanguageController::class, 'details'])->name('details');
-
         Route::post('save', [LanguageController::class, 'save'])->name('save');
-        Route::patch('{slug}/update', [LanguageController::class, 'update'])->name('update');
-        Route::delete('{slug}/delete', [LanguageController::class, 'delete'])->name('delete');
+
+        Route::prefix('{slug}')->group(function () {
+            Route::get('edit', [LanguageController::class, 'edit'])->name('edit');
+            Route::get('details', [LanguageController::class, 'details'])->name('details');
+            Route::patch('update', [LanguageController::class, 'update'])->name('update');
+            Route::delete('delete', [LanguageController::class, 'delete'])->name('delete');
+        });
     });
 
     Route::prefix('ai-brains')->name('ai-brains.')->group(function () {
         Route::get('/', [AiBrainController::class, 'index'])->name('index');
-        Route::get('{slug}/details', [AiBrainController::class, 'details'])->name('details');
-
         Route::get('create', [AiBrainController::class, 'create'])->name('create');
-        Route::get('{slug}/edit', [AiBrainController::class, 'edit'])->name('edit');
-
         Route::post('save', [AiBrainController::class, 'save'])->name('save');
-        Route::patch('{slug}/update', [AiBrainController::class, 'update'])->name('update');
-        Route::delete('{slug}/delete', [AiBrainController::class, 'delete'])->name('delete');
+
+        Route::prefix('{slug}')->group(function () {
+            Route::get('edit', [AiBrainController::class, 'edit'])->name('edit');
+            Route::get('details', [AiBrainController::class, 'details'])->name('details');
+            Route::patch('update', [AiBrainController::class, 'update'])->name('update');
+            Route::delete('delete', [AiBrainController::class, 'delete'])->name('delete');
+        });
     });
 
     Route::prefix('kdp-layouts')->name('kdp-layouts.')->group(function () {
@@ -177,11 +188,13 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
 
     Route::prefix('ai-prompts')->name('ai-prompts.')->group(function () {
         Route::get('/', [AiPromptController::class, 'index'])->name('index');
-        Route::get('{slug}/edit', [AiPromptController::class, 'edit'])->name('edit');
-        Route::get('{slug}/details', [AiPromptController::class, 'details'])->name('details');
-
         Route::post('save', [AiPromptController::class, 'save'])->name('save');
-        Route::patch('{slug}/update', [AiPromptController::class, 'update'])->name('update');
+
+        Route::prefix('{slug}')->group(function () {
+            Route::get('edit', [AiPromptController::class, 'edit'])->name('edit');
+            Route::get('details', [AiPromptController::class, 'details'])->name('details');
+            Route::patch('update', [AiPromptController::class, 'update'])->name('update');
+        });
     });
 
     Route::prefix('ai-brain-output-types')->name('ai-brain-output-types.')->group(function () {
@@ -197,14 +210,16 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
     Route::prefix('users')->name('users.')->middleware(['is.super.admin'])->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::get('create', [UserController::class, 'create'])->name('create');
-        Route::get('{slug}/edit', [UserController::class, 'edit'])->name('edit');
-        Route::get('{slug}/details', [UserController::class, 'details'])->name('details');
-
         Route::post('save', [UserController::class, 'save'])->name('save');
-        Route::patch('{slug}/update', [UserController::class, 'update'])->name('update');
-        Route::delete('{slug}/delete', [UserController::class, 'delete'])->name('delete');
-        Route::patch('{slug}/active', [UserController::class, 'active'])->name('active');
-        Route::patch('{slug}/inactive', [UserController::class, 'inactive'])->name('inactive');
+
+        Route::prefix('{slug}')->group(function () {
+            Route::get('edit', [UserController::class, 'edit'])->name('edit');
+            Route::get('details', [UserController::class, 'details'])->name('details');
+            Route::patch('update', [UserController::class, 'update'])->name('update');
+            Route::delete('delete', [UserController::class, 'delete'])->name('delete');
+            Route::patch('active', [UserController::class, 'active'])->name('active');
+            Route::patch('inactive', [UserController::class, 'inactive'])->name('inactive');
+        });
     });
 
     Route::prefix('novels')->name('novels.')->group(function () {
@@ -228,8 +243,6 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
             Route::post('page-planner', [NovelController::class, 'generatePagePlanner'])->name('page-planner');
             Route::post('complete-novel', [NovelController::class, 'generateCompleteNovel'])->name('complete-novel');
         });
-
-
 
         Route::prefix('{slug}')->group(function () {
             Route::get('edit', [NovelController::class, 'edit'])->name('edit');
@@ -259,10 +272,12 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
     Route::prefix('activity-logs')->name('activity-logs.')->group(function () {
         Route::get('index', [ActivityLogController::class, 'index'])->name('index');
 
-        Route::get('{slug}/details', [ActivityLogController::class, 'details'])->name('details');
         Route::get('{modelSlug}/show-all/{recordSlug}', [ActivityLogController::class, 'indexForModel'])->name('show-all');
 
-        Route::delete('{slug}/delete', [ActivityLogController::class, 'delete'])->name('delete');
+        Route::prefix('{slug}')->group(function () {
+            Route::get('details', [ActivityLogController::class, 'details'])->name('details');
+            Route::delete('delete', [ActivityLogController::class, 'delete'])->name('delete');
+        });
     });
 
     Route::prefix('queue-monitor')->name('queue-monitor.')->middleware(['is.super.admin'])->group(function () {
