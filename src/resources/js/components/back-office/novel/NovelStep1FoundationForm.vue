@@ -7,10 +7,7 @@ import { useForm, router as intertiaJsRoute } from "@inertiajs/vue3";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library as FontAwesomeLibrary } from "@fortawesome/fontawesome-svg-core";
-import {
-    faLightbulb,
-    faBrain,
-} from "@fortawesome/free-solid-svg-icons";
+import { faLightbulb, faBrain } from "@fortawesome/free-solid-svg-icons";
 
 FontAwesomeLibrary.add(faLightbulb, faBrain);
 
@@ -164,10 +161,7 @@ defineExpose({ submit });
     <div class="space-y-6">
         <div class="bg-white border rounded-xl p-5 shadow-sm space-y-4">
             <h3 class="text-base font-semibold flex items-center gap-2">
-                <FontAwesomeIcon
-                    icon="lightbulb"
-                    class="text-blue-600"
-                />
+                <FontAwesomeIcon icon="lightbulb" class="text-blue-600" />
                 Foundation Configuration
             </h3>
 
@@ -185,23 +179,14 @@ defineExpose({ submit });
                         :apiUrl="route('search.audiences')"
                         :multiple="false"
                         placeholder="Select audiences"
-                        :error="
-                            foundationGeneratorForm.errors
-                                .audience_id
-                        "
+                        :error="foundationGeneratorForm.errors.audience_id"
                     />
 
                     <p
-                        v-if="
-                            foundationGeneratorForm.errors
-                                .audience_id
-                        "
+                        v-if="foundationGeneratorForm.errors.audience_id"
                         class="text-red-500 text-sm mt-1"
                     >
-                        {{
-                            foundationGeneratorForm.errors
-                                .audience_id
-                        }}
+                        {{ foundationGeneratorForm.errors.audience_id }}
                     </p>
                 </div>
 
@@ -223,23 +208,11 @@ defineExpose({ submit });
                         :apiUrl="route('search.languages')"
                         :multiple="false"
                         placeholder="Select languages"
-                        :error="
-                            foundationGeneratorForm.errors
-                                .language_id
-                        "
+                        :error="foundationGeneratorForm.errors.language_id"
                     />
 
-                    <p
-                        v-if="
-                            foundationGeneratorForm.errors
-                                .language_id
-                        "
-                        class="text-red-500 text-sm mt-1"
-                    >
-                        {{
-                            foundationGeneratorForm.errors
-                                .language_id
-                        }}
+                    <p v-if="foundationGeneratorForm.errors.language_id">
+                        {{ foundationGeneratorForm.errors.language_id }}
                     </p>
                 </div>
 
@@ -254,30 +227,19 @@ defineExpose({ submit });
                         :form="foundationGeneratorForm"
                         fieldName="genre_ids"
                         :selectedItem="
-                            audienceDependentFieldsReset
-                                ? null
-                                : novel?.genres
+                            audienceDependentFieldsReset ? null : novel?.genres
                         "
                         :apiUrl="genresApiUrl"
                         :multiple="true"
                         placeholder="Select genres"
-                        :error="
-                            foundationGeneratorForm.errors
-                                .genre_ids
-                        "
+                        :error="foundationGeneratorForm.errors.genre_ids"
                     />
 
                     <p
-                        v-if="
-                            foundationGeneratorForm.errors
-                                .genre_ids
-                        "
+                        v-if="foundationGeneratorForm.errors.genre_ids"
                         class="text-red-500 text-sm mt-1"
                     >
-                        {{
-                            foundationGeneratorForm.errors
-                                .genre_ids
-                        }}
+                        {{ foundationGeneratorForm.errors.genre_ids }}
                     </p>
                 </div>
 
@@ -299,23 +261,14 @@ defineExpose({ submit });
                         :apiUrl="route('search.novel-types')"
                         :multiple="false"
                         placeholder="Select novel types"
-                        :error="
-                            foundationGeneratorForm.errors
-                                .novel_type_id
-                        "
+                        :error="foundationGeneratorForm.errors.novel_type_id"
                     />
 
                     <p
-                        v-if="
-                            foundationGeneratorForm.errors
-                                .novel_type_id
-                        "
+                        v-if="foundationGeneratorForm.errors.novel_type_id"
                         class="text-red-500 text-sm mt-1"
                     >
-                        {{
-                            foundationGeneratorForm.errors
-                                .novel_type_id
-                        }}
+                        {{ foundationGeneratorForm.errors.novel_type_id }}
                     </p>
                 </div>
 
@@ -325,9 +278,7 @@ defineExpose({ submit });
                     </label>
 
                     <textarea
-                        v-model="
-                            foundationGeneratorForm.additional_information
-                        "
+                        v-model="foundationGeneratorForm.additional_information"
                         rows="3"
                         placeholder="Any additional context or instructions for the AI..."
                         class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none border-gray-300"
@@ -336,22 +287,14 @@ defineExpose({ submit });
             </div>
         </div>
 
-        <div
-            class="bg-white border rounded-xl p-5 shadow-sm space-y-4"
-        >
-            <h3
-                class="text-base font-semibold flex items-center gap-2"
-            >
-                <FontAwesomeIcon
-                    icon="brain"
-                    class="text-purple-600"
-                />
+        <div class="bg-white border rounded-xl p-5 shadow-sm space-y-4">
+            <h3 class="text-base font-semibold flex items-center gap-2">
+                <FontAwesomeIcon icon="brain" class="text-purple-600" />
                 AI Brain Configuration
             </h3>
 
             <p class="text-sm text-gray-500">
-                Select the AI model that will be used for
-                generating your novel.
+                Select the AI model that will be used for generating your novel.
             </p>
 
             <div
@@ -361,14 +304,10 @@ defineExpose({ submit });
                     :form="foundationGeneratorForm"
                     fieldName="ai_brain_id"
                     :selectedItem="novel?.ai_brain"
-                    :apiUrl="
-                        buildAiBrainSearchUrl()
-                    "
+                    :apiUrl="buildAiBrainSearchUrl()"
                     :multiple="false"
                     placeholder="Select AI Brain"
-                    :error="
-                        foundationGeneratorForm.errors.ai_brain_id
-                    "
+                    :error="foundationGeneratorForm.errors.ai_brain_id"
                     class="ai-brain-select"
                 />
             </div>

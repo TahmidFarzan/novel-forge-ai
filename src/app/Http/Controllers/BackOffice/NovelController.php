@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
+use App\Http\Requests\NovelCharactersRequest;
 
 class NovelController extends Controller
 {
@@ -79,6 +80,19 @@ class NovelController extends Controller
         $result = $this->novelService->generateFoundation($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateCharacters(NovelCharactersRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateCharacters($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
             'status'  => $result['status'],
         ]);
