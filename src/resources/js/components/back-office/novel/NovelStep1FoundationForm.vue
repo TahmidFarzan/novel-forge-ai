@@ -25,7 +25,7 @@ const { novel } = defineProps({
 
 const isUpdate = computed(() => !!novel?.slug);
 
-const plotGeneratorSaveForm = useForm({
+const foundationGeneratorForm = useForm({
     additional_information: novel?.additional_information ?? null,
     language_id: novel?.language_id ?? null,
     genre_ids: novel?.genres?.map((genre) => genre.id) ?? [],
@@ -35,7 +35,7 @@ const plotGeneratorSaveForm = useForm({
 });
 
 const genresApiUrl = computed(() => {
-    const audienceId = plotGeneratorSaveForm.audience_id;
+    const audienceId = foundationGeneratorForm.audience_id;
 
     if (!audienceId) {
         return route("search.genres");
@@ -50,7 +50,7 @@ const audienceDependentFieldsReset = ref(false);
 const audienceDependentFieldsKey = ref(0);
 
 watch(
-    () => plotGeneratorSaveForm.audience_id,
+    () => foundationGeneratorForm.audience_id,
     (newAudienceId, oldAudienceId) => {
         if (newAudienceId === oldAudienceId) {
             return;
@@ -58,12 +58,12 @@ watch(
 
         audienceDependentFieldsReset.value = true;
 
-        plotGeneratorSaveForm.language_id = null;
-        plotGeneratorSaveForm.genre_ids = [];
-        plotGeneratorSaveForm.novel_type_id = null;
-        plotGeneratorSaveForm.additional_information = null;
+        foundationGeneratorForm.language_id = null;
+        foundationGeneratorForm.genre_ids = [];
+        foundationGeneratorForm.novel_type_id = null;
+        foundationGeneratorForm.additional_information = null;
 
-        plotGeneratorSaveForm.clearErrors(
+        foundationGeneratorForm.clearErrors(
             "language_id",
             "genre_ids",
             "novel_type_id",
@@ -81,33 +81,33 @@ function buildAiBrainSearchUrl() {
 }
 
 const validateFoundation = () => {
-    plotGeneratorSaveForm.clearErrors();
+    foundationGeneratorForm.clearErrors();
 
     let valid = true;
 
-    if (!plotGeneratorSaveForm.language_id) {
-        plotGeneratorSaveForm.setError("language_id", "Language is required");
+    if (!foundationGeneratorForm.language_id) {
+        foundationGeneratorForm.setError("language_id", "Language is required");
         valid = false;
     }
 
     if (
-        !Array.isArray(plotGeneratorSaveForm.genre_ids) ||
-        plotGeneratorSaveForm.genre_ids.length === 0
+        !Array.isArray(foundationGeneratorForm.genre_ids) ||
+        foundationGeneratorForm.genre_ids.length === 0
     ) {
-        plotGeneratorSaveForm.setError("genre_ids", "Genres is required");
+        foundationGeneratorForm.setError("genre_ids", "Genres is required");
         valid = false;
     }
 
-    if (!plotGeneratorSaveForm.novel_type_id) {
-        plotGeneratorSaveForm.setError(
+    if (!foundationGeneratorForm.novel_type_id) {
+        foundationGeneratorForm.setError(
             "novel_type_id",
             "Novel type is required",
         );
         valid = false;
     }
 
-    if (!plotGeneratorSaveForm.audience_id) {
-        plotGeneratorSaveForm.setError("audience_id", "Audience is required");
+    if (!foundationGeneratorForm.audience_id) {
+        foundationGeneratorForm.setError("audience_id", "Audience is required");
         valid = false;
     }
 
@@ -115,7 +115,7 @@ const validateFoundation = () => {
 };
 
 function submit() {
-    if (plotGeneratorSaveForm.processing) {
+    if (foundationGeneratorForm.processing) {
         return;
     }
 
@@ -129,12 +129,12 @@ function submit() {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
-            plotGeneratorSaveForm.clearErrors();
+            foundationGeneratorForm.clearErrors();
             emit("completed");
         },
         onError: (errors) => {
-            plotGeneratorSaveForm.clearErrors();
-            plotGeneratorSaveForm.setError(errors);
+            foundationGeneratorForm.clearErrors();
+            foundationGeneratorForm.setError(errors);
         },
         onFinish: () => {
             emit("finished");
@@ -143,15 +143,15 @@ function submit() {
 
     if (isUpdate.value) {
         intertiaJsRoute.post(
-            route("back-office.novels.regenerate.foundation", {
+            route("back-office.novels.generate.foundation", {
                 slug: novel?.slug,
             }),
-            { ...plotGeneratorSaveForm.data(), _method: "patch" },
+            { ...foundationGeneratorForm.data(), _method: "patch" },
             requestConfig,
         );
     } else {
-        plotGeneratorSaveForm.post(
-            route("back-office.novels.generate.foundation"),
+        foundationGeneratorForm.post(
+            route("back-office.novels.create.foundation"),
             requestConfig,
         );
     }
@@ -179,27 +179,27 @@ defineExpose({ submit });
                     </label>
 
                     <InfiniteScrollApiSelect
-                        :form="plotGeneratorSaveForm"
+                        :form="foundationGeneratorForm"
                         fieldName="audience_id"
                         :selectedItem="novel?.audience"
                         :apiUrl="route('search.audiences')"
                         :multiple="false"
                         placeholder="Select audiences"
                         :error="
-                            plotGeneratorSaveForm.errors
+                            foundationGeneratorForm.errors
                                 .audience_id
                         "
                     />
 
                     <p
                         v-if="
-                            plotGeneratorSaveForm.errors
+                            foundationGeneratorForm.errors
                                 .audience_id
                         "
                         class="text-red-500 text-sm mt-1"
                     >
                         {{
-                            plotGeneratorSaveForm.errors
+                            foundationGeneratorForm.errors
                                 .audience_id
                         }}
                     </p>
@@ -213,7 +213,7 @@ defineExpose({ submit });
 
                     <InfiniteScrollApiSelect
                         :key="`language-${audienceDependentFieldsKey}`"
-                        :form="plotGeneratorSaveForm"
+                        :form="foundationGeneratorForm"
                         fieldName="language_id"
                         :selectedItem="
                             audienceDependentFieldsReset
@@ -224,20 +224,20 @@ defineExpose({ submit });
                         :multiple="false"
                         placeholder="Select languages"
                         :error="
-                            plotGeneratorSaveForm.errors
+                            foundationGeneratorForm.errors
                                 .language_id
                         "
                     />
 
                     <p
                         v-if="
-                            plotGeneratorSaveForm.errors
+                            foundationGeneratorForm.errors
                                 .language_id
                         "
                         class="text-red-500 text-sm mt-1"
                     >
                         {{
-                            plotGeneratorSaveForm.errors
+                            foundationGeneratorForm.errors
                                 .language_id
                         }}
                     </p>
@@ -251,7 +251,7 @@ defineExpose({ submit });
 
                     <InfiniteScrollApiSelect
                         :key="`genres-${audienceDependentFieldsKey}`"
-                        :form="plotGeneratorSaveForm"
+                        :form="foundationGeneratorForm"
                         fieldName="genre_ids"
                         :selectedItem="
                             audienceDependentFieldsReset
@@ -262,20 +262,20 @@ defineExpose({ submit });
                         :multiple="true"
                         placeholder="Select genres"
                         :error="
-                            plotGeneratorSaveForm.errors
+                            foundationGeneratorForm.errors
                                 .genre_ids
                         "
                     />
 
                     <p
                         v-if="
-                            plotGeneratorSaveForm.errors
+                            foundationGeneratorForm.errors
                                 .genre_ids
                         "
                         class="text-red-500 text-sm mt-1"
                     >
                         {{
-                            plotGeneratorSaveForm.errors
+                            foundationGeneratorForm.errors
                                 .genre_ids
                         }}
                     </p>
@@ -289,7 +289,7 @@ defineExpose({ submit });
 
                     <InfiniteScrollApiSelect
                         :key="`novel-type-${audienceDependentFieldsKey}`"
-                        :form="plotGeneratorSaveForm"
+                        :form="foundationGeneratorForm"
                         fieldName="novel_type_id"
                         :selectedItem="
                             audienceDependentFieldsReset
@@ -300,20 +300,20 @@ defineExpose({ submit });
                         :multiple="false"
                         placeholder="Select novel types"
                         :error="
-                            plotGeneratorSaveForm.errors
+                            foundationGeneratorForm.errors
                                 .novel_type_id
                         "
                     />
 
                     <p
                         v-if="
-                            plotGeneratorSaveForm.errors
+                            foundationGeneratorForm.errors
                                 .novel_type_id
                         "
                         class="text-red-500 text-sm mt-1"
                     >
                         {{
-                            plotGeneratorSaveForm.errors
+                            foundationGeneratorForm.errors
                                 .novel_type_id
                         }}
                     </p>
@@ -326,7 +326,7 @@ defineExpose({ submit });
 
                     <textarea
                         v-model="
-                            plotGeneratorSaveForm.additional_information
+                            foundationGeneratorForm.additional_information
                         "
                         rows="3"
                         placeholder="Any additional context or instructions for the AI..."
@@ -358,7 +358,7 @@ defineExpose({ submit });
                 class="border-2 border-dashed border-purple-200 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-blue-50"
             >
                 <InfiniteScrollApiSelect
-                    :form="plotGeneratorSaveForm"
+                    :form="foundationGeneratorForm"
                     fieldName="ai_brain_id"
                     :selectedItem="novel?.ai_brain"
                     :apiUrl="
@@ -367,17 +367,17 @@ defineExpose({ submit });
                     :multiple="false"
                     placeholder="Select AI Brain"
                     :error="
-                        plotGeneratorSaveForm.errors.ai_brain_id
+                        foundationGeneratorForm.errors.ai_brain_id
                     "
                     class="ai-brain-select"
                 />
             </div>
 
             <p
-                v-if="plotGeneratorSaveForm.errors.ai_brain_id"
+                v-if="foundationGeneratorForm.errors.ai_brain_id"
                 class="text-red-500 text-sm"
             >
-                {{ plotGeneratorSaveForm.errors.ai_brain_id }}
+                {{ foundationGeneratorForm.errors.ai_brain_id }}
             </p>
         </div>
     </div>

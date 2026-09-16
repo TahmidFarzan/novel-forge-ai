@@ -112,20 +112,20 @@ class NovelService
         $statusEvent = $isNew ? "save" : "update";
 
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_PLOT_GENERATOR));
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION_GENERATOR));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $receivedInputs = $this->receivedInputsFormatter($request->input("language_id"), $request->input("audience_id"), $request->input("novel_type_id"), $request->input("genre_ids"), $request->input("additional_information", "Auto"));
+            $receivedInputs = $this->foundationRequestInputsFormatter($request->input("language_id"), $request->input("audience_id"), $request->input("novel_type_id"), $request->input("genre_ids"), $request->input("additional_information", "Auto"));
             $prompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $receivedInputs);
 
             $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             $novel = DB::transaction(function () use ($request, $apiResponse, $novel, $isNew) {
-                $novelObject = $this->extractNovelPlotFromResponse($apiResponse);
+                $foundationObject = $this->extractFoundationFromResponse($apiResponse);
 
-                $novel->title     = $novelObject->title;
-                $novel->sub_title = $novelObject->subtitle;
-                $novel->plot      = $novelObject->plot;
+                $novel->title     = $foundationObject->title;
+                $novel->sub_title = $foundationObject->subtitle;
+                $novel->plot      = $foundationObject->plot;
 
 
                 $novel->audience_id   = $request->input("audience_id");
@@ -197,7 +197,7 @@ class NovelService
         }
     }
 
-    private function extractNovelPlotFromResponse($apiResponse): object
+    private function extractFoundationFromResponse($apiResponse): object
     {
         $content = data_get(
             $apiResponse,
@@ -239,7 +239,7 @@ class NovelService
         ];
     }
 
-    private function receivedInputsFormatter(int|string $languageId, int|string $audienceId, int|string $storyBookTypeId, array $genreIds, string $additionalInformation): array
+    private function foundationRequestInputsFormatter(int|string $languageId, int|string $audienceId, int|string $storyBookTypeId, array $genreIds, string $additionalInformation): array
     {
         $receivedInputs = array();
 

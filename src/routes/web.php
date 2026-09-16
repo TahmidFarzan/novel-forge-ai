@@ -226,43 +226,29 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
         Route::get('/', [NovelController::class, 'index'])->name('index');
         Route::get('create', [NovelController::class, 'create'])->name('create');
 
-        Route::prefix('generate')->name('generate.')->group(function () {
-            Route::post('foundation', [NovelController::class, 'generateFoundation'])->name('foundation');
-            Route::post('characters', [NovelController::class, 'generateCharacters'])->name('characters');
-            Route::post('world-vibe', [NovelController::class, 'generateWorldVibe'])->name('world-vibe');
-            Route::post('locations', [NovelController::class, 'generateLocations'])->name('locations');
-            Route::post('factions', [NovelController::class, 'generateFactions'])->name('factions');
-            Route::post('creature', [NovelController::class, 'generateCreature'])->name('creature');
-            Route::post('system', [NovelController::class, 'generateSystem'])->name('system');
-            Route::post('timeline', [NovelController::class, 'generateTimeline'])->name('timeline');
-            Route::post('story-structure', [NovelController::class, 'generateStoryStructure'])->name('story-structure');
-            Route::post('twists-and-foreshadowing', [NovelController::class, 'generateTwistsAndForeshadowing'])->name('twists-and-foreshadowing');
-            Route::post('scene-planner', [NovelController::class, 'generateScenePlanner'])->name('scene-planner');
-            Route::post('dialogue-planner', [NovelController::class, 'generateDialoguePlanner'])->name('dialogue-planner');
-            Route::post('chapter-planner', [NovelController::class, 'generateChapterPlanner'])->name('chapter-planner');
-            Route::post('page-planner', [NovelController::class, 'generatePagePlanner'])->name('page-planner');
-            Route::post('complete-novel', [NovelController::class, 'generateCompleteNovel'])->name('complete-novel');
+        Route::prefix('create')->name('create.')->group(function () {
+            Route::post('foundation', [NovelController::class, 'createFoundation'])->name('foundation');
         });
 
         Route::prefix('{slug}')->group(function () {
             Route::get('edit', [NovelController::class, 'edit'])->name('edit');
 
             Route::prefix('regenerate')->name('regenerate.')->group(function () {
-                Route::patch('foundation', [NovelController::class, 'regenerateFoundation'])->name('foundation');
-                Route::patch('characters', [NovelController::class, 'regenerateCharacters'])->name('characters');
-                Route::patch('world-vibe', [NovelController::class, 'regenerateWorldVibe'])->name('world-vibe');
-                Route::patch('locations', [NovelController::class, 'regenerateLocations'])->name('locations');
-                Route::patch('factions', [NovelController::class, 'regenerateFactions'])->name('factions');
-                Route::patch('creature', [NovelController::class, 'regenerateCreature'])->name('creature');
-                Route::patch('system', [NovelController::class, 'regenerateSystem'])->name('system');
-                Route::patch('timeline', [NovelController::class, 'regenerateTimeline'])->name('timeline');
-                Route::patch('story-structure', [NovelController::class, 'regenerateStoryStructure'])->name('story-structure');
-                Route::patch('twists-and-foreshadowing', [NovelController::class, 'regenerateTwistsAndForeshadowing'])->name('twists-and-foreshadowing');
-                Route::patch('scene-planner', [NovelController::class, 'regenerateScenePlanner'])->name('scene-planner');
-                Route::patch('dialogue-planner', [NovelController::class, 'regenerateDialoguePlanner'])->name('dialogue-planner');
-                Route::patch('chapter-planner', [NovelController::class, 'regenerateChapterPlanner'])->name('chapter-planner');
-                Route::patch('page-planner', [NovelController::class, 'regeneratePagePlanner'])->name('page-planner');
-                Route::patch('complete-novel', [NovelController::class, 'regenerateCompleteNovel'])->name('complete-novel');
+                Route::patch('foundation', [NovelController::class, 'generateFoundation'])->name('foundation');
+                Route::patch('characters', [NovelController::class, 'generateCharacters'])->name('characters');
+                Route::patch('world-vibe', [NovelController::class, 'generateWorldVibe'])->name('world-vibe');
+                Route::patch('locations', [NovelController::class, 'generateLocations'])->name('locations');
+                Route::patch('factions', [NovelController::class, 'generateFactions'])->name('factions');
+                Route::patch('creature', [NovelController::class, 'generateCreature'])->name('creature');
+                Route::patch('system', [NovelController::class, 'generateSystem'])->name('system');
+                Route::patch('timeline', [NovelController::class, 'generateTimeline'])->name('timeline');
+                Route::patch('story-structure', [NovelController::class, 'generateStoryStructure'])->name('story-structure');
+                Route::patch('twists-and-foreshadowing', [NovelController::class, 'generateTwistsAndForeshadowing'])->name('twists-and-foreshadowing');
+                Route::patch('scene-planner', [NovelController::class, 'generateScenePlanner'])->name('scene-planner');
+                Route::patch('dialogue-planner', [NovelController::class, 'generateDialoguePlanner'])->name('dialogue-planner');
+                Route::patch('chapter-planner', [NovelController::class, 'generateChapterPlanner'])->name('chapter-planner');
+                Route::patch('page-planner', [NovelController::class, 'generatePagePlanner'])->name('page-planner');
+                Route::patch('complete-novel', [NovelController::class, 'generateCompleteNovel'])->name('complete-novel');
             });
 
             Route::delete('delete', [NovelController::class, 'delete'])->name('delete');

@@ -52,7 +52,7 @@ class NovelController extends Controller
     }
 
 
-    public function generateFoundation(NovelFoundationRequest $request): RedirectResponse
+    public function createFoundation(NovelFoundationRequest $request): RedirectResponse
     {
         $novel = $this->novelService->new();
         Gate::authorize('create', $novel);
@@ -71,7 +71,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function regenerateFoundation(NovelFoundationRequest $request, string $slug): RedirectResponse
+    public function generateFoundation(NovelFoundationRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
