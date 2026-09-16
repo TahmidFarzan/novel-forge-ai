@@ -31,7 +31,7 @@ const foundationGeneratorForm = useForm({
     genre_ids: novel?.genres?.map((genre) => genre.id) ?? [],
     novel_type_id: novel?.novel_type_id ?? null,
     audience_id: novel?.audience_id ?? null,
-    ai_brain_id: novel?.ai_brain_id ?? null,
+    ai_brain_id: null,
 });
 
 const genresApiUrl = computed(() => {
