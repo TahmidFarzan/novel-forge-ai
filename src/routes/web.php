@@ -82,7 +82,6 @@ Route::prefix('search')->name('search.')->group(function () {
         Route::get('user-permissions-by-group', [SearchController::class, 'userPermissionsByGroup'])->name('user-permissions-by-group');
 
         Route::get('novel-statuses', [SearchController::class, 'novelStatuses'])->name('novel-statuses');
-
     });
 
     Route::middleware(['response.cache:60,public,30,etag'])->group(function () {
@@ -212,8 +211,6 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
         Route::get('/', [NovelController::class, 'index'])->name('index');
         Route::get('create', [NovelController::class, 'create'])->name('create');
 
-        Route::get('{slug}/edit', [NovelController::class, 'edit'])->name('edit');
-
         Route::prefix('generate')->name('generate.')->group(function () {
             Route::post('foundation', [NovelController::class, 'generateFoundation'])->name('foundation');
             Route::post('characters', [NovelController::class, 'generateCharacters'])->name('characters');
@@ -232,7 +229,31 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
             Route::post('complete-novel', [NovelController::class, 'generateCompleteNovel'])->name('complete-novel');
         });
 
-        Route::delete('{slug}/delete', [NovelController::class, 'delete'])->name('delete');
+
+
+        Route::prefix('{slug}')->group(function () {
+            Route::get('edit', [NovelController::class, 'edit'])->name('edit');
+
+            Route::prefix('regenerate')->name('regenerate.')->group(function () {
+                Route::post('foundation', [NovelController::class, 'regenerateFoundation'])->name('foundation');
+                Route::post('characters', [NovelController::class, 'regenerateCharacters'])->name('characters');
+                Route::post('world-vibe', [NovelController::class, 'regenerateWorldVibe'])->name('world-vibe');
+                Route::post('locations', [NovelController::class, 'regenerateLocations'])->name('locations');
+                Route::post('factions', [NovelController::class, 'regenerateFactions'])->name('factions');
+                Route::post('creature', [NovelController::class, 'regenerateCreature'])->name('creature');
+                Route::post('system', [NovelController::class, 'regenerateSystem'])->name('system');
+                Route::post('timeline', [NovelController::class, 'regenerateTimeline'])->name('timeline');
+                Route::post('story-structure', [NovelController::class, 'regenerateStoryStructure'])->name('story-structure');
+                Route::post('twists-and-foreshadowing', [NovelController::class, 'regenerateTwistsAndForeshadowing'])->name('twists-and-foreshadowing');
+                Route::post('scene-planner', [NovelController::class, 'regenerateScenePlanner'])->name('scene-planner');
+                Route::post('dialogue-planner', [NovelController::class, 'regenerateDialoguePlanner'])->name('dialogue-planner');
+                Route::post('chapter-planner', [NovelController::class, 'regenerateChapterPlanner'])->name('chapter-planner');
+                Route::post('page-planner', [NovelController::class, 'regeneratePagePlanner'])->name('page-planner');
+                Route::post('complete-novel', [NovelController::class, 'regenerateCompleteNovel'])->name('complete-novel');
+            });
+
+            Route::delete('delete', [NovelController::class, 'delete'])->name('delete');
+        });
     });
 
     Route::prefix('activity-logs')->name('activity-logs.')->group(function () {
@@ -247,7 +268,6 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
     Route::prefix('queue-monitor')->name('queue-monitor.')->middleware(['is.super.admin'])->group(function () {
         Route::get('/', ShowQueueMonitorController::class)->name('index');
     });
-
 });
 
 Route::get('/', function () {

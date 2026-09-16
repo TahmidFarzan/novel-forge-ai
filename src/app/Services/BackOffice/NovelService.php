@@ -115,29 +115,6 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_PLOT_GENERATOR));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $language  = $this->languageService->findByIdsOrEnglish($request->input("language_id"));
-            $audience  = $this->audienceService->findById($request->input("audience_id"));
-            $novelType = $this->audienceService->findById($request->input("novel_type_id"));
-            $genres    = $this->genreService->findByIdsOrRandom($request->input("genre_ids"));
-
-            $genrePromptInstruction = '';
-            $additionalInformation = $request->input("additional_information", "Auto");
-
-            foreach ($genres as $genre) {
-
-                $gInstruction = trim($genre->prompt_instruction);
-
-                if (! str_ends_with($gInstruction, '.')) {
-                    $gInstruction .= '.';
-                }
-
-                if ($genrePromptInstruction !== '') {
-                    $genrePromptInstruction .= ' ';
-                }
-
-                $genrePromptInstruction .= $gInstruction;
-            }
-
             $receivedInputs = $this->receivedInputsFormatter($request->input("language_id"), $request->input("audience_id"), $request->input("novel_type_id"), $request->input("genre_ids"), $request->input("additional_information", "Auto"));
             $prompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $receivedInputs);
 

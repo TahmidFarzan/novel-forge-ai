@@ -71,6 +71,19 @@ class NovelController extends Controller
         ]);
     }
 
+    public function regenerateFoundation(NovelFoundationRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateFoundation($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
     public function delete(string $slug): RedirectResponse
     {
         $user = $this->novelService->find($slug);

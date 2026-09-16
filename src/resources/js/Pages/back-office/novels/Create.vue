@@ -2,12 +2,10 @@
 import Layout from "@/pages/layouts/AuthLayout.vue";
 import InfiniteScrollApiSelect from "@/components/common/multi-select/InfiniteScrollApiSelect.vue";
 
-import {
-    AiBrainOutputTypes,
-} from "@/composables/useAiBrain";
+import { AiBrainOutputTypes } from "@/composables/useAiBrain";
 
 import { ref, computed, onMounted, nextTick, watch } from "vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, router as intertiaJsRoute } from "@inertiajs/vue3";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library as FontAwesomeLibrary } from "@fortawesome/fontawesome-svg-core";
@@ -98,7 +96,8 @@ const STEP_DEFINITIONS = [
         id: 1,
         name: "Foundation Generator",
         icon: "lightbulb",
-        description: "Generate the title, subtitle, and initial plot foundation",
+        description:
+            "Generate the title, subtitle, and initial plot foundation",
         outputField: "plot",
         aiBrainOutputTypeCode: AiBrainOutputTypes.Text,
     },
@@ -434,36 +433,82 @@ const validateStep = (stepId) => {
     return valid;
 };
 
-function submitStep1() {
+const validateFoundation = (stepId) => {
+    plotGeneratorSaveForm.clearErrors();
+
+    let valid = true;
+
+    if (!plotGeneratorSaveForm.language_id) {
+        plotGeneratorSaveForm.setError("language_id", "Language is required");
+        valid = false;
+    }
+
+    if (
+        !Array.isArray(plotGeneratorSaveForm.genre_ids) ||
+        plotGeneratorSaveForm.genre_ids.length === 0
+    ) {
+        plotGeneratorSaveForm.setError("genre_ids", "Genres is required");
+        valid = false;
+    }
+
+    if (!plotGeneratorSaveForm.novel_type_id) {
+        plotGeneratorSaveForm.setError(
+            "novel_type_id",
+            "Novel type is required",
+        );
+        valid = false;
+    }
+
+    if (!plotGeneratorSaveForm.audience_id) {
+        plotGeneratorSaveForm.setError("audience_id", "Audience is required");
+        valid = false;
+    }
+
+    return valid;
+};
+
+function submitFoundation() {
     if (plotGeneratorSaveForm.processing) {
         return;
     }
 
-    if (!validateStep(1)) {
+    if (!validateFoundation()) {
         return;
     }
 
     submittingStep.value = 1;
 
-    plotGeneratorSaveForm.post(
-        route("back-office.novels.generate.foundation"),
-        {
-            preserveScroll: true,
-            preserveState: true,
-            onSuccess: () => {
-                completedSteps.value.add(1);
-                activeStep.value = 2;
-                plotGeneratorSaveForm.clearErrors();
-            },
-            onError: (errors) => {
-                plotGeneratorSaveForm.clearErrors();
-                plotGeneratorSaveForm.setError(errors);
-            },
-            onFinish: () => {
-                submittingStep.value = null;
-            },
+    const requestConfig = {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            completedSteps.value.add(1);
+            activeStep.value = 2;
+            plotGeneratorSaveForm.clearErrors();
         },
-    );
+        onError: (errors) => {
+            plotGeneratorSaveForm.clearErrors();
+            plotGeneratorSaveForm.setError(errors);
+        },
+        onFinish: () => {
+            submittingStep.value = null;
+        },
+    };
+
+    if (isUpdate.value) {
+        intertiaJsRoute.post(
+            route("back-office.novels.regenerate.foundation", {
+                slug: storyBook?.slug,
+            }),
+            { ...plotGeneratorSaveForm.data(), _method: "patch" },
+            requestConfig,
+        );
+    } else {
+        plotGeneratorSaveForm.post(
+            route("back-office.novels.generate.foundation"),
+            requestConfig,
+        );
+    }
 }
 
 function submitFutureStep() {
@@ -524,7 +569,9 @@ const goPrev = () => {
                 </div>
 
                 <div class="px-0 pt-4 border-b border-gray-200">
-                    <nav class="hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-x-2 pb-px">
+                    <nav
+                        class="hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-x-2 pb-px"
+                    >
                         <button
                             v-for="step in STEP_DEFINITIONS"
                             :key="step.id"
@@ -949,7 +996,7 @@ const goPrev = () => {
                         <button
                             v-if="activeStep === 1"
                             type="button"
-                            @click="submitStep1"
+                            @click="submitFoundation"
                             :disabled="plotGeneratorSaveForm.processing"
                             class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed"
                         >
@@ -958,7 +1005,10 @@ const goPrev = () => {
                                 icon="spinner"
                                 spin
                             />
-                            <FontAwesomeIcon v-else icon="wand-magic-sparkles" />
+                            <FontAwesomeIcon
+                                v-else
+                                icon="wand-magic-sparkles"
+                            />
 
                             {{
                                 submittingStep === 1
