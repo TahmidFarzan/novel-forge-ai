@@ -101,7 +101,7 @@ const submit = () => {
     };
 
     inertiaRoute.patch(
-        route("back-office.novels.regenerate.system", {
+        route("back-office.novels.generate.system", {
             slug: novel?.slug,
         }),
         {

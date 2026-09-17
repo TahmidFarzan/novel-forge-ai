@@ -101,7 +101,7 @@ const submit = () => {
     };
 
     inertiaRoute.patch(
-        route("back-office.novels.regenerate.timeline", {
+        route("back-office.novels.generate.timeline", {
             slug: novel?.slug,
         }),
         {

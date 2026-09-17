@@ -233,7 +233,7 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
         Route::prefix('{slug}')->group(function () {
             Route::get('edit', [NovelController::class, 'edit'])->name('edit');
 
-            Route::prefix('regenerate')->name('regenerate.')->group(function () {
+            Route::prefix('generate')->name('generate.')->group(function () {
                 Route::patch('foundation', [NovelController::class, 'generateFoundation'])->name('foundation');
                 Route::patch('characters', [NovelController::class, 'generateCharacters'])->name('characters');
                 Route::patch('world-bible', [NovelController::class, 'generateWorldBible'])->name('world-bible');
