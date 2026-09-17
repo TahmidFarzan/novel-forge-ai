@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\BackOffice;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\NovelChapterPlannerRequest;
 use App\Http\Requests\NovelCharactersRequest;
+use App\Http\Requests\NovelCompleteNovelRequest;
 use App\Http\Requests\NovelCreaturesRequest;
+use App\Http\Requests\NovelDialoguePlannerRequest;
 use App\Http\Requests\NovelFactionsRequest;
 use App\Http\Requests\NovelFoundationRequest;
 use App\Http\Requests\NovelLocationsRequest;
+use App\Http\Requests\NovelPagePlannerRequest;
 use App\Http\Requests\NovelScenePlannerRequest;
 use App\Http\Requests\NovelStoryStructureRequest;
 use App\Http\Requests\NovelSystemsRequest;
@@ -217,6 +221,58 @@ class NovelController extends Controller
         Gate::authorize('update', $novel);
 
         $result = $this->novelService->generateScenePlanner($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateDialoguePlanner(NovelDialoguePlannerRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateDialoguePlanner($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateChapterPlanner(NovelChapterPlannerRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateChapterPlanner($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generatePagePlanner(NovelPagePlannerRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generatePagePlanner($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateCompleteNovel(NovelCompleteNovelRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateCompleteNovel($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],

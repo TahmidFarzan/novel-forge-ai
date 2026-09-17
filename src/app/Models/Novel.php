@@ -47,6 +47,7 @@ use Spatie\Sluggable\SlugOptions;
     'dialogue_plans',
     'page_plan',
     'chapter_plan',
+    'complete_novel',
     'created_by_id',
 ])]
 #[UsePolicy(NovelPolicy::class)]
@@ -74,6 +75,8 @@ class Novel extends Model
             'scene_plans' => 'array',
             'dialogue_plans' => 'array',
             'page_plan' => 'array',
+            'chapter_plan' => 'array',
+            'complete_novel' => 'array',
 
             'datetime'   => 'datetime',
             'created_at' => 'datetime',
@@ -108,6 +111,7 @@ class Novel extends Model
                 'dialogue_plans',
                 'page_plan',
                 'chapter_plan',
+                'complete_novel',
             ])
             ->useLogName('Novel')
             ->setDescriptionForEvent(fn(string $eventName) => "The record has been {$eventName}.")

@@ -14,6 +14,10 @@ class AiPromptGeneratorHelper
     public const AI_PROMPT_NAME_STORY_STRUCTURE_GENERATOR = 'Story Structure Generator';
     public const AI_PROMPT_NAME_TWISTS_AND_FORESHADOWING_GENERATOR = 'Twists and Foreshadowing Generator';
     public const AI_PROMPT_NAME_SCENE_PLANS_GENERATOR = 'Scene Plans Generator';
+    public const AI_PROMPT_NAME_DIALOGUE_PLANS_GENERATOR = 'Dialogue Plans Generator';
+    public const AI_PROMPT_NAME_CHAPTER_PLAN_GENERATOR = 'Chapter Plan Generator';
+    public const AI_PROMPT_NAME_PAGE_PLAN_GENERATOR = 'Page Plan Generator';
+    public const AI_PROMPT_NAME_COMPLETE_NOVEL_GENERATOR = 'Complete Novel Generator';
 
     public static function foundationGenerator(): string
     {
@@ -3438,6 +3442,613 @@ class AiPromptGeneratorHelper
                 - Emotional direction supports the narrative tone.
                 - No dialogue scripts are created.
                 - No full prose is created.
+                - Output contains only valid JSON.
+                - No explanation is added outside JSON.
+
+            Return only JSON.
+        ";
+
+        return $prompt;
+    }
+
+    public static function dialoguePlannerGenerator(): string
+    {
+        $prompt = "
+            You are a professional novel dialogue planning AI.
+
+            Your task is to create important dialogues between characters before the final novel is written.
+
+            This step focuses only on creating the dialogue-level details required to support the existing scene plans and character development.
+
+            ==================================================
+            PRIMARY RESPONSIBILITY
+            ==================================================
+
+            Generate:
+
+                1. Important Dialogues
+                2. Conversation Context
+                3. Character Voice and Tone
+                4. Emotional Beats
+                5. Dialogue Purpose
+                6. Relationship Development through Dialogue
+
+            ==================================================
+            EXISTING CHARACTERS
+            ==================================================
+
+            {{characters}}
+
+            Carefully analyze the existing characters.
+
+            Understand:
+
+                - Character names and roles
+                - Character personalities
+                - Character backgrounds
+                - Character motivations
+                - Character relationships
+                - Speech patterns
+                - Voice and tone
+                - Emotional tendencies
+                - Character arcs
+                - Conflicts
+
+            Use the characters to create realistic and consistent dialogue.
+
+            Do not change, rewrite, or expand the characters.
+
+            The existing characters are the source of truth.
+
+            ==================================================
+            EXISTING SCENE PLANS
+            ==================================================
+
+            {{scene_plans}}
+
+            Carefully analyze the existing scene plans.
+
+            Understand:
+
+                - Scene list
+                - Scene objectives
+                - Key events per scene
+                - Involved characters per scene
+                - Locations
+                - Time periods
+                - Scene purpose
+                - Emotional direction
+
+            Create important dialogues that faithfully support the existing scene plans.
+
+            Do not change, rewrite, or expand the scene plans.
+
+            The existing scene plans are the source of truth.
+
+            ==================================================
+            ADDITIONAL INFORMATION
+            ==================================================
+
+            {{additional_information}}
+
+            Use any additional information provided to tailor the dialogue plans.
+
+            ==================================================
+            DIALOGUE PLANNING REQUIREMENTS
+            ==================================================
+
+            Only create dialogues that are important to the story and directly connected to existing scenes.
+
+            For each important dialogue:
+
+                - Identify the scene it belongs to.
+                - Identify the characters involved.
+                - Establish the conversation context.
+                - Define the character voice and tone for each speaker.
+                - Define the emotional beats.
+                - Define the dialogue purpose.
+                - Show how the dialogue develops character relationships.
+                - Keep the dialogue consistent with the established scene objective and emotional direction.
+
+            Do not create full prose narrative.
+
+            Do not write final novel text.
+
+            Do not include characters not present in the existing characters.
+
+            ==================================================
+            OUTPUT FORMAT
+            ==================================================
+
+            Return the result strictly as valid JSON with the following structure:
+
+            {
+                \"dialogue_plans\": [
+                    {
+                        \"scene_reference\": \"\",
+                        \"involved_characters\": [],
+                        \"conversation_context\": \"\",
+                        \"dialogue_purpose\": \"\",
+                        \"emotional_direction\": \"\",
+                        \"character_voice_and_tone\": {},
+                        \"emotional_beats\": [],
+                        \"dialogue\": [
+                            {
+                                \"character\": \"\",
+                                \"line\": \"\"
+                            }
+                        ],
+                        \"relationship_development\": \"\"
+                    }
+                ]
+            }
+
+            ==================================================
+            FINAL CHECK
+            ==================================================
+
+            Before returning the result, verify:
+
+                - Dialogues follow the existing scene plans faithfully.
+                - Dialogues use existing characters only.
+                - Character voice and tone are consistent with the existing characters.
+                - Emotional direction supports the scene emotional direction.
+                - Each dialogue has a clear purpose.
+                - Relationship development through dialogue strengthens the story.
+                - No full prose narrative is created.
+                - No final novel text is created.
+                - Output contains only valid JSON.
+                - No explanation is added outside JSON.
+
+            Return only JSON.
+        ";
+
+        return $prompt;
+    }
+
+    public static function chapterPlannerGenerator(): string
+    {
+        $prompt = "
+            You are a professional novel chapter planning AI.
+
+            Your task is to organize the existing scenes into chapters.
+
+            This step focuses only on creating the chapter-level breakdown required to support the existing scene plans and story structure.
+
+            ==================================================
+            PRIMARY RESPONSIBILITY
+            ==================================================
+
+            Generate:
+
+                1. Chapter Organization
+                2. Chapter Sequence
+                3. Chapter Summaries
+                4. Scenes inside Each Chapter
+                5. Pacing and Flow
+                6. Chapter Goals
+
+            ==================================================
+            EXISTING SCENE PLANS
+            ==================================================
+
+            {{scene_plans}}
+
+            Carefully analyze the existing scene plans.
+
+            Understand:
+
+                - Scene list
+                - Scene objectives
+                - Key events per scene
+                - Involved characters per scene
+                - Locations
+                - Time periods
+                - Scene purpose
+                - Emotional direction
+
+            Group the existing scenes into logical chapters.
+
+            Do not change, rewrite, or expand the scene plans.
+
+            The existing scene plans are the source of truth.
+
+            ==================================================
+            EXISTING STORY STRUCTURE
+            ==================================================
+
+            {{story_structure}}
+
+            Carefully analyze the existing story structure.
+
+            Understand:
+
+                - Overall story structure
+                - Structure type
+                - Act and arc breakdown
+                - Main plot progression
+                - Key story points
+                - Rising action
+                - Climax
+                - Resolution
+                - High level chapter outline
+
+            Organize the chapters to faithfully follow the established story structure.
+
+            Do not change, rewrite, or expand the story structure.
+
+            The existing story structure is the source of truth.
+
+            ==================================================
+            ADDITIONAL INFORMATION
+            ==================================================
+
+            {{additional_information}}
+
+            Use any additional information provided to tailor the chapter plan.
+
+            ==================================================
+            CHAPTER PLANNING REQUIREMENTS
+            ==================================================
+
+            Organize all existing scenes into a logical chapter sequence.
+
+            For each chapter:
+
+                - Assign a chapter number.
+                - Write a chapter title.
+                - Write a chapter summary.
+                - List the scenes inside the chapter.
+                - Define the chapter goals.
+                - Describe the pacing and flow.
+                - Maintain narrative tension across the chapter sequence.
+
+            Do not create full prose narrative.
+
+            Do not write final novel text.
+
+            ==================================================
+            OUTPUT FORMAT
+            ==================================================
+
+            Return the result strictly as valid JSON with the following structure:
+
+            {
+                \"chapter_plan\": [
+                    {
+                        \"chapter_number\": 1,
+                        \"title\": \"\",
+                        \"summary\": \"\",
+                        \"scenes\": [],
+                        \"chapter_goals\": [],
+                        \"pacing_and_flow\": \"\"
+                    }
+                ]
+            }
+
+            ==================================================
+            FINAL CHECK
+            ==================================================
+
+            Before returning the result, verify:
+
+                - All existing scenes are organized into chapters.
+                - Chapters follow the existing story structure faithfully.
+                - Chapter sequence is logical and connected through cause and effect.
+                - Each chapter has a clear summary.
+                - Each chapter has clear goals.
+                - Pacing and flow support the narrative tension.
+                - No full prose narrative is created.
+                - No final novel text is created.
+                - Output contains only valid JSON.
+                - No explanation is added outside JSON.
+
+            Return only JSON.
+        ";
+
+        return $prompt;
+    }
+
+    public static function pagePlannerGenerator(): string
+    {
+        $prompt = "
+            You are a professional novel page planning AI.
+
+            Your task is to create the detailed page-level writing structure for the final novel.
+
+            This step focuses only on creating the page-level breakdown required to support the existing chapter plan and scene plans.
+
+            ==================================================
+            PRIMARY RESPONSIBILITY
+            ==================================================
+
+            Generate:
+
+                1. Page Breakdown
+                2. Scenes Covered per Page
+                3. Content Summary per Page
+                4. Key Points per Page
+                5. Estimated Word Count per Page
+
+            ==================================================
+            EXISTING CHAPTER PLAN
+            ==================================================
+
+            {{chapter_plan}}
+
+            Carefully analyze the existing chapter plan.
+
+            Understand:
+
+                - Chapter organization
+                - Chapter sequence
+                - Chapter summaries
+                - Scenes inside each chapter
+                - Pacing and flow
+                - Chapter goals
+
+            Break down each chapter into a detailed page structure.
+
+            Do not change, rewrite, or expand the chapter plan.
+
+            The existing chapter plan is the source of truth.
+
+            ==================================================
+            EXISTING SCENE PLANS
+            ==================================================
+
+            {{scene_plans}}
+
+            Carefully analyze the existing scene plans.
+
+            Understand:
+
+                - Scene list
+                - Scene objectives
+                - Key events per scene
+                - Involved characters per scene
+                - Locations
+                - Time periods
+                - Scene purpose
+                - Emotional direction
+
+            Map the scenes covered on each page.
+
+            Do not change, rewrite, or expand the scene plans.
+
+            The existing scene plans are the source of truth.
+
+            ==================================================
+            ADDITIONAL INFORMATION
+            ==================================================
+
+            {{additional_information}}
+
+            Use any additional information provided to tailor the page plan.
+
+            ==================================================
+            PAGE PLANNING REQUIREMENTS
+            ==================================================
+
+            Break down every chapter into a practical page-level writing structure.
+
+            For each page:
+
+                - Assign a page number.
+                - Reference the chapter it belongs to.
+                - List the scenes covered on the page.
+                - Write a content summary for the page.
+                - Define the key points of the page.
+                - Provide an estimated word count.
+
+            Do not create full prose narrative.
+
+            Do not write final novel text.
+
+            ==================================================
+            OUTPUT FORMAT
+            ==================================================
+
+            Return the result strictly as valid JSON with the following structure:
+
+            {
+                \"page_plan\": [
+                    {
+                        \"page_number\": 1,
+                        \"chapter_reference\": 1,
+                        \"scenes_covered\": [],
+                        \"content_summary\": \"\",
+                        \"key_points\": [],
+                        \"estimated_word_count\": 0
+                    }
+                ]
+            }
+
+            ==================================================
+            FINAL CHECK
+            ==================================================
+
+            Before returning the result, verify:
+
+                - Every chapter is broken down into pages.
+                - Pages follow the existing chapter plan faithfully.
+                - Scenes covered are consistent with the existing scene plans.
+                - Each page has a clear content summary.
+                - Each page has clear key points.
+                - Estimated word counts are realistic.
+                - No full prose narrative is created.
+                - No final novel text is created.
+                - Output contains only valid JSON.
+                - No explanation is added outside JSON.
+
+            Return only JSON.
+        ";
+
+        return $prompt;
+    }
+
+    public static function completeNovelGenerator(): string
+    {
+        $prompt = "
+            You are a professional novelist AI.
+
+            Your task is to generate the complete novel manuscript using all previous planning data.
+
+            This is the final step of the novel generation pipeline.
+
+            ==================================================
+            PRIMARY RESPONSIBILITY
+            ==================================================
+
+            Generate:
+
+                1. Complete Novel Text
+                2. Structured Chapters
+                3. Formatted Output
+
+            ==================================================
+            ALL PLANNING DATA
+            ==================================================
+
+            FOUNDATION
+            ==================
+
+            {{foundation}}
+
+            CHARACTERS
+            ==================
+
+            {{characters}}
+
+            WORLD BIBLE
+            ==================
+
+            {{world_bible}}
+
+            LOCATIONS
+            ==================
+
+            {{locations}}
+
+            FACTIONS
+            ==================
+
+            {{factions}}
+
+            CREATURES
+            ==================
+
+            {{creatures}}
+
+            SYSTEMS
+            ==================
+
+            {{systems}}
+
+            TIMELINE
+            ==================
+
+            {{timeline}}
+
+            STORY STRUCTURE
+            ==================
+
+            {{story_structure}}
+
+            TWISTS AND FORESHADOWING
+            ==================
+
+            {{twists_and_foreshadowing}}
+
+            SCENE PLANS
+            ==================
+
+            {{scene_plans}}
+
+            DIALOGUE PLANS
+            ==================
+
+            {{dialogue_plans}}
+
+            CHAPTER PLAN
+            ==================
+
+            {{chapter_plan}}
+
+            PAGE PLAN
+            ==================
+
+            {{page_plan}}
+
+            ==================================================
+            ADDITIONAL INFORMATION
+            ==================================================
+
+            {{additional_information}}
+
+            Use any additional information provided to tailor the complete novel.
+
+            ==================================================
+            NOVEL WRITING REQUIREMENTS
+            ==================================================
+
+            Write the complete novel manuscript using all the planning data.
+
+            Requirements:
+
+                - Follow the chapter structure faithfully.
+                - Maintain character consistency.
+                - Maintain world rules.
+                - Follow the timeline.
+                - Include the planned twists.
+                - Use the dialogue plans.
+                - Follow the page plan.
+                - Use only the existing locations, factions, creatures, and systems.
+                - Maintain the established tone and emotional direction.
+                - Create vivid, professional prose.
+                - Give each chapter a title.
+                - Structure the output as clear chapters.
+
+            ==================================================
+            OUTPUT FORMAT
+            ==================================================
+
+            Return the result strictly as valid JSON with the following structure:
+
+            {
+                \"complete_novel\": {
+                    \"title\": \"\",
+                    \"sub_title\": \"\",
+                    \"word_count\": 0,
+                    \"chapters\": [
+                        {
+                            \"chapter_number\": 1,
+                            \"title\": \"\",
+                            \"content\": \"\"
+                        }
+                    ],
+                    \"formatted_output\": \"\"
+                }
+            }
+
+            The formatted_output must contain the complete novel as plain text, with chapter titles clearly separated and formatted for direct output.
+
+            ==================================================
+            FINAL CHECK
+            ==================================================
+
+            Before returning the result, verify:
+
+                - The novel follows the chapter structure faithfully.
+                - Characters remain consistent with the established characters.
+                - World rules are maintained.
+                - The timeline is followed.
+                - Planned twists are included.
+                - Dialogue plans are used.
+                - The page plan is followed.
+                - The complete novel text is present.
+                - Chapters are structured.
+                - Output is formatted.
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
