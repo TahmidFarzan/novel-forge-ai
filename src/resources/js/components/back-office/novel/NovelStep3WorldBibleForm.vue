@@ -19,7 +19,7 @@ const { novel } = defineProps({
     },
 });
 
-const worldVibeForm = useForm({
+const worldBibleForm = useForm({
     ai_brain_id: null,
 });
 
@@ -30,14 +30,14 @@ function buildAiBrainSearchUrl() {
 }
 
 function submit() {
-    if (worldVibeForm.processing) {
+    if (worldBibleForm.processing) {
         return;
     }
 
-    worldVibeForm.clearErrors();
+    worldBibleForm.clearErrors();
 
-    if (!worldVibeForm.ai_brain_id) {
-        worldVibeForm.setError(
+    if (!worldBibleForm.ai_brain_id) {
+        worldBibleForm.setError(
             "ai_brain_id",
             "AI Brain selection is required",
         );
@@ -73,22 +73,22 @@ defineExpose({ submit });
                 class="border-2 border-dashed border-purple-200 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-blue-50"
             >
                 <InfiniteScrollApiSelect
-                    :form="worldVibeForm"
+                    :form="worldBibleForm"
                     fieldName="ai_brain_id"
-                    :selectedItem="worldVibeForm.ai_brain_id"
+                    :selectedItem="worldBibleForm.ai_brain_id"
                     :apiUrl="buildAiBrainSearchUrl()"
                     :multiple="false"
                     placeholder="Select AI Brain"
-                    :error="worldVibeForm.errors.ai_brain_id"
+                    :error="worldBibleForm.errors.ai_brain_id"
                     class="ai-brain-select"
                 />
             </div>
 
             <p
-                v-if="worldVibeForm.errors.ai_brain_id"
+                v-if="worldBibleForm.errors.ai_brain_id"
                 class="text-red-500 text-sm"
             >
-                {{ worldVibeForm.errors.ai_brain_id }}
+                {{ worldBibleForm.errors.ai_brain_id }}
             </p>
         </div>
     </div>

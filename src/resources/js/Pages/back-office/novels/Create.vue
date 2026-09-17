@@ -3,7 +3,7 @@ import Layout from "@/pages/layouts/AuthLayout.vue";
 
 import NovelStep1FoundationForm from "@/components/back-office/novel/NovelStep1FoundationForm.vue";
 import NovelStep2CharactersForm from "@/components/back-office/novel/NovelStep2CharactersForm.vue";
-import NovelStep3WorldVibeForm from "@/components/back-office/novel/NovelStep3WorldVibeForm.vue";
+import NovelStep3WorldBibleForm from "@/components/back-office/novel/NovelStep3WorldBibleForm.vue";
 import NovelStep4LocationsForm from "@/components/back-office/novel/NovelStep4LocationsForm.vue";
 import NovelStep5FactionsForm from "@/components/back-office/novel/NovelStep5FactionsForm.vue";
 import NovelStep6CreatureForm from "@/components/back-office/novel/NovelStep6CreatureForm.vue";
@@ -312,7 +312,7 @@ const submitActiveStep = () => {
                         @completed="handleStepCompleted(2)"
                     />
 
-                    <NovelStep3WorldVibeForm
+                    <NovelStep3WorldBibleForm
                         v-else-if="activeStep === 3"
                         ref="activeStepComponentRef"
                         :novel="novel"

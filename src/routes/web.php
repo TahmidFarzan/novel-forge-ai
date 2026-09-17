@@ -236,7 +236,7 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
             Route::prefix('regenerate')->name('regenerate.')->group(function () {
                 Route::patch('foundation', [NovelController::class, 'generateFoundation'])->name('foundation');
                 Route::patch('characters', [NovelController::class, 'generateCharacters'])->name('characters');
-                Route::patch('world-vibe', [NovelController::class, 'generateWorldVibe'])->name('world-vibe');
+                Route::patch('world-bible', [NovelController::class, 'generateWorldBible'])->name('world-bible');
                 Route::patch('locations', [NovelController::class, 'generateLocations'])->name('locations');
                 Route::patch('factions', [NovelController::class, 'generateFactions'])->name('factions');
                 Route::patch('creature', [NovelController::class, 'generateCreature'])->name('creature');
