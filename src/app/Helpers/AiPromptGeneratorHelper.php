@@ -363,14 +363,14 @@ class AiPromptGeneratorHelper
             The existing novel foundation is the source of truth.
 
             ==================================================
-            CHARACTER ADDITIONAL INFORMATION
+            ADDITIONAL IINFORMATION
             ==================================================
 
             {{additional_information}}
 
             This field is optional.
 
-            If character additional information is provided:
+            If additional iinformation is provided:
 
                 - Use it as creative guidance.
                 - Integrate it naturally with the existing novel foundation.

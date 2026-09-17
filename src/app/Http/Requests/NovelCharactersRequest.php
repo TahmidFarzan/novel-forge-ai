@@ -38,7 +38,7 @@ class NovelCharactersRequest extends FormRequest
     {
         return [
             'foundation.required'  => 'Foundation is required.',
-            'additional_information.string'  => 'Character additional information must be a string.',
+            'additional_information.string'  => 'Additional Iinformation must be a string.',
         ];
     }
 }
