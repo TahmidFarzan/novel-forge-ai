@@ -4,7 +4,10 @@ namespace App\Services\BackOffice;
 use App\Helpers\AiPromptGeneratorHelper;
 use App\Helpers\NovelHelper;
 use App\Http\Requests\NovelCharactersRequest;
+use App\Http\Requests\NovelFactionsRequest;
 use App\Http\Requests\NovelFoundationRequest;
+use App\Http\Requests\NovelLocationsRequest;
+use App\Http\Requests\NovelWorldBibleRequest;
 use App\Models\Novel;
 use App\Services\BackOffice\AiBrainService;
 use App\Services\BackOffice\AiPromptService;
@@ -204,6 +207,111 @@ class NovelService
         }
     }
 
+    public function generateWorldBible(NovelWorldBibleRequest $request, Novel $novel): array
+    {
+        try {
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_WORLD_BIBLE_GENERATOR));
+            $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
+
+            $requestInputs = $this->worldBibleRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
+            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+
+            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+
+            DB::transaction(function () use ($apiResponse, $novel) {
+                $worldBibleObject  = $this->extractWorldBibleFromResponse($apiResponse);
+                $novel->world_bible = $worldBibleObject;
+                $novel->status      = NovelHelper::STATUS_ONGOING;
+                $novel->save();
+            });
+
+            return [
+                'status'  => 'success',
+                'message' => 'World Bible generated successfully.',
+            ];
+        } catch (Exception $exception) {
+
+            Log::error("Failed to generate World Bible", [
+                "exception" => $exception->getMessage(),
+            ]);
+
+            return [
+                'status'  => 'error',
+                'message' => 'Failed to generate World Bible. Please try again.',
+            ];
+        }
+    }
+
+    public function generateLocations(NovelLocationsRequest $request, Novel $novel): array
+    {
+        try {
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_LOCATION_GENERATOR));
+            $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
+
+            $requestInputs = $this->locationsRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
+            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+
+            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+
+            DB::transaction(function () use ($apiResponse, $novel) {
+                $locationsObject  = $this->extractLocationsFromResponse($apiResponse);
+                $novel->locations = $locationsObject;
+                $novel->status    = NovelHelper::STATUS_ONGOING;
+                $novel->save();
+            });
+
+            return [
+                'status'  => 'success',
+                'message' => 'Locations generated successfully.',
+            ];
+        } catch (Exception $exception) {
+
+            Log::error("Failed to generate Locations", [
+                "exception" => $exception->getMessage(),
+            ]);
+
+            return [
+                'status'  => 'error',
+                'message' => 'Failed to generate Locations. Please try again.',
+            ];
+        }
+    }
+
+    public function generateFactions(NovelFactionsRequest $request, Novel $novel): array
+    {
+        try {
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_FACTION_GENERATOR));
+            $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
+
+            $requestInputs = $this->factionsRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
+            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+
+            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+
+            DB::transaction(function () use ($apiResponse, $novel) {
+                $factionsObject  = $this->extractFactionsFromResponse($apiResponse);
+                $novel->factions = $factionsObject;
+                $novel->status   = NovelHelper::STATUS_ONGOING;
+                $novel->save();
+            });
+
+            return [
+                'status'  => 'success',
+                'message' => 'Factions generated successfully.',
+            ];
+        } catch (Exception $exception) {
+
+            Log::error("Failed to generate Factions", [
+                "exception" => $exception->getMessage(),
+            ]);
+
+            return [
+                'status'  => 'error',
+                'message' => 'Failed to generate Factions. Please try again.',
+            ];
+        }
+    }
+
     public function delete(Novel $novel): array
     {
 
@@ -359,6 +467,153 @@ class NovelService
         return (object) [
             'characters'            => $decoded['characters'] ?? [],
             'relationship_dynamics' => $decoded['relationship_dynamics'] ?? [],
+        ];
+    }
+
+    private function worldBibleRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    {
+        return [
+            "foundation"             => json_encode($novel->foundation, JSON_PRETTY_PRINT),
+            "characters"             => json_encode($novel->characters, JSON_PRETTY_PRINT),
+            "additional_information" => $additionalIinformation,
+        ];
+    }
+
+    private function locationsRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    {
+        return [
+            "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
+            "characters"             => json_encode($novel->characters, JSON_PRETTY_PRINT),
+            "additional_information" => $additionalIinformation,
+        ];
+    }
+
+    private function factionsRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    {
+        return [
+            "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
+            "locations"              => json_encode($novel->locations, JSON_PRETTY_PRINT),
+            "additional_information" => $additionalIinformation,
+        ];
+    }
+
+    private function extractWorldBibleFromResponse($apiResponse): object
+    {
+        $content = data_get(
+            $apiResponse,
+            'choices.0.message.content'
+        );
+
+        if (! is_string($content) || trim($content) === '') {
+            throw new Exception('Invalid AI response structure.');
+        }
+
+        $content = trim($content);
+
+        $content = preg_replace(
+            '/^```(?:json)?\s*|\s*```$/i',
+            '',
+            $content
+        );
+
+        $content = trim($content);
+
+        $decoded = json_decode(
+            $content,
+            true
+        );
+
+        if (
+            json_last_error() !== JSON_ERROR_NONE ||
+            ! is_array($decoded)
+        ) {
+            throw new Exception(
+                'AI response is not valid JSON: ' . json_last_error_msg()
+            );
+        }
+
+        return (object) [
+            'world_bible' => $decoded['world_bible'] ?? [],
+        ];
+    }
+
+    private function extractLocationsFromResponse($apiResponse): object
+    {
+        $content = data_get(
+            $apiResponse,
+            'choices.0.message.content'
+        );
+
+        if (! is_string($content) || trim($content) === '') {
+            throw new Exception('Invalid AI response structure.');
+        }
+
+        $content = trim($content);
+
+        $content = preg_replace(
+            '/^```(?:json)?\s*|\s*```$/i',
+            '',
+            $content
+        );
+
+        $content = trim($content);
+
+        $decoded = json_decode(
+            $content,
+            true
+        );
+
+        if (
+            json_last_error() !== JSON_ERROR_NONE ||
+            ! is_array($decoded)
+        ) {
+            throw new Exception(
+                'AI response is not valid JSON: ' . json_last_error_msg()
+            );
+        }
+
+        return (object) [
+            'locations' => $decoded['locations'] ?? [],
+        ];
+    }
+
+    private function extractFactionsFromResponse($apiResponse): object
+    {
+        $content = data_get(
+            $apiResponse,
+            'choices.0.message.content'
+        );
+
+        if (! is_string($content) || trim($content) === '') {
+            throw new Exception('Invalid AI response structure.');
+        }
+
+        $content = trim($content);
+
+        $content = preg_replace(
+            '/^```(?:json)?\s*|\s*```$/i',
+            '',
+            $content
+        );
+
+        $content = trim($content);
+
+        $decoded = json_decode(
+            $content,
+            true
+        );
+
+        if (
+            json_last_error() !== JSON_ERROR_NONE ||
+            ! is_array($decoded)
+        ) {
+            throw new Exception(
+                'AI response is not valid JSON: ' . json_last_error_msg()
+            );
+        }
+
+        return (object) [
+            'factions' => $decoded['factions'] ?? [],
         ];
     }
 }

@@ -4,6 +4,9 @@ namespace App\Http\Controllers\BackOffice;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NovelFoundationRequest;
+use App\Http\Requests\NovelWorldBibleRequest;
+use App\Http\Requests\NovelLocationsRequest;
+use App\Http\Requests\NovelFactionsRequest;
 use App\Services\BackOffice\NovelService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -91,6 +94,45 @@ class NovelController extends Controller
         Gate::authorize('update', $novel);
 
         $result = $this->novelService->generateCharacters($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateWorldBible(NovelWorldBibleRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateWorldBible($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateLocations(NovelLocationsRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateLocations($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateFactions(NovelFactionsRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateFactions($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
