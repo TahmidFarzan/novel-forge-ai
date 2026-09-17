@@ -140,7 +140,7 @@ function submit() {
 
     if (isUpdate.value) {
         intertiaJsRoute.post(
-            route("back-office.novels.generate.foundation", {
+            route("back-office.novels.regenerate.foundation", {
                 slug: novel?.slug,
             }),
             { ...foundationGeneratorForm.data(), _method: "patch" },

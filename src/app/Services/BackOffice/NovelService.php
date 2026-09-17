@@ -4,9 +4,12 @@ namespace App\Services\BackOffice;
 use App\Helpers\AiPromptGeneratorHelper;
 use App\Helpers\NovelHelper;
 use App\Http\Requests\NovelCharactersRequest;
+use App\Http\Requests\NovelCreaturesRequest;
 use App\Http\Requests\NovelFactionsRequest;
 use App\Http\Requests\NovelFoundationRequest;
 use App\Http\Requests\NovelLocationsRequest;
+use App\Http\Requests\NovelSystemsRequest;
+use App\Http\Requests\NovelTimelineRequest;
 use App\Http\Requests\NovelWorldBibleRequest;
 use App\Models\Novel;
 use App\Services\BackOffice\AiBrainService;
@@ -312,6 +315,111 @@ class NovelService
         }
     }
 
+    public function generateCreature(NovelCreaturesRequest $request, Novel $novel): array
+    {
+        try {
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_CREATURE_GENERATOR));
+            $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
+
+            $requestInputs = $this->creaturesRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
+            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+
+            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+
+            DB::transaction(function () use ($apiResponse, $novel) {
+                $creaturesObject  = $this->extractCreaturesFromResponse($apiResponse);
+                $novel->creatures = $creaturesObject;
+                $novel->status    = NovelHelper::STATUS_ONGOING;
+                $novel->save();
+            });
+
+            return [
+                'status'  => 'success',
+                'message' => 'Creatures generated successfully.',
+            ];
+        } catch (Exception $exception) {
+
+            Log::error("Failed to generate Creatures", [
+                "exception" => $exception->getMessage(),
+            ]);
+
+            return [
+                'status'  => 'error',
+                'message' => 'Failed to generate Creatures. Please try again.',
+            ];
+        }
+    }
+
+    public function generateSystem(NovelSystemsRequest $request, Novel $novel): array
+    {
+        try {
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_SYSTEM_GENERATOR));
+            $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
+
+            $requestInputs = $this->systemsRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
+            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+
+            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+
+            DB::transaction(function () use ($apiResponse, $novel) {
+                $systemsObject  = $this->extractSystemsFromResponse($apiResponse);
+                $novel->systems = $systemsObject;
+                $novel->status  = NovelHelper::STATUS_ONGOING;
+                $novel->save();
+            });
+
+            return [
+                'status'  => 'success',
+                'message' => 'Systems generated successfully.',
+            ];
+        } catch (Exception $exception) {
+
+            Log::error("Failed to generate Systems", [
+                "exception" => $exception->getMessage(),
+            ]);
+
+            return [
+                'status'  => 'error',
+                'message' => 'Failed to generate Systems. Please try again.',
+            ];
+        }
+    }
+
+    public function generateTimeline(NovelTimelineRequest $request, Novel $novel): array
+    {
+        try {
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_TIMELINE_GENERATOR));
+            $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
+
+            $requestInputs = $this->timelineRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
+            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+
+            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+
+            DB::transaction(function () use ($apiResponse, $novel) {
+                $timelineObject  = $this->extractTimelineFromResponse($apiResponse);
+                $novel->timeline = $timelineObject;
+                $novel->status   = NovelHelper::STATUS_ONGOING;
+                $novel->save();
+            });
+
+            return [
+                'status'  => 'success',
+                'message' => 'Timeline generated successfully.',
+            ];
+        } catch (Exception $exception) {
+
+            Log::error("Failed to generate Timeline", [
+                "exception" => $exception->getMessage(),
+            ]);
+
+            return [
+                'status'  => 'error',
+                'message' => 'Failed to generate Timeline. Please try again.',
+            ];
+        }
+    }
+
     public function delete(Novel $novel): array
     {
 
@@ -497,6 +605,36 @@ class NovelService
         ];
     }
 
+    private function creaturesRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    {
+        return [
+            "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
+            "locations"              => json_encode($novel->locations, JSON_PRETTY_PRINT),
+            "factions"               => json_encode($novel->factions, JSON_PRETTY_PRINT),
+            "additional_information" => $additionalIinformation,
+        ];
+    }
+
+    private function systemsRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    {
+        return [
+            "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
+            "creatures"              => json_encode($novel->creatures, JSON_PRETTY_PRINT),
+            "factions"               => json_encode($novel->factions, JSON_PRETTY_PRINT),
+            "additional_information" => $additionalIinformation,
+        ];
+    }
+
+    private function timelineRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    {
+        return [
+            "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
+            "factions"               => json_encode($novel->factions, JSON_PRETTY_PRINT),
+            "foundation"             => json_encode($novel->foundation, JSON_PRETTY_PRINT),
+            "additional_information" => $additionalIinformation,
+        ];
+    }
+
     private function extractWorldBibleFromResponse($apiResponse): object
     {
         $content = data_get(
@@ -614,6 +752,126 @@ class NovelService
 
         return (object) [
             'factions' => $decoded['factions'] ?? [],
+        ];
+    }
+
+    private function extractCreaturesFromResponse($apiResponse): object
+    {
+        $content = data_get(
+            $apiResponse,
+            'choices.0.message.content'
+        );
+
+        if (! is_string($content) || trim($content) === '') {
+            throw new Exception('Invalid AI response structure.');
+        }
+
+        $content = trim($content);
+
+        $content = preg_replace(
+            '/^```(?:json)?\s*|\s*```$/i',
+            '',
+            $content
+        );
+
+        $content = trim($content);
+
+        $decoded = json_decode(
+            $content,
+            true
+        );
+
+        if (
+            json_last_error() !== JSON_ERROR_NONE ||
+            ! is_array($decoded)
+        ) {
+            throw new Exception(
+                'AI response is not valid JSON: ' . json_last_error_msg()
+            );
+        }
+
+        return (object) [
+            'creatures' => $decoded['creatures'] ?? [],
+        ];
+    }
+
+    private function extractSystemsFromResponse($apiResponse): object
+    {
+        $content = data_get(
+            $apiResponse,
+            'choices.0.message.content'
+        );
+
+        if (! is_string($content) || trim($content) === '') {
+            throw new Exception('Invalid AI response structure.');
+        }
+
+        $content = trim($content);
+
+        $content = preg_replace(
+            '/^```(?:json)?\s*|\s*```$/i',
+            '',
+            $content
+        );
+
+        $content = trim($content);
+
+        $decoded = json_decode(
+            $content,
+            true
+        );
+
+        if (
+            json_last_error() !== JSON_ERROR_NONE ||
+            ! is_array($decoded)
+        ) {
+            throw new Exception(
+                'AI response is not valid JSON: ' . json_last_error_msg()
+            );
+        }
+
+        return (object) [
+            'systems' => $decoded['systems'] ?? [],
+        ];
+    }
+
+    private function extractTimelineFromResponse($apiResponse): object
+    {
+        $content = data_get(
+            $apiResponse,
+            'choices.0.message.content'
+        );
+
+        if (! is_string($content) || trim($content) === '') {
+            throw new Exception('Invalid AI response structure.');
+        }
+
+        $content = trim($content);
+
+        $content = preg_replace(
+            '/^```(?:json)?\s*|\s*```$/i',
+            '',
+            $content
+        );
+
+        $content = trim($content);
+
+        $decoded = json_decode(
+            $content,
+            true
+        );
+
+        if (
+            json_last_error() !== JSON_ERROR_NONE ||
+            ! is_array($decoded)
+        ) {
+            throw new Exception(
+                'AI response is not valid JSON: ' . json_last_error_msg()
+            );
+        }
+
+        return (object) [
+            'timeline' => $decoded['timeline'] ?? [],
         ];
     }
 }

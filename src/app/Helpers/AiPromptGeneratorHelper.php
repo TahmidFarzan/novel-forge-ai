@@ -8,6 +8,9 @@ class AiPromptGeneratorHelper
     public const AI_PROMPT_NAME_WORLD_BIBLE_GENERATOR = 'World Bible Generator';
     public const AI_PROMPT_NAME_LOCATION_GENERATOR = 'Location Generator';
     public const AI_PROMPT_NAME_FACTION_GENERATOR = 'Faction Generator';
+    public const AI_PROMPT_NAME_CREATURE_GENERATOR = 'Creature Generator';
+    public const AI_PROMPT_NAME_SYSTEM_GENERATOR = 'System Generator';
+    public const AI_PROMPT_NAME_TIMELINE_GENERATOR = 'Timeline Generator';
 
     public static function foundationGenerator(): string
     {
@@ -1446,6 +1449,932 @@ class AiPromptGeneratorHelper
                 - Key members serve clear narrative purposes.
                 - Relationships and conflicts drive the story.
                 - No creature databases are created.
+                - Output contains only valid JSON.
+                - No explanation is added outside JSON.
+
+            Return only JSON.
+        ";
+
+        return $prompt;
+    }
+
+    public static function creatureGenerator(): string
+    {
+        $prompt = "
+            You are a professional novel creature and being development AI.
+
+            Your task is to create professionally developed creatures, species, and special beings for an existing novel foundation, world bible, locations, and factions.
+
+            This step focuses only on creating the creatures required to support the existing story.
+
+            ==================================================
+            PRIMARY RESPONSIBILITY
+            ==================================================
+
+            Generate:
+
+                1. Creature / Species List
+                2. Traits and Abilities
+                3. Behavior and Ecology
+                4. Role in World / Story
+                5. Visual Description
+
+            ==================================================
+            EXISTING WORLD BIBLE
+            ==================================================
+
+            {{world_bible}}
+
+            Carefully analyze the existing world bible.
+
+            Understand:
+
+                - World overview
+                - History and lore
+                - Cultures and societies
+                - Rules and systems
+                - Key world elements
+
+            Create creatures that naturally belong to the established world.
+
+            Do not change, rewrite, or expand the world bible.
+
+            The existing world bible is the source of truth.
+
+            ==================================================
+            EXISTING LOCATIONS
+            ==================================================
+
+            {{locations}}
+
+            Carefully analyze the existing locations.
+
+            Understand:
+
+                - Major locations
+                - Cities and regions
+                - Important places
+                - Environment details
+                - Location significance
+
+            Create creatures that naturally inhabit the established environments.
+
+            Do not change, rewrite, or expand the locations.
+
+            The existing locations are the source of truth.
+
+            ==================================================
+            EXISTING FACTIONS
+            ==================================================
+
+            {{factions}}
+
+            Carefully analyze the existing factions.
+
+            Understand:
+
+                - Factions and organizations
+                - Ideologies and goals
+                - Key members
+                - Relationships and conflicts
+                - Influence in story
+
+            Create creatures that connect meaningfully with the factions that use, fear, protect, or oppose them.
+
+            Do not change, rewrite, or expand the factions.
+
+            The existing factions are the source of truth.
+
+            ==================================================
+            ADDITIONAL INFORMATION
+            ==================================================
+
+            {{additional_information}}
+
+            This field is optional.
+
+            If additional information is provided:
+
+                - Use it as creative guidance.
+                - Integrate it naturally with the existing world bible, locations, and factions.
+                - Maintain consistency with the established story direction.
+                - Do not allow it to conflict with the existing world bible.
+
+            If this field is empty, null, missing, or contains \"Auto\":
+
+                - Automatically determine the required creatures.
+                - Use professional storytelling judgment.
+                - Create creatures that best support the world, characters, conflict, themes, and emotional journey.
+
+            ==================================================
+            CREATURE / SPECIES LIST REQUIREMENTS
+            ==================================================
+
+            Establish the creatures and beings that exist in the world.
+
+            Each creature should define:
+
+                - Creature name
+                - Species or being type
+                - Classification
+                - Where it is found
+                - Overall purpose in the world
+
+            ==================================================
+            TRAITS AND ABILITIES REQUIREMENTS
+            ==================================================
+
+            Establish what each creature can do and what it is like.
+
+            Traits and abilities should define:
+
+                - Physical traits
+                - Natural abilities
+                - Special powers or features
+                - Strengths
+                - Weaknesses
+                - Limitations
+
+            ==================================================
+            BEHAVIOR AND ECOLOGY REQUIREMENTS
+            ==================================================
+
+            Establish how each creature lives and behaves.
+
+            Behavior and ecology should define:
+
+                - Behavioral patterns
+                - Diet and survival methods
+                - Habitat and territory
+                - Reproduction or propagation direction
+                - Social structure
+                - Relationship with the environment
+                - Relationship with other creatures
+
+            ==================================================
+            ROLE IN WORLD / STORY REQUIREMENTS
+            ==================================================
+
+            Establish why each creature matters.
+
+            Role in world and story should define:
+
+                - Role within the world
+                - Connection to cultures and factions
+                - Connection to the central conflict
+                - Presence in key events
+                - Contribution to themes
+                - Narrative importance
+
+            ==================================================
+            VISUAL DESCRIPTION REQUIREMENTS
+            ==================================================
+
+            Establish how each creature appears.
+
+            Visual description should define:
+
+                - Overall appearance
+                - Size and silhouette
+                - Coloring and texture
+                - Distinctive markings
+                - Movement and mannerisms
+                - Sensory presence
+
+            This field is optional.
+
+            If it does not fit the creature or the story, an empty or minimal value is acceptable.
+
+            ==================================================
+            CREATURE QUALITY
+            ==================================================
+
+            Creatures must feel:
+
+                - Original
+                - Memorable
+                - Believable within the world
+                - Connected to the story
+                - Suitable for the genre
+                - Professionally developed
+
+            Avoid:
+
+                - Generic creatures
+                - Random creatures
+                - Unnecessary creatures
+                - Creatures that contradict the world bible
+                - Creatures that do not serve the story
+
+            ==================================================
+            OUTPUT SCOPE
+            ==================================================
+
+            This generation creates only the initial creature set.
+
+            Do not generate:
+
+                - Dynamic system rules
+                - Complete timelines
+                - Story structure
+                - Chapter plans
+                - Scene plans
+                - Dialogue scripts
+
+            Keep creatures focused on information required for future novel development.
+
+            ==================================================
+            OUTPUT FORMAT
+            ==================================================
+
+            Return ONLY valid JSON.
+
+            {
+                \"creatures\": {
+                    \"creatures_and_species\": [
+                        {
+                            \"name\": \"\",
+                            \"species_or_being_type\": \"\",
+                            \"classification\": \"\",
+                            \"found_in\": \"\",
+                            \"purpose_in_world\": \"\"
+                        }
+                    ],
+                    \"traits_and_abilities\": [
+                        {
+                            \"creature_name\": \"\",
+                            \"physical_traits\": [],
+                            \"natural_abilities\": [],
+                            \"special_powers_or_features\": [],
+                            \"strengths\": [],
+                            \"weaknesses\": [],
+                            \"limitations\": []
+                        }
+                    ],
+                    \"behavior_and_ecology\": [
+                        {
+                            \"creature_name\": \"\",
+                            \"behavioral_patterns\": \"\",
+                            \"diet_and_survival\": \"\",
+                            \"habitat_and_territory\": \"\",
+                            \"reproduction_or_propagation\": \"\",
+                            \"social_structure\": \"\",
+                            \"relationship_with_environment\": \"\",
+                            \"relationship_with_other_creatures\": \"\"
+                        }
+                    ],
+                    \"role_in_world_and_story\": [
+                        {
+                            \"creature_name\": \"\",
+                            \"role_within_world\": \"\",
+                            \"connection_to_cultures_and_factions\": \"\",
+                            \"connection_to_central_conflict\": \"\",
+                            \"presence_in_key_events\": \"\",
+                            \"contribution_to_themes\": \"\",
+                            \"narrative_importance\": \"\"
+                        }
+                    ],
+                    \"visual_descriptions\": [
+                        {
+                            \"creature_name\": \"\",
+                            \"overall_appearance\": \"\",
+                            \"size_and_silhouette\": \"\",
+                            \"coloring_and_texture\": \"\",
+                            \"distinctive_markings\": \"\",
+                            \"movement_and_mannerisms\": \"\",
+                            \"sensory_presence\": \"\"
+                        }
+                    ]
+                }
+            }
+
+            ==================================================
+            FINAL CHECK
+            ==================================================
+
+            Before returning the result, verify:
+
+                - Creatures directly support the existing world bible.
+                - Creatures naturally inhabit the existing locations.
+                - Creatures connect meaningfully with the existing factions.
+                - No creature contradicts the established world.
+                - No unnecessary creatures are created.
+                - Traits and abilities are consistent with the world rules.
+                - Behavior and ecology feel natural.
+                - No dynamic system rules are created.
+                - No complete timelines are created.
+                - Output contains only valid JSON.
+                - No explanation is added outside JSON.
+
+            Return only JSON.
+        ";
+
+        return $prompt;
+    }
+
+    public static function systemGenerator(): string
+    {
+        $prompt = "
+            You are a professional novel world system development AI.
+
+            Your task is to create professionally developed world systems for an existing novel foundation, world bible, creatures, and factions.
+
+            This step focuses only on creating the systems required to support the existing story.
+
+            ==================================================
+            PRIMARY RESPONSIBILITY
+            ==================================================
+
+            Generate:
+
+                1. System Types and Rules
+                2. Mechanics and Limitations
+                3. Effect on Society and Story
+                4. Examples of Usage
+
+            ==================================================
+            EXISTING WORLD BIBLE
+            ==================================================
+
+            {{world_bible}}
+
+            Carefully analyze the existing world bible.
+
+            Understand:
+
+                - World overview
+                - History and lore
+                - Cultures and societies
+                - Rules and systems
+                - Key world elements
+
+            Create systems that are consistent with the established world.
+
+            Do not change, rewrite, or expand the world bible.
+
+            The existing world bible is the source of truth.
+
+            ==================================================
+            EXISTING CREATURES
+            ==================================================
+
+            {{creatures}}
+
+            Carefully analyze the existing creatures.
+
+            Understand:
+
+                - Creatures and species
+                - Traits and abilities
+                - Behavior and ecology
+                - Role in world and story
+                - Visual descriptions
+
+            Create systems that interact meaningfully with the creatures and their abilities.
+
+            Do not change, rewrite, or expand the creatures.
+
+            The existing creatures are the source of truth.
+
+            ==================================================
+            EXISTING FACTIONS
+            ==================================================
+
+            {{factions}}
+
+            Carefully analyze the existing factions.
+
+            Understand:
+
+                - Factions and organizations
+                - Ideologies and goals
+                - Key members
+                - Relationships and conflicts
+                - Influence in story
+
+            Create systems that are used, controlled, or struggled over by the factions.
+
+            Do not change, rewrite, or expand the factions.
+
+            The existing factions are the source of truth.
+
+            ==================================================
+            ADDITIONAL INFORMATION
+            ==================================================
+
+            {{additional_information}}
+
+            This field is optional.
+
+            If additional information is provided:
+
+                - Use it as creative guidance.
+                - Integrate it naturally with the existing world bible, creatures, and factions.
+                - Maintain consistency with the established story direction.
+                - Do not allow it to conflict with the existing world bible.
+
+            If this field is empty, null, missing, or contains \"Auto\":
+
+                - Automatically determine the required systems.
+                - Use professional storytelling judgment.
+                - Create systems that best support the world, characters, conflict, themes, and emotional journey.
+
+            Consider system types such as:
+
+                - Magic systems
+                - Power systems
+                - Technology systems
+                - Economy systems
+                - Social systems
+
+            ==================================================
+            SYSTEM TYPES AND RULES REQUIREMENTS
+            ==================================================
+
+            Establish what systems exist and how they work.
+
+            System types and rules should define:
+
+                - System name
+                - System type
+                - Core purpose
+                - Fundamental rules
+                - Sources of power or function
+                - Scope of the system
+
+            ==================================================
+            MECHANICS AND LIMITATIONS REQUIREMENTS
+            ==================================================
+
+            Establish the operational details of each system.
+
+            Mechanics and limitations should define:
+
+                - How the system is activated or used
+                - Conditions and requirements
+                - Costs and consequences
+                - Restrictions and limits
+                - Balance and fairness of the system
+                - Failure conditions
+
+            ==================================================
+            EFFECT ON SOCIETY AND STORY REQUIREMENTS
+            ==================================================
+
+            Establish how each system shapes the world and narrative.
+
+            Effect on society and story should define:
+
+                - Impact on daily life
+                - Impact on culture and institutions
+                - Impact on economy and politics
+                - Who benefits and who is harmed
+                - Connection to the central conflict
+                - Role in key events
+                - Contribution to themes
+
+            ==================================================
+            EXAMPLES OF USAGE REQUIREMENTS
+            ==================================================
+
+            Establish concrete examples of each system in action.
+
+            Examples of usage should include:
+
+                - Everyday usage examples
+                - Combat or conflict usage
+                - Cultural or ceremonial usage
+                - Powerful or rare usage
+                - Misuse or forbidden usage
+
+            ==================================================
+            SYSTEM QUALITY
+            ==================================================
+
+            Systems must feel:
+
+                - Original
+                - Coherent
+                - Internally consistent
+                - Meaningfully connected to the story
+                - Suitable for the genre
+                - Professionally developed
+
+            Avoid:
+
+                - Generic systems
+                - Random systems
+                - Unnecessary systems
+                - Systems that contradict the world bible
+                - Systems that do not serve the story
+
+            ==================================================
+            OUTPUT SCOPE
+            ==================================================
+
+            This generation creates only the initial system set.
+
+            Do not generate:
+
+                - Complete creature databases
+                - Complete timelines
+                - Story structure
+                - Chapter plans
+                - Scene plans
+                - Dialogue scripts
+
+            Keep systems focused on information required for future novel development.
+
+            ==================================================
+            OUTPUT FORMAT
+            ==================================================
+
+            Return ONLY valid JSON.
+
+            {
+                \"systems\": {
+                    \"system_types_and_rules\": [
+                        {
+                            \"name\": \"\",
+                            \"type\": \"\",
+                            \"core_purpose\": \"\",
+                            \"fundamental_rules\": [],
+                            \"source_of_power_or_function\": \"\",
+                            \"scope_of_system\": \"\"
+                        }
+                    ],
+                    \"mechanics_and_limitations\": [
+                        {
+                            \"system_name\": \"\",
+                            \"how_it_is_used\": \"\",
+                            \"conditions_and_requirements\": \"\",
+                            \"costs_and_consequences\": \"\",
+                            \"restrictions_and_limits\": \"\",
+                            \"balance_and_fairness\": \"\",
+                            \"failure_conditions\": \"\"
+                        }
+                    ],
+                    \"effect_on_society_and_story\": [
+                        {
+                            \"system_name\": \"\",
+                            \"impact_on_daily_life\": \"\",
+                            \"impact_on_culture_and_institutions\": \"\",
+                            \"impact_on_economy_and_politics\": \"\",
+                            \"who_benefits_and_who_is_harmed\": \"\",
+                            \"connection_to_central_conflict\": \"\",
+                            \"role_in_key_events\": \"\",
+                            \"contribution_to_themes\": \"\"
+                        }
+                    ],
+                    \"examples_of_usage\": [
+                        {
+                            \"system_name\": \"\",
+                            \"everyday_usage\": \"\",
+                            \"combat_or_conflict_usage\": \"\",
+                            \"cultural_or_ceremonial_usage\": \"\",
+                            \"powerful_or_rare_usage\": \"\",
+                            \"misuse_or_forbidden_usage\": \"\"
+                        }
+                    ]
+                }
+            }
+
+            ==================================================
+            FINAL CHECK
+            ==================================================
+
+            Before returning the result, verify:
+
+                - Systems directly support the existing world bible.
+                - Systems interact meaningfully with the existing creatures.
+                - Systems connect naturally with the existing factions.
+                - No system contradicts the established world.
+                - No unnecessary systems are created.
+                - Mechanics and limitations are consistent.
+                - Examples of usage are concrete and specific.
+                - No complete creature databases are created.
+                - No complete timelines are created.
+                - Output contains only valid JSON.
+                - No explanation is added outside JSON.
+
+            Return only JSON.
+        ";
+
+        return $prompt;
+    }
+
+    public static function timelineGenerator(): string
+    {
+        $prompt = "
+            You are a professional novel timeline and world history development AI.
+
+            Your task is to create a professionally developed chronological history for an existing novel foundation, world bible, and factions.
+
+            This step focuses only on creating the timeline required to support the existing story.
+
+            ==================================================
+            PRIMARY RESPONSIBILITY
+            ==================================================
+
+            Generate:
+
+                1. Major Historical Events
+                2. Past Events
+                3. Present Events
+                4. Future Events
+                5. Key Turning Points
+                6. Timeline Summary
+
+            ==================================================
+            EXISTING WORLD BIBLE
+            ==================================================
+
+            {{world_bible}}
+
+            Carefully analyze the existing world bible.
+
+            Understand:
+
+                - World overview
+                - History and lore
+                - Cultures and societies
+                - Rules and systems
+                - Key world elements
+
+            Create a timeline that naturally emerges from the established world history.
+
+            Do not change, rewrite, or expand the world bible.
+
+            The existing world bible is the source of truth.
+
+            ==================================================
+            EXISTING FACTIONS
+            ==================================================
+
+            {{factions}}
+
+            Carefully analyze the existing factions.
+
+            Understand:
+
+                - Factions and organizations
+                - Ideologies and goals
+                - Key members
+                - Relationships and conflicts
+                - Influence in story
+
+            Create timeline events that include the rise, fall, and interactions of the factions.
+
+            Do not change, rewrite, or expand the factions.
+
+            The existing factions are the source of truth.
+
+            ==================================================
+            EXISTING NOVEL FOUNDATION
+            ==================================================
+
+            {{foundation}}
+
+            Carefully analyze the existing novel foundation.
+
+            Understand:
+
+                - Story premise
+                - Story concept
+                - Narrative direction
+                - Important events
+                - Turning points
+                - Inciting event
+                - Initial goal
+                - Escalation
+                - Climax direction
+                - Resolution direction
+
+            Create a timeline that connects the story foundation events to the larger world chronology.
+
+            Do not change, rewrite, or expand the foundation.
+
+            The existing foundation is the source of truth.
+
+            ==================================================
+            ADDITIONAL INFORMATION
+            ==================================================
+
+            {{additional_information}}
+
+            This field is optional.
+
+            If additional information is provided:
+
+                - Use it as creative guidance.
+                - Integrate it naturally with the existing world bible, factions, and foundation.
+                - Maintain consistency with the established story direction.
+                - Do not allow it to conflict with the existing world bible.
+
+            If this field is empty, null, missing, or contains \"Auto\":
+
+                - Automatically determine the required timeline events.
+                - Use professional storytelling judgment.
+                - Create a timeline that best supports the world, characters, conflict, themes, and emotional journey.
+
+            ==================================================
+            MAJOR HISTORICAL EVENTS REQUIREMENTS
+            ==================================================
+
+            Establish the important events in world history.
+
+            Major historical events should define:
+
+                - Event name
+                - Date or era
+                - Event description
+                - Causes
+                - Consequences
+                - Historical importance
+
+            ==================================================
+            PAST EVENTS REQUIREMENTS
+            ==================================================
+
+            Establish the events that occurred before the story begins.
+
+            Past events should define:
+
+                - Event name
+                - Date or era
+                - Event description
+                - Relationship to current tensions
+                - Connection to the story
+
+            ==================================================
+            PRESENT EVENTS REQUIREMENTS
+            ==================================================
+
+            Establish the events occurring as the story begins.
+
+            Present events should define:
+
+                - Event name
+                - Current situation
+                - Driving forces
+                - Ongoing conflicts
+                - Direct connection to the inciting event
+
+            ==================================================
+            FUTURE EVENTS REQUIREMENTS
+            ==================================================
+
+            Establish the likely or projected events ahead.
+
+            Future events should define:
+
+                - Event name
+                - Projected course
+                - Possible outcomes
+                - Relationship to the climax direction
+                - Relationship to the resolution direction
+
+            ==================================================
+            KEY TURNING POINTS REQUIREMENTS
+            ==================================================
+
+            Establish the moments that change the direction of the world and story.
+
+            Key turning points should define:
+
+                - Turning point name
+                - When it occurs
+                - What changes
+                - Immediate effects
+                - Long-term effects
+                - Connection to the characters
+
+            ==================================================
+            TIMELINE SUMMARY REQUIREMENTS
+            ==================================================
+
+            Establish a clear chronological overview.
+
+            The timeline summary should:
+
+                - Summarize the full chronology
+                - Present the most important events in order
+                - Show the connection between the world history and the story
+                - Provide a clear sense of cause and effect
+                - Support future novel development steps
+
+            ==================================================
+            TIMELINE QUALITY
+            ==================================================
+
+            The timeline must feel:
+
+                - Logical
+                - Coherent
+                - Chronologically consistent
+                - Meaningfully connected to the story
+                - Suitable for the genre
+                - Professionally developed
+
+            Avoid:
+
+                - Random events
+                - Contradictory dates
+                - Events disconnected from the world
+                - Events disconnected from the story
+                - Unnecessary timeline entries
+
+            ==================================================
+            OUTPUT SCOPE
+            ==================================================
+
+            This generation creates only the initial world timeline.
+
+            Do not generate:
+
+                - Complete creature databases
+                - Dynamic system rules
+                - Story structure
+                - Chapter plans
+                - Scene plans
+                - Dialogue scripts
+
+            Keep the timeline focused on information required for future novel development.
+
+            ==================================================
+            OUTPUT FORMAT
+            ==================================================
+
+            Return ONLY valid JSON.
+
+            {
+                \"timeline\": {
+                    \"major_historical_events\": [
+                        {
+                            \"name\": \"\",
+                            \"date_or_era\": \"\",
+                            \"description\": \"\",
+                            \"causes\": \"\",
+                            \"consequences\": \"\",
+                            \"historical_importance\": \"\"
+                        }
+                    ],
+                    \"past_events\": [
+                        {
+                            \"name\": \"\",
+                            \"date_or_era\": \"\",
+                            \"description\": \"\",
+                            \"relationship_to_current_tensions\": \"\",
+                            \"connection_to_story\": \"\"
+                        }
+                    ],
+                    \"present_events\": [
+                        {
+                            \"name\": \"\",
+                            \"current_situation\": \"\",
+                            \"driving_forces\": \"\",
+                            \"ongoing_conflicts\": \"\",
+                            \"connection_to_inciting_event\": \"\"
+                        }
+                    ],
+                    \"future_events\": [
+                        {
+                            \"name\": \"\",
+                            \"projected_course\": \"\",
+                            \"possible_outcomes\": [],
+                            \"relationship_to_climax_direction\": \"\",
+                            \"relationship_to_resolution_direction\": \"\"
+                        }
+                    ],
+                    \"key_turning_points\": [
+                        {
+                            \"name\": \"\",
+                            \"when_it_occurs\": \"\",
+                            \"what_changes\": \"\",
+                            \"immediate_effects\": \"\",
+                            \"long_term_effects\": \"\",
+                            \"connection_to_characters\": \"\"
+                        }
+                    ],
+                    \"timeline_summary\": \"\"
+                }
+            }
+
+            ==================================================
+            FINAL CHECK
+            ==================================================
+
+            Before returning the result, verify:
+
+                - Timeline events directly support the existing world bible.
+                - Timeline events include the rise and fall of the existing factions.
+                - Timeline events connect with the existing foundation.
+                - The chronology is internally consistent.
+                - No event contradicts the established world.
+                - No unnecessary events are created.
+                - Key turning points change the direction of the story.
+                - No complete creature databases are created.
+                - No dynamic system rules are created.
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 

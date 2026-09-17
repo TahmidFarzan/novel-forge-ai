@@ -390,6 +390,30 @@ class SeederHelper
                 'prompt'               => AiPromptGeneratorHelper::factionGenerator(),
             ],
 
+            (object) [
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_CREATURE_GENERATOR,
+                'code'                 => "CreatureGenerator",
+                'step_number'          => 6,
+                'depend_on_prompt_ids' => null,
+                'prompt'               => AiPromptGeneratorHelper::creatureGenerator(),
+            ],
+
+            (object) [
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_SYSTEM_GENERATOR,
+                'code'                 => "SystemGenerator",
+                'step_number'          => 7,
+                'depend_on_prompt_ids' => null,
+                'prompt'               => AiPromptGeneratorHelper::systemGenerator(),
+            ],
+
+            (object) [
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_TIMELINE_GENERATOR,
+                'code'                 => "TimelineGenerator",
+                'step_number'          => 8,
+                'depend_on_prompt_ids' => null,
+                'prompt'               => AiPromptGeneratorHelper::timelineGenerator(),
+            ],
+
         ]);
     }
 

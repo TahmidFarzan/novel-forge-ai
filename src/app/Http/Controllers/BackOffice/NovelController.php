@@ -3,17 +3,20 @@
 namespace App\Http\Controllers\BackOffice;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\NovelFoundationRequest;
-use App\Http\Requests\NovelWorldBibleRequest;
-use App\Http\Requests\NovelLocationsRequest;
+use App\Http\Requests\NovelCharactersRequest;
+use App\Http\Requests\NovelCreaturesRequest;
 use App\Http\Requests\NovelFactionsRequest;
+use App\Http\Requests\NovelFoundationRequest;
+use App\Http\Requests\NovelLocationsRequest;
+use App\Http\Requests\NovelSystemsRequest;
+use App\Http\Requests\NovelTimelineRequest;
+use App\Http\Requests\NovelWorldBibleRequest;
 use App\Services\BackOffice\NovelService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
-use App\Http\Requests\NovelCharactersRequest;
 
 class NovelController extends Controller
 {
@@ -133,6 +136,45 @@ class NovelController extends Controller
         Gate::authorize('update', $novel);
 
         $result = $this->novelService->generateFactions($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateCreature(NovelCreaturesRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateCreature($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateSystem(NovelSystemsRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateSystem($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateTimeline(NovelTimelineRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateTimeline($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
