@@ -26,12 +26,12 @@ const { novel } = defineProps({
 const isUpdate = computed(() => !!novel?.id);
 
 const charactersGeneratorForm = useForm({
-    plot: novel?.plot
-        ? typeof novel.plot === "string"
-            ? novel.plot
-            : JSON.stringify(novel.plot)
+    foundation: novel?.foundation
+        ? typeof novel.foundation === "string"
+            ? novel.foundation
+            : JSON.stringify(novel.foundation)
         : null,
-    character_additional_information: null,
+    additional_information: null,
     ai_brain_id: null,
 });
 
@@ -48,8 +48,8 @@ const validate = () => {
         valid = false;
     }
 
-    if (!charactersGeneratorForm.plot) {
-        charactersGeneratorForm.setError("plot", "Plot is required");
+    if (!charactersGeneratorForm.foundation) {
+        charactersGeneratorForm.setError("foundation", "Foundation is required");
         valid = false;
     }
 
@@ -89,8 +89,8 @@ const submit = () => {
     <div class="space-y-6">
         <div class="bg-white border rounded-xl p-5 shadow-sm space-y-4">
             <div>
-                <p v-if="charactersGeneratorForm.errors.plot">
-                    {{ charactersGeneratorForm.errors.plot }}
+                <p v-if="charactersGeneratorForm.errors.foundation">
+                    {{ charactersGeneratorForm.errors.foundation }}
                 </p>
             </div>
 
@@ -99,12 +99,12 @@ const submit = () => {
                     Characters Additional Information
                 </label>
 
-                <textarea v-model="charactersGeneratorForm.character_additional_information" rows="3"
+                <textarea v-model="charactersGeneratorForm.additional_information" rows="3"
                     placeholder="Any additional context or instructions for the AI..."
                     class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none border-gray-300"></textarea>
 
-                <p v-if="charactersGeneratorForm.errors.character_additional_information">
-                    {{charactersGeneratorForm.errors.character_additional_information}}
+                <p v-if="charactersGeneratorForm.errors.additional_information">
+                    {{charactersGeneratorForm.errors.additional_information}}
                 </p>
             </div>
         </div>

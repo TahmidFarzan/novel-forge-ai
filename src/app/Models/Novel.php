@@ -33,7 +33,7 @@ use Spatie\Sluggable\SlugOptions;
     'language_id',
     'ai_prompt',
 
-    'plot',
+    'foundation',
     'characters',
     'world_bible',
     'locations',
@@ -62,7 +62,7 @@ class Novel extends Model
         return [
 
             'characters' => 'array',
-            'plot' => 'array',
+            'foundation' => 'array',
             'world_bible' => 'array',
             'locations' => 'array',
             'factions' => 'array',
@@ -94,7 +94,7 @@ class Novel extends Model
                 "novel_type_id",
                 'language_id',
                 'ai_prompt',
-                'plot',
+                'foundation',
                 'characters',
                 'world_bible',
                 'locations',

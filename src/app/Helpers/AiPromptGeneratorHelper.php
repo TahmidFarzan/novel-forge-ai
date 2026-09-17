@@ -23,7 +23,7 @@ class AiPromptGeneratorHelper
 
                 1. Novel Title
                 2. Novel Subtitle
-                3. Novel Plot Foundation
+                3. Novel Foundation
 
             ==================================================
             USER INPUT
@@ -118,7 +118,7 @@ class AiPromptGeneratorHelper
             Do not create complete world-building documentation or a world bible.
 
             ==================================================
-            PLOT DEVELOPMENT
+            FOUNDATION DEVELOPMENT
             ==================================================
 
             Build a strong narrative foundation.
@@ -166,7 +166,7 @@ class AiPromptGeneratorHelper
 
             Avoid generic, predictable, formulaic, repetitive, mechanical, or shallow storytelling.
 
-            Do not rely on common plot formulas unless they are meaningfully transformed into something distinctive.
+            Do not rely on common foundation formulas unless they are meaningfully transformed into something distinctive.
 
             Make important story elements feel intentional and interconnected.
 
@@ -235,7 +235,7 @@ class AiPromptGeneratorHelper
             {
                 \"novel_title\": \"\",
                 \"novel_subtitle\": \"\",
-                \"novel_plot\": {
+                \"novel_foundation\": {
 
                     \"premise\": \"\",
                     \"story_concept\": \"\",
@@ -282,7 +282,7 @@ class AiPromptGeneratorHelper
                 - The title represents the novel's identity.
                 - The subtitle supports the novel's identity.
                 - The premise is distinctive and compelling.
-                - The plot has a clear narrative direction.
+                - The foundation has a clear narrative direction.
                 - The protagonist has a meaningful motivation and goal.
                 - The central conflict is meaningful.
                 - The opposing force creates genuine obstacles.
@@ -338,7 +338,7 @@ class AiPromptGeneratorHelper
             EXISTING NOVEL FOUNDATION
             ==================================================
 
-            {{plot}}
+            {{foundation}}
 
             Carefully analyze the existing novel foundation.
 
@@ -358,7 +358,7 @@ class AiPromptGeneratorHelper
 
             Create characters that naturally support the existing story.
 
-            Do not change, rewrite, or expand the plot.
+            Do not change, rewrite, or expand the foundation.
 
             The existing novel foundation is the source of truth.
 
@@ -366,7 +366,7 @@ class AiPromptGeneratorHelper
             CHARACTER ADDITIONAL INFORMATION
             ==================================================
 
-            {{character_additional_information}}
+            {{additional_information}}
 
             This field is optional.
 
@@ -375,13 +375,13 @@ class AiPromptGeneratorHelper
                 - Use it as creative guidance.
                 - Integrate it naturally with the existing novel foundation.
                 - Maintain consistency with the established story direction.
-                - Do not allow it to conflict with the existing plot.
+                - Do not allow it to conflict with the existing foundation.
 
             If this field is empty, null, missing, or contains \"Auto\":
 
                 - Automatically determine the required characters.
                 - Use professional storytelling judgment.
-                - Create characters that best support the plot, conflict, themes, and emotional journey.
+                - Create characters that best support the foundation, conflict, themes, and emotional journey.
 
             Do not create unnecessary characters.
 
@@ -539,7 +539,7 @@ class AiPromptGeneratorHelper
 
         Before returning the result, verify:
 
-            - Characters directly support the existing plot.
+            - Characters directly support the existing foundation.
             - Main character supports the central conflict.
             - Supporting characters have clear narrative purposes.
             - Opposing characters create meaningful obstacles.

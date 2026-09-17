@@ -28,7 +28,7 @@ return new class extends Migration
             $table->longText('additional_information')->nullable();
 
 
-            $table->jsonb('plot')->nullable();
+            $table->jsonb('foundation')->nullable();
             $table->jsonb('characters')->nullable();
             $table->jsonb('world_bible')->nullable();
             $table->jsonb('locations')->nullable();

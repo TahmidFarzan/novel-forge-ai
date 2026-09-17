@@ -124,7 +124,7 @@ class NovelService
 
                 $novel->title     = $foundationObject->title;
                 $novel->sub_title = $foundationObject->subtitle;
-                $novel->plot      = $foundationObject->plot;
+                $novel->foundation      = $foundationObject->foundation;
 
                 $novel->audience_id   = $request->input("audience_id");
                 $novel->novel_type_id = $request->input("novel_type_id");
@@ -175,7 +175,7 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_CHARACTER_GENERATOR));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->charactersRequestInputsFormatter($novel, $request->input("character_additional_information", "Auto"));
+            $requestInputs = $this->charactersRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
             $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
 
             $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
@@ -268,7 +268,7 @@ class NovelService
         return (object) [
             'title'    => $decoded['novel_title'] ?? null,
             'subtitle' => $decoded['novel_subtitle'] ?? null,
-            'plot'     => $decoded['novel_plot'] ?? null,
+            'foundation'     => $decoded['novel_foundation'] ?? null,
         ];
     }
 
@@ -308,14 +308,14 @@ class NovelService
         return $receivedInputs;
     }
 
-    private function charactersRequestInputsFormatter(Novel $novel, string $characterAdditionalInformation): array
+    private function charactersRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
     {
         $requestInputs = [];
 
-        $formatedPlot  = json_encode($novel->plot, JSON_PRETTY_PRINT);
+        $formatedFoundation  = json_encode($novel->foundation, JSON_PRETTY_PRINT);
         $requestInputs = [
-            "plot"                             => $formatedPlot,
-            "character_additional_information" => $characterAdditionalInformation,
+            "foundation"                             => $formatedFoundation,
+            "additional_information" => $additionalIinformation,
         ];
 
         return $requestInputs;
