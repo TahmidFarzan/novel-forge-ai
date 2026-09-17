@@ -414,6 +414,30 @@ class SeederHelper
                 'prompt'               => AiPromptGeneratorHelper::timelineGenerator(),
             ],
 
+            (object) [
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STORY_STRUCTURE_GENERATOR,
+                'code'                 => "StoryStructureGenerator",
+                'step_number'          => 9,
+                'depend_on_prompt_ids' => null,
+                'prompt'               => AiPromptGeneratorHelper::storyStructureGenerator(),
+            ],
+
+            (object) [
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_TWISTS_AND_FORESHADOWING_GENERATOR,
+                'code'                 => "TwistsAndForeshadowingGenerator",
+                'step_number'          => 10,
+                'depend_on_prompt_ids' => null,
+                'prompt'               => AiPromptGeneratorHelper::twistsAndForeshadowingGenerator(),
+            ],
+
+            (object) [
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_SCENE_PLANS_GENERATOR,
+                'code'                 => "ScenePlansGenerator",
+                'step_number'          => 11,
+                'depend_on_prompt_ids' => null,
+                'prompt'               => AiPromptGeneratorHelper::scenePlannerGenerator(),
+            ],
+
         ]);
     }
 

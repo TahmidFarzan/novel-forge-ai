@@ -8,8 +8,11 @@ use App\Http\Requests\NovelCreaturesRequest;
 use App\Http\Requests\NovelFactionsRequest;
 use App\Http\Requests\NovelFoundationRequest;
 use App\Http\Requests\NovelLocationsRequest;
+use App\Http\Requests\NovelScenePlannerRequest;
+use App\Http\Requests\NovelStoryStructureRequest;
 use App\Http\Requests\NovelSystemsRequest;
 use App\Http\Requests\NovelTimelineRequest;
+use App\Http\Requests\NovelTwistsAndForeshadowingRequest;
 use App\Http\Requests\NovelWorldBibleRequest;
 use App\Services\BackOffice\NovelService;
 use Illuminate\Http\RedirectResponse;
@@ -175,6 +178,45 @@ class NovelController extends Controller
         Gate::authorize('update', $novel);
 
         $result = $this->novelService->generateTimeline($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateStoryStructure(NovelStoryStructureRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateStoryStructure($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateTwistsAndForeshadowing(NovelTwistsAndForeshadowingRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateTwistsAndForeshadowing($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateScenePlanner(NovelScenePlannerRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateScenePlanner($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],

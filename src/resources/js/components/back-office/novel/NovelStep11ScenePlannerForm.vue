@@ -2,24 +2,48 @@
 import InfiniteScrollApiSelect from "@/components/common/multi-select/InfiniteScrollApiSelect.vue";
 import { AiBrainOutputTypes } from "@/composables/useAiBrain";
 
-import { useForm } from "@inertiajs/vue3";
+import { computed } from "vue";
+import { useForm, router as inertiaRoute } from "@inertiajs/vue3";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library as FontAwesomeLibrary } from "@fortawesome/fontawesome-svg-core";
-import { faListCheck } from "@fortawesome/free-solid-svg-icons";
+import {
+    faBrain,
+    faListCheck,
+    faSpinner,
+    faWandMagicSparkles,
+} from "@fortawesome/free-solid-svg-icons";
 
-FontAwesomeLibrary.add(faListCheck);
+FontAwesomeLibrary.add(faBrain, faListCheck, faSpinner, faWandMagicSparkles);
 
 const emit = defineEmits(["completed"]);
 
 const { novel } = defineProps({
     novel: {
         type: Object,
-        default: null,
+        required: true,
     },
 });
 
+const isUpdate = computed(() => !!novel?.id);
+
 const scenePlansForm = useForm({
+    story_structure: novel?.story_structure
+        ? typeof novel.story_structure === "string"
+            ? novel.story_structure
+            : JSON.stringify(novel.story_structure)
+        : null,
+    twists_and_foreshadowing: novel?.twists_and_foreshadowing
+        ? typeof novel.twists_and_foreshadowing === "string"
+            ? novel.twists_and_foreshadowing
+            : JSON.stringify(novel.twists_and_foreshadowing)
+        : null,
+    locations: novel?.locations
+        ? typeof novel.locations === "string"
+            ? novel.locations
+            : JSON.stringify(novel.locations)
+        : null,
+    additional_information: null,
     ai_brain_id: null,
 });
 
@@ -29,39 +53,73 @@ function buildAiBrainSearchUrl() {
     });
 }
 
-function submit() {
-    if (scenePlansForm.processing) {
-        return;
-    }
-
+const validate = () => {
     scenePlansForm.clearErrors();
+
+    let valid = true;
 
     if (!scenePlansForm.ai_brain_id) {
         scenePlansForm.setError(
             "ai_brain_id",
             "AI Brain selection is required",
         );
+        valid = false;
+    }
+
+    if (!scenePlansForm.story_structure) {
+        scenePlansForm.setError("story_structure", "Story Structure is required");
+        valid = false;
+    }
+
+    if (!scenePlansForm.twists_and_foreshadowing) {
+        scenePlansForm.setError("twists_and_foreshadowing", "Twists and Foreshadowing is required");
+        valid = false;
+    }
+
+    if (!scenePlansForm.locations) {
+        scenePlansForm.setError("locations", "Locations are required");
+        valid = false;
+    }
+
+    return valid;
+};
+
+const handleSuccess = () => {
+    scenePlansForm.clearErrors();
+    emit("completed", novel);
+};
+
+const submit = () => {
+    if (!isUpdate.value || scenePlansForm.processing || !validate()) {
         return;
     }
 
-    emit("completed");
-}
+    const requestConfig = {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: handleSuccess,
+    };
+
+    inertiaRoute.patch(
+        route("back-office.novels.generate.scene-planner", {
+            slug: novel?.slug,
+        }),
+        {
+            ...scenePlansForm.data(),
+            _method: "patch",
+        },
+        requestConfig,
+    );
+};
 
 defineExpose({ submit });
 </script>
 
 <template>
     <div class="space-y-6">
-        <div
-            class="bg-white border rounded-xl p-5 shadow-sm space-y-4"
-        >
-            <h3
-                class="text-base font-semibold flex items-center gap-2"
-            >
-                <FontAwesomeIcon
-                    icon="list-check"
-                    class="text-blue-600"
-                />
+        <div class="bg-white border rounded-xl p-5 shadow-sm space-y-4">
+            <h3 class="text-base font-semibold flex items-center gap-2">
+                <FontAwesomeIcon icon="list-check" class="text-blue-600" />
                 Scene Planner
             </h3>
 
@@ -69,27 +127,62 @@ defineExpose({ submit });
                 Plan the novel's scenes
             </p>
 
-            <div
-                class="border-2 border-dashed border-purple-200 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-blue-50"
-            >
-                <InfiniteScrollApiSelect
-                    :form="scenePlansForm"
-                    fieldName="ai_brain_id"
-                    :selectedItem="scenePlansForm.ai_brain_id"
-                    :apiUrl="buildAiBrainSearchUrl()"
-                    :multiple="false"
-                    placeholder="Select AI Brain"
-                    :error="scenePlansForm.errors.ai_brain_id"
-                    class="ai-brain-select"
-                />
+            <div>
+                <label class="block text-sm font-medium mb-1">
+                    Scene Plans Additional Information
+                </label>
+
+                <textarea v-model="scenePlansForm.additional_information" rows="3"
+                    placeholder="Any additional context or instructions for the AI..."
+                    class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none border-gray-300"></textarea>
+
+                <p v-if="scenePlansForm.errors.additional_information">
+                    {{ scenePlansForm.errors.additional_information }}
+                </p>
             </div>
 
-            <p
-                v-if="scenePlansForm.errors.ai_brain_id"
-                class="text-red-500 text-sm"
-            >
+            <p v-if="scenePlansForm.errors.story_structure" class="text-red-500 text-sm">
+                {{ scenePlansForm.errors.story_structure }}
+            </p>
+
+            <p v-if="scenePlansForm.errors.twists_and_foreshadowing" class="text-red-500 text-sm">
+                {{ scenePlansForm.errors.twists_and_foreshadowing }}
+            </p>
+
+            <p v-if="scenePlansForm.errors.locations" class="text-red-500 text-sm">
+                {{ scenePlansForm.errors.locations }}
+            </p>
+        </div>
+
+        <div class="bg-white border rounded-xl p-5 shadow-sm space-y-4">
+            <div class="flex items-center gap-2">
+                <FontAwesomeIcon icon="brain" class="text-purple-600" />
+                <h3 class="text-base font-semibold">AI Brain Configuration</h3>
+            </div>
+
+            <p class="text-sm text-gray-500">
+                Select the AI model that will generate the scene plans.
+            </p>
+
+            <div class="border-2 border-dashed border-purple-200 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-blue-50" >
+                <InfiniteScrollApiSelect :form="scenePlansForm" fieldName="ai_brain_id"
+                    :selectedItem="null" :apiUrl="buildAiBrainSearchUrl()" :multiple="false"
+                    placeholder="Select AI Brain" :error="scenePlansForm.errors.ai_brain_id"
+                    class="ai-brain-select"/>
+            </div>
+
+            <p v-if="scenePlansForm.errors.ai_brain_id" class="text-red-500 text-sm">
                 {{ scenePlansForm.errors.ai_brain_id }}
             </p>
+        </div>
+
+        <div class="flex justify-end">
+            <button type="button" @click="submit" :disabled="!isUpdate || scenePlansForm.processing"
+                class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed">
+                <FontAwesomeIcon v-if="scenePlansForm.processing" icon="spinner" spin/>
+                <FontAwesomeIcon v-else icon="wand-magic-sparkles" />
+                {{ scenePlansForm.processing ? "Generating..." : "Generate Scene Plans" }}
+            </button>
         </div>
     </div>
 </template>

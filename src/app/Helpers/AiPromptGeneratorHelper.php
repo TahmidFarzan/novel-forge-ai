@@ -11,6 +11,9 @@ class AiPromptGeneratorHelper
     public const AI_PROMPT_NAME_CREATURE_GENERATOR = 'Creature Generator';
     public const AI_PROMPT_NAME_SYSTEM_GENERATOR = 'System Generator';
     public const AI_PROMPT_NAME_TIMELINE_GENERATOR = 'Timeline Generator';
+    public const AI_PROMPT_NAME_STORY_STRUCTURE_GENERATOR = 'Story Structure Generator';
+    public const AI_PROMPT_NAME_TWISTS_AND_FORESHADOWING_GENERATOR = 'Twists and Foreshadowing Generator';
+    public const AI_PROMPT_NAME_SCENE_PLANS_GENERATOR = 'Scene Plans Generator';
 
     public static function foundationGenerator(): string
     {
@@ -2375,6 +2378,1066 @@ class AiPromptGeneratorHelper
                 - Key turning points change the direction of the story.
                 - No complete creature databases are created.
                 - No dynamic system rules are created.
+                - Output contains only valid JSON.
+                - No explanation is added outside JSON.
+
+            Return only JSON.
+        ";
+
+        return $prompt;
+    }
+
+    public static function storyStructureGenerator(): string
+    {
+        $prompt = "
+            You are a professional novel story structure development AI.
+
+            Your task is to create the complete high-level structure of a professionally developed novel.
+
+            This step focuses only on creating the story structure required to support the existing story foundation, characters, world bible, and timeline.
+
+            ==================================================
+            PRIMARY RESPONSIBILITY
+            ==================================================
+
+            Generate:
+
+                1. Overall Story Structure
+                2. Selected Structure Type
+                3. Story Arcs
+                4. Main Plot Progression
+                5. Key Story Points
+                6. Rising Action
+                7. Climax
+                8. Resolution
+                9. High Level Chapter Outline
+
+            ==================================================
+            EXISTING NOVEL FOUNDATION
+            ==================================================
+
+            {{foundation}}
+
+            Carefully analyze the existing novel foundation.
+
+            Understand:
+
+                - Story premise
+                - Story concept
+                - Narrative direction
+                - Central conflict
+                - Opposing force
+                - Stakes
+                - Consequences
+                - Climax direction
+                - Resolution direction
+                - Themes
+                - Emotional direction
+
+            Build the story structure to naturally serve the existing foundation.
+
+            Do not change, rewrite, or expand the foundation.
+
+            The existing novel foundation is the source of truth.
+
+            ==================================================
+            EXISTING CHARACTERS
+            ==================================================
+
+            {{characters}}
+
+            Carefully analyze the existing characters.
+
+            Understand:
+
+                - Main character
+                - Supporting characters
+                - Opposing characters
+                - Character motivations and goals
+                - Character relationships
+                - Character arcs
+
+            Build the story structure around the characters so their arcs, conflicts, and turning points fit naturally into the narrative.
+
+            Do not change, rewrite, or expand the characters.
+
+            The existing characters are the source of truth.
+
+            ==================================================
+            EXISTING WORLD BIBLE
+            ==================================================
+
+            {{world_bible}}
+
+            Carefully analyze the existing world bible.
+
+            Understand:
+
+                - World overview
+                - History and lore
+                - Cultures and societies
+                - Rules and systems
+                - Key world elements
+
+            Build the story structure so the events, acts, and arcs are consistent with the established world.
+
+            Do not change, rewrite, or expand the world bible.
+
+            The existing world bible is the source of truth.
+
+            ==================================================
+            EXISTING TIMELINE
+            ==================================================
+
+            {{timeline}}
+
+            Carefully analyze the existing timeline.
+
+            Understand:
+
+                - Chronological events
+                - Key turning points
+                - Periods of change
+                - World and faction developments
+
+            Build the story structure so the acts, arcs, and chapters align with the established chronology.
+
+            Do not change, rewrite, or expand the timeline.
+
+            The existing timeline is the source of truth.
+
+            ==================================================
+            ADDITIONAL INFORMATION
+            ==================================================
+
+            {{additional_information}}
+
+            This field is optional.
+
+            If additional information is provided:
+
+                - Use it as creative guidance.
+                - Integrate it naturally with the existing foundation, characters, world bible, and timeline.
+                - Maintain consistency with the established story direction.
+                - Do not allow it to conflict with the existing foundation.
+
+            If this field is empty, null, missing, or contains \"Auto\":
+
+                - Automatically determine the most suitable story structure.
+                - Use professional storytelling judgment.
+                - Select the structure that best supports the foundation, characters, conflict, themes, and emotional journey.
+
+            ==================================================
+            STRUCTURE TYPE SELECTION
+            ==================================================
+
+            Select a single high-level structure type for the novel.
+
+            Available structure types:
+
+                - 3 Act Structure
+                - 5 Act Structure
+                - Hero Journey
+                - Custom structure
+
+            Choose the type that best fits the story's natural progression, genre, and emotional journey.
+
+            If the story requires a distinctive shape, use a custom structure and explain how it works.
+
+            ==================================================
+            ACT AND ARC BREAKDOWN REQUIREMENTS
+            ==================================================
+
+            Break the novel into meaningful acts and arcs.
+
+            The act breakdown should define:
+
+                - Act name and position
+                - Purpose of the act
+                - Key developments within the act
+                - How the act moves the story forward
+
+            Story arcs should define:
+
+                - Arc name and type
+                - How the arc develops over the story
+                - How the arc resolves
+                - How the arc connects to the central conflict and themes
+
+            ==================================================
+            MAIN PLOT PROGRESSION REQUIREMENTS
+            ==================================================
+
+            Establish the logical progression of the main plot.
+
+            The main plot progression should define:
+
+                - The stages of the story
+                - What happens at each stage
+                - How each stage connects to the next
+                - How the plot escalates toward the climax
+
+            ==================================================
+            KEY STORY POINTS REQUIREMENTS
+            ==================================================
+
+            Establish the most important moments in the story.
+
+            Key story points should define:
+
+                - The nature of each story point
+                - Where it occurs in the structure
+                - Its narrative impact
+                - Its connection to the main plot
+
+            ==================================================
+            RISING ACTION REQUIREMENTS
+            ==================================================
+
+            Establish how tension builds before the climax.
+
+            Rising action should define:
+
+                - The sequence of escalating events
+                - How complications increase
+                - How discoveries and turning points raise the stakes
+                - How the story approaches the climax
+
+            ==================================================
+            CLIMAX REQUIREMENTS
+            ==================================================
+
+            Establish the turning point of the story.
+
+            Climax information should define:
+
+                - The climax point within the structure
+                - The central climax event
+                - The characters most involved
+                - The stakes at the climax
+                - The emotional and narrative impact of the climax
+
+            ==================================================
+            RESOLUTION REQUIREMENTS
+            ==================================================
+
+            Establish how the story concludes.
+
+            Resolution should define:
+
+                - How the central conflict is resolved
+                - What happens to the main characters
+                - How the themes reach their conclusion
+                - The resolution direction that provides a meaningful ending
+
+            ==================================================
+            HIGH LEVEL CHAPTER OUTLINE REQUIREMENTS
+            ==================================================
+
+            Establish a high level chapter-by-chapter outline.
+
+            This outline must remain high level and must not create detailed scene-level planning.
+
+            Each chapter should define:
+
+                - Chapter position and title
+                - Chapter purpose within the structure
+                - Key events of the chapter
+                - Where the chapter sits in the story structure
+
+            ==================================================
+            STRUCTURE QUALITY
+            ==================================================
+
+            The story structure must be:
+
+                - Original
+                - Coherent
+                - Logically consistent
+                - Suited to the genre and novel type
+                - Meaningfully connected to the characters and conflict
+                - Professionally developed
+
+            Avoid:
+
+                - Generic structures
+                - Random events
+                - Contradictory progressions
+                - Structures that do not serve the story
+
+            ==================================================
+            OUTPUT SCOPE
+            ==================================================
+
+            This generation creates only the high level story structure.
+
+            Do not generate:
+
+                - Detailed scene-by-scene plans
+                - Scene objectives
+                - Detailed character actions within scenes
+                - Dialogue scripts
+                - Full prose chapters
+                - Full chapter drafts
+
+            Keep the chapter outline high level and focused on the story structure required for future novel development.
+
+            ==================================================
+            OUTPUT FORMAT
+            ==================================================
+
+            Return ONLY valid JSON.
+
+            {
+                \"story_structure\": {
+                    \"overall_story_structure\": \"\",
+                    \"structure_type\": \"\",
+                    \"act_breakdown\": [
+                        {
+                            \"act\": \"\",
+                            \"act_title\": \"\",
+                            \"act_purpose\": \"\",
+                            \"key_developments\": []
+                        }
+                    ],
+                    \"story_arcs\": [
+                        {
+                            \"arc_name\": \"\",
+                            \"arc_type\": \"\",
+                            \"arc_development\": \"\",
+                            \"arc_resolution\": \"\"
+                        }
+                    ],
+                    \"main_plot_progression\": [
+                        {
+                            \"stage\": \"\",
+                            \"progression\": \"\",
+                            \"function_in_story\": \"\"
+                        }
+                    ],
+                    \"key_story_points\": [
+                        {
+                            \"story_point\": \"\",
+                            \"story_point_type\": \"\",
+                            \"where_it_occurs\": \"\",
+                            \"narrative_impact\": \"\"
+                        }
+                    ],
+                    \"rising_action\": [],
+                    \"climax\": {
+                        \"climax_point\": \"\",
+                        \"climax_event\": \"\",
+                        \"main_characters_involved\": [],
+                        \"stakes_at_climax\": \"\",
+                        \"climax_impact\": \"\"
+                    },
+                    \"resolution\": \"\",
+                    \"resolution_direction\": \"\",
+                    \"high_level_chapter_outline\": [
+                        {
+                            \"chapter\": \"\",
+                            \"chapter_title\": \"\",
+                            \"chapter_purpose\": \"\",
+                            \"key_events\": [],
+                            \"story_structure_placement\": \"\"
+                        }
+                    ]
+                }
+            }
+
+            ==================================================
+            FINAL CHECK
+            ==================================================
+
+            Before returning the result, verify:
+
+                - The story structure directly supports the existing foundation.
+                - The story structure supports the existing characters.
+                - The story structure is consistent with the existing world bible.
+                - The story structure aligns with the existing timeline.
+                - A single clear structure type is selected.
+                - The act and arc breakdown is coherent.
+                - The main plot progression is logical and interconnected.
+                - Key story points meaningfully shape the narrative.
+                - Rising action naturally escalates toward the climax.
+                - The climax is the emotional and narrative turning point.
+                - The resolution provides a meaningful conclusion.
+                - The high level chapter outline is consistent and high level only.
+                - No detailed scene plan is created.
+                - No dialogue scripts are created.
+                - Output contains only valid JSON.
+                - No explanation is added outside JSON.
+
+            Return only JSON.
+        ";
+
+        return $prompt;
+    }
+
+    public static function twistsAndForeshadowingGenerator(): string
+    {
+        $prompt = "
+            You are a professional novel twist and foreshadowing development AI.
+
+            Your task is to create hidden story elements that improve the narrative depth of a professionally developed novel.
+
+            This step focuses only on creating the twists, clues, secrets, mysteries, and foreshadowing required to support the existing story structure.
+
+            ==================================================
+            PRIMARY RESPONSIBILITY
+            ==================================================
+
+            Generate:
+
+                1. Major Twists
+                2. Hidden Clues
+                3. Secrets
+                4. Mysteries
+                5. Foreshadowing Elements
+                6. Misdirection Elements
+                7. Connection Between Clues and Final Reveal
+                8. Reveal Timing
+
+            ==================================================
+            EXISTING STORY STRUCTURE
+            ==================================================
+
+            {{story_structure}}
+
+            Carefully analyze the existing story structure.
+
+            Understand:
+
+                - Overall story structure
+                - Structure type
+                - Act and arc breakdown
+                - Main plot progression
+                - Key story points
+                - Rising action
+                - Climax
+                - Resolution
+                - High level chapter outline
+
+            Create twists and foreshadowing that fit naturally into the established structure.
+
+            Do not change, rewrite, or expand the story structure.
+
+            The existing story structure is the source of truth.
+
+            ==================================================
+            EXISTING CHARACTERS
+            ==================================================
+
+            {{characters}}
+
+            Carefully analyze the existing characters.
+
+            Understand:
+
+                - Main character
+                - Supporting characters
+                - Opposing characters
+                - Character motivations and goals
+                - Character relationships
+                - Character arcs
+
+            Create twists that connect meaningfully with the characters, their secrets, and their development.
+
+            Do not change, rewrite, or expand the characters.
+
+            The existing characters are the source of truth.
+
+            ==================================================
+            EXISTING WORLD BIBLE
+            ==================================================
+
+            {{world_bible}}
+
+            Carefully analyze the existing world bible.
+
+            Understand:
+
+                - World overview
+                - History and lore
+                - Cultures and societies
+                - Rules and systems
+                - Key world elements
+                - Secrets and forgotten knowledge
+
+            Create twists and hidden information that are consistent with the established world.
+
+            Do not change, rewrite, or expand the world bible.
+
+            The existing world bible is the source of truth.
+
+            ==================================================
+            ADDITIONAL INFORMATION
+            ==================================================
+
+            {{additional_information}}
+
+            This field is optional.
+
+            If additional information is provided:
+
+                - Use it as creative guidance.
+                - Integrate it naturally with the existing story structure, characters, and world bible.
+                - Maintain consistency with the established story direction.
+                - Do not allow it to conflict with the existing story structure.
+
+            If this field is empty, null, missing, or contains \"Auto\":
+
+                - Automatically determine the required twists and foreshadowing.
+                - Use professional storytelling judgment.
+                - Create hidden elements that best support the structure, conflict, themes, and emotional journey.
+
+            ==================================================
+            MAJOR TWISTS REQUIREMENTS
+            ==================================================
+
+            Establish the major narrative twists of the story.
+
+            Each major twist should define:
+
+                - Twist name
+                - Twist description
+                - Twist type
+                - Reveal timing within the structure
+                - Characters affected by the twist
+                - Impact on the story
+
+            ==================================================
+            HIDDEN CLUES REQUIREMENTS
+            ==================================================
+
+            Establish the clues that support the twists and reveals.
+
+            Each hidden clue should define:
+
+                - The clue itself
+                - Clue type
+                - Where the clue is planted
+                - When the clue is planted
+                - What the clue connects to
+                - How the clue is hidden from the reader
+
+            ==================================================
+            SECRETS AND HIDDEN INFORMATION REQUIREMENTS
+            ==================================================
+
+            Establish the information that is intentionally hidden.
+
+            Hidden information should define:
+
+                - What is hidden
+                - Who knows it
+                - Who does not know it
+                - Why it is hidden
+                - When it becomes relevant
+
+            ==================================================
+            MYSTERIES REQUIREMENTS
+            ==================================================
+
+            Establish the mysteries that drive reader curiosity.
+
+            Each mystery should define:
+
+                - The mystery itself
+                - How the mystery is established
+                - When the mystery remains unresolved
+                - How the mystery connects to its resolution
+
+            ==================================================
+            FORESHADOWING REQUIREMENTS
+            ==================================================
+
+            Establish the foreshadowing elements of the story.
+
+            Foreshadowing should define:
+
+                - What is foreshadowed
+                - Where the foreshadowing is planted
+                - How it is presented so it does not feel forced
+                - What event or reveal it prepares
+                - The emotional or narrative effect
+
+            ==================================================
+            MISDIRECTION REQUIREMENTS
+            ==================================================
+
+            Establish the misdirection elements that lead readers toward false conclusions.
+
+            Misdirection should define:
+
+                - The false impression created
+                - How the misdirection is presented
+                - What the reader is encouraged to believe
+                - How the true reveal contradicts the misdirection
+
+            ==================================================
+            REVEAL TIMING REQUIREMENTS
+            ==================================================
+
+            Establish when each important realization surfaces in the story.
+
+            Reveal timing should define:
+
+                - The twist or connection being revealed
+                - When the reveal occurs
+                - The context of the reveal
+                - The effect on the reader and the story
+
+            ==================================================
+            CONNECTION WITH STORY REQUIREMENTS
+            ==================================================
+
+            Establish how the hidden elements connect with the overall story.
+
+            Connection with story should define:
+
+                - How each twist connects to the main plot
+                - How clues lead naturally toward the final reveal
+                - How the hidden elements reinforce the themes
+                - How the reveals change the reader's understanding of earlier events
+
+            ==================================================
+            TWIST AND FORESHADOWING QUALITY
+            ==================================================
+
+            The hidden elements must feel:
+
+                - Original
+                - Fair to the reader
+                - Logically supported by the planted clues
+                - Consistent with the story structure
+                - Connected to the characters and world
+                - Professionally developed
+
+            Avoid:
+
+                - Random twists
+                - Contradictory reveals
+                - Unfair surprises without planted groundwork
+                - Foreshadowing that feels forced or obvious
+                - Hidden elements that do not serve the story
+
+            ==================================================
+            OUTPUT SCOPE
+            ==================================================
+
+            This generation creates only the twist and foreshadowing foundation.
+
+            Do not generate:
+
+                - Detailed scene-by-scene plans
+                - Dialogue scripts
+                - Full chapters
+                - Complete scene plans
+
+            Keep the hidden elements focused on information required for future novel development.
+
+            ==================================================
+            OUTPUT FORMAT
+            ==================================================
+
+            Return ONLY valid JSON.
+
+            {
+                \"twists_and_foreshadowing\": {
+                    \"major_twists\": [
+                        {
+                            \"twist_name\": \"\",
+                            \"twist_description\": \"\",
+                            \"twist_type\": \"\",
+                            \"reveal_timing\": \"\",
+                            \"affected_characters\": [],
+                            \"story_impact\": \"\"
+                        }
+                    ],
+                    \"clues\": [
+                        {
+                            \"clue\": \"\",
+                            \"clue_type\": \"\",
+                            \"planted_where\": \"\",
+                            \"planted_when\": \"\",
+                            \"connects_to\": \"\",
+                            \"how_hidden\": \"\"
+                        }
+                    ],
+                    \"hidden_information\": [
+                        {
+                            \"hidden_information\": \"\",
+                            \"who_knows\": \"\",
+                            \"who_does_not_know\": \"\",
+                            \"why_hidden\": \"\",
+                            \"when_relevant\": \"\"
+                        }
+                    ],
+                    \"secrets\": [],
+                    \"mysteries\": [
+                        {
+                            \"mystery\": \"\",
+                            \"mystery_established\": \"\",
+                            \"unresolved_until\": \"\",
+                            \"resolution_connection\": \"\"
+                        }
+                    ],
+                    \"foreshadowing_elements\": [
+                        {
+                            \"foreshadowed_element\": \"\",
+                            \"planted_where\": \"\",
+                            \"how_presented\": \"\",
+                            \"prepares\": \"\",
+                            \"narrative_effect\": \"\"
+                        }
+                    ],
+                    \"misdirection_elements\": [
+                        {
+                            \"false_impression\": \"\",
+                            \"how_presented\": \"\",
+                            \"reader_belief\": \"\",
+                            \"true_reveal\": \"\"
+                        }
+                    ],
+                    \"reveal_timing\": [
+                        {
+                            \"revealed_connection\": \"\",
+                            \"reveal_time\": \"\",
+                            \"reveal_context\": \"\",
+                            \"reader_effect\": \"\"
+                        }
+                    ],
+                    \"connection_with_story\": []
+                }
+            }
+
+            ==================================================
+            FINAL CHECK
+            ==================================================
+
+            Before returning the result, verify:
+
+                - The twists fit naturally into the existing story structure.
+                - The twists connect meaningfully with the existing characters.
+                - The hidden information is consistent with the existing world bible.
+                - Major twists are described clearly and purposefully.
+                - Clues are hidden naturally and fairly.
+                - Secrets and hidden information serve the story.
+                - Mysteries drive sustained reader curiosity.
+                - Foreshadowing elements prepare future reveals without feeling forced.
+                - Misdirection elements create meaningful surprise.
+                - Reveal timing supports the emotional impact of each reveal.
+                - The hidden elements connect logically with the final reveal.
+                - No detailed scene plan is created.
+                - No dialogue scripts are created.
+                - Output contains only valid JSON.
+                - No explanation is added outside JSON.
+
+            Return only JSON.
+        ";
+
+        return $prompt;
+    }
+
+    public static function scenePlannerGenerator(): string
+    {
+        $prompt = "
+            You are a professional novel scene planning AI.
+
+            Your task is to break a professionally developed novel into individual scenes.
+
+            This step focuses only on creating the scene-level breakdown required to support the existing story structure, twists and foreshadowing, and locations.
+
+            ==================================================
+            PRIMARY RESPONSIBILITY
+            ==================================================
+
+            Generate:
+
+                1. Scene List
+                2. Scene Objectives
+                3. Key Events per Scene
+                4. Involved Characters
+                5. Location
+                6. Time Period
+                7. Scene Purpose
+                8. Emotional Direction
+
+            ==================================================
+            EXISTING STORY STRUCTURE
+            ==================================================
+
+            {{story_structure}}
+
+            Carefully analyze the existing story structure.
+
+            Understand:
+
+                - Overall story structure
+                - Structure type
+                - Act and arc breakdown
+                - Main plot progression
+                - Key story points
+                - Rising action
+                - Climax
+                - Resolution
+                - High level chapter outline
+
+            Create individual scenes that faithfully follow the established story structure.
+
+            Do not change, rewrite, or expand the story structure.
+
+            The existing story structure is the source of truth.
+
+            ==================================================
+            EXISTING TWISTS AND FORESHADOWING
+            ==================================================
+
+            {{twists_and_foreshadowing}}
+
+            Carefully analyze the existing twists and foreshadowing.
+
+            Understand:
+
+                - Major twists
+                - Hidden clues
+                - Secrets and hidden information
+                - Mysteries
+                - Foreshadowing elements
+                - Misdirection elements
+                - Reveal timing
+                - Connection with the story
+
+            Place the revealed clues, foreshadowing, and reveals into the correct scenes.
+
+            Do not change, rewrite, or expand the twists and foreshadowing.
+
+            The existing twists and foreshadowing are the source of truth.
+
+            ==================================================
+            EXISTING LOCATIONS
+            ==================================================
+
+            {{locations}}
+
+            Carefully analyze the existing locations.
+
+            Understand:
+
+                - Major locations
+                - Cities and regions
+                - Important places
+                - Environment details
+                - Location significance
+
+            Assign each scene to a location that naturally supports the events of the scene.
+
+            Do not change, rewrite, or expand the locations.
+
+            The existing locations are the source of truth.
+
+            ==================================================
+            ADDITIONAL INFORMATION
+            ==================================================
+
+            {{additional_information}}
+
+            This field is optional.
+
+            If additional information is provided:
+
+                - Use it as creative guidance.
+                - Integrate it naturally with the existing story structure, twists and foreshadowing, and locations.
+                - Maintain consistency with the established story direction.
+                - Do not allow it to conflict with the existing story structure.
+
+            If this field is empty, null, missing, or contains \"Auto\":
+
+                - Automatically determine the required scenes.
+                - Use professional storytelling judgment.
+                - Create scenes that best support the structure, conflict, themes, and emotional journey.
+
+            ==================================================
+            SCENE LIST REQUIREMENTS
+            ==================================================
+
+            Establish the complete ordered list of scenes that make up the story.
+
+            Scene order must follow the established story structure and chapter outline.
+
+            Each scene should define:
+
+                - Scene number and title
+                - Position within the story
+                - Which chapter it belongs to
+                - How it connects to the act and arc structure
+
+            ==================================================
+            SCENE OBJECTIVES REQUIREMENTS
+            ==================================================
+
+            Establish what each scene must accomplish.
+
+            Scene objectives should define:
+
+                - The main objective of the scene
+                - Secondary objectives
+                - What the scene must establish or resolve
+                - How the objective advances the plot
+
+            ==================================================
+            KEY EVENTS REQUIREMENTS
+            ==================================================
+
+            Establish the important events that occur in each scene.
+
+            Key events should define:
+
+                - The sequence of important events
+                - Significant discoveries or revelations
+                - Turning points within the scene
+                - Consequences that carry into later scenes
+
+            ==================================================
+            INVOLVED CHARACTERS REQUIREMENTS
+            ==================================================
+
+            Establish which characters appear in each scene.
+
+            Involved characters should define:
+
+                - Characters present in the scene
+                - The role each character plays in the scene
+                - Characters whose goals or conflicts are affected
+
+            Only include characters that are essential to the scene.
+
+            ==================================================
+            LOCATION REQUIREMENTS
+            ==================================================
+
+            Establish where each scene takes place.
+
+            Location should define:
+
+                - The specific location of the scene
+                - How the location influences the scene's events and mood
+                - Consistency with the existing locations
+
+            ==================================================
+            TIME PERIOD REQUIREMENTS
+            ==================================================
+
+            Establish when each scene takes place.
+
+            Time period should define:
+
+                - The point in the story timeline
+                - Any time shifts or gaps
+                - How the timing affects the scene
+
+            ==================================================
+            SCENE PURPOSE REQUIREMENTS
+            ==================================================
+
+            Establish why each scene exists in the story.
+
+            Scene purpose should define:
+
+                - The dramatic purpose of the scene
+                - What it contributes to the characters
+                - What it contributes to the plot
+                - What it contributes to the themes
+
+            ==================================================
+            EMOTIONAL DIRECTION REQUIREMENTS
+            ==================================================
+
+            Establish the emotional tone of each scene.
+
+            Emotional direction should define:
+
+                - The primary emotion of the scene
+                - How the emotion shifts during the scene
+                - The emotional state the scene leaves for the reader
+
+            ==================================================
+            SCENE QUALITY
+            ==================================================
+
+            The scenes must be:
+
+                - Ordered logically according to the story structure
+                - Connected through cause and effect
+                - Consistent with the characters and world
+                - Supportive of the twists and foreshadowing
+                - Professionally developed
+
+            Avoid:
+
+                - Random scenes
+                - Unnecessary scenes
+                - Scenes that contradict the story structure
+                - Scenes that do not serve the story
+
+            ==================================================
+            OUTPUT SCOPE
+            ==================================================
+
+            This generation creates only the scene plan foundation.
+
+            Do not generate:
+
+                - Dialogue scripts
+                - Full prose for scenes
+                - Full chapter drafts
+                - Detailed character actions within scenes
+
+            Keep the scene plans focused on information required for future novel development.
+
+            ==================================================
+            OUTPUT FORMAT
+            ==================================================
+
+            Return ONLY valid JSON.
+
+            {
+                \"scene_plans\": [
+                    {
+                        \"scene_number\": \"\",
+                        \"scene_title\": \"\",
+                        \"story_position\": \"\",
+                        \"chapter\": \"\",
+                        \"scene_objectives\": [],
+                        \"key_events\": [],
+                        \"involved_characters\": [],
+                        \"location\": \"\",
+                        \"time_period\": \"\",
+                        \"scene_purpose\": \"\",
+                        \"emotional_direction\": \"\"
+                    }
+                ]
+            }
+
+            ==================================================
+            FINAL CHECK
+            ==================================================
+
+            Before returning the result, verify:
+
+                - Scenes follow the existing story structure faithfully.
+                - Scenes place the planted clues and reveals correctly.
+                - Scenes use locations consistently with the existing locations.
+                - Scene order is logical and connected through cause and effect.
+                - Each scene has clear objectives.
+                - Key events advance the plot meaningfully.
+                - Only essential characters are included.
+                - Time periods are consistent with the story timeline.
+                - Each scene has a clear purpose.
+                - Emotional direction supports the narrative tone.
+                - No dialogue scripts are created.
+                - No full prose is created.
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
