@@ -248,8 +248,11 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
                 Route::patch('dialogue-planner', [NovelController::class, 'generateDialoguePlanner'])->name('dialogue-planner');
                 Route::patch('chapter-planner', [NovelController::class, 'generateChapterPlanner'])->name('chapter-planner');
                 Route::patch('page-planner', [NovelController::class, 'generatePagePlanner'])->name('page-planner');
-                Route::patch('complete-novel', [NovelController::class, 'generateCompleteNovel'])->name('complete-novel');
+                Route::patch('chapter-summaries', [NovelController::class, 'generateChapterSummaries'])->name('chapter-summaries');
+                Route::patch('chapter-content', [NovelController::class, 'generateChapterContent'])->name('chapter-content');
             });
+
+            Route::patch('review', [NovelController::class, 'reviewNovel'])->name('review');
 
             Route::delete('delete', [NovelController::class, 'delete'])->name('delete');
         });

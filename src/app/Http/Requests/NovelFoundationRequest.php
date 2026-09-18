@@ -20,7 +20,6 @@ class NovelFoundationRequest extends FormRequest
 
             'language_id'            => [
                 'required',
-                'string',
             ],
 
             'genre_ids'              => [

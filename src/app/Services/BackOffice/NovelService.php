@@ -3,9 +3,10 @@ namespace App\Services\BackOffice;
 
 use App\Helpers\AiPromptGeneratorHelper;
 use App\Helpers\NovelHelper;
-use App\Http\Requests\NovelCharactersRequest;
+use App\Http\Requests\NovelChapterContentRequest;
 use App\Http\Requests\NovelChapterPlannerRequest;
-use App\Http\Requests\NovelCompleteNovelRequest;
+use App\Http\Requests\NovelChapterSummaryRequest;
+use App\Http\Requests\NovelCharactersRequest;
 use App\Http\Requests\NovelCreaturesRequest;
 use App\Http\Requests\NovelDialoguePlannerRequest;
 use App\Http\Requests\NovelFactionsRequest;
@@ -25,6 +26,7 @@ use App\Services\BackOffice\AudienceService;
 use App\Services\BackOffice\GenreService;
 use App\Services\BackOffice\HuggingFaceApiService;
 use App\Services\BackOffice\LanguageService;
+use App\Services\BackOffice\NovelChapterService;
 use App\Services\BackOffice\NovelTypeService;
 use Exception;
 use Illuminate\Http\Request;
@@ -42,8 +44,9 @@ class NovelService
     protected NovelTypeService $novelTypeService;
     protected HuggingFaceApiService $huggingFaceApiService;
     protected LanguageService $languageService;
+    protected NovelChapterService $novelChapterService;
 
-    public function __construct(AiBrainService $aiBrainService, AiPromptService $aiPromptService, AudienceService $audienceService, GenreService $genreService, NovelTypeService $novelTypeService, HuggingFaceApiService $huggingFaceApiService, LanguageService $languageService)
+    public function __construct(AiBrainService $aiBrainService, AiPromptService $aiPromptService, AudienceService $audienceService, GenreService $genreService, NovelTypeService $novelTypeService, HuggingFaceApiService $huggingFaceApiService, LanguageService $languageService, NovelChapterService $novelChapterService)
     {
         $this->aiBrainService        = $aiBrainService;
         $this->aiPromptService       = $aiPromptService;
@@ -52,6 +55,7 @@ class NovelService
         $this->novelTypeService      = $novelTypeService;
         $this->huggingFaceApiService = $huggingFaceApiService;
         $this->languageService       = $languageService;
+        $this->novelChapterService   = $novelChapterService;
     }
 
     public function new (): Novel
@@ -74,6 +78,8 @@ class NovelService
 
             'latestActivityLog',
             'latestActivityLog.causer',
+
+            'novelChapters',
         ])->where('slug', $slug)->firstOrFail();
     }
 
@@ -135,9 +141,9 @@ class NovelService
             $novel = DB::transaction(function () use ($request, $apiResponse, $novel, $isNew) {
                 $foundationObject = $this->extractFoundationFromResponse($apiResponse);
 
-                $novel->title     = $foundationObject->title;
-                $novel->sub_title = $foundationObject->subtitle;
-                $novel->foundation      = $foundationObject->foundation;
+                $novel->title      = $foundationObject->title;
+                $novel->sub_title  = $foundationObject->subtitle;
+                $novel->foundation = $foundationObject->foundation;
 
                 $novel->audience_id   = $request->input("audience_id");
                 $novel->novel_type_id = $request->input("novel_type_id");
@@ -229,7 +235,7 @@ class NovelService
             $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($apiResponse, $novel) {
-                $worldBibleObject  = $this->extractWorldBibleFromResponse($apiResponse);
+                $worldBibleObject   = $this->extractWorldBibleFromResponse($apiResponse);
                 $novel->world_bible = $worldBibleObject;
                 $novel->status      = NovelHelper::STATUS_ONGOING;
                 $novel->save();
@@ -439,9 +445,9 @@ class NovelService
             $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($apiResponse, $novel) {
-                $storyStructureObject    = $this->extractStoryStructureFromResponse($apiResponse);
-                $novel->story_structure  = $storyStructureObject;
-                $novel->status           = NovelHelper::STATUS_ONGOING;
+                $storyStructureObject   = $this->extractStoryStructureFromResponse($apiResponse);
+                $novel->story_structure = $storyStructureObject;
+                $novel->status          = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
 
@@ -474,9 +480,9 @@ class NovelService
             $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($apiResponse, $novel) {
-                $twistsObject                = $this->extractTwistsAndForeshadowingFromResponse($apiResponse);
+                $twistsObject                    = $this->extractTwistsAndForeshadowingFromResponse($apiResponse);
                 $novel->twists_and_foreshadowing = $twistsObject;
-                $novel->status               = NovelHelper::STATUS_ONGOING;
+                $novel->status                   = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
 
@@ -509,9 +515,9 @@ class NovelService
             $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($apiResponse, $novel) {
-                $scenePlansObject  = $this->extractScenePlansFromResponse($apiResponse);
+                $scenePlansObject   = $this->extractScenePlansFromResponse($apiResponse);
                 $novel->scene_plans = $scenePlansObject;
-                $novel->status     = NovelHelper::STATUS_ONGOING;
+                $novel->status      = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
 
@@ -544,9 +550,9 @@ class NovelService
             $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($apiResponse, $novel) {
-                $dialoguePlansObject = $this->extractDialoguePlansFromResponse($apiResponse);
+                $dialoguePlansObject   = $this->extractDialoguePlansFromResponse($apiResponse);
                 $novel->dialogue_plans = $dialoguePlansObject;
-                $novel->status       = NovelHelper::STATUS_ONGOING;
+                $novel->status         = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
 
@@ -579,9 +585,9 @@ class NovelService
             $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($apiResponse, $novel) {
-                $chapterPlanObject = $this->extractChapterPlanFromResponse($apiResponse);
+                $chapterPlanObject   = $this->extractChapterPlanFromResponse($apiResponse);
                 $novel->chapter_plan = $chapterPlanObject;
-                $novel->status     = NovelHelper::STATUS_ONGOING;
+                $novel->status       = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
 
@@ -614,9 +620,9 @@ class NovelService
             $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($apiResponse, $novel) {
-                $pagePlanObject  = $this->extractPagePlanFromResponse($apiResponse);
+                $pagePlanObject   = $this->extractPagePlanFromResponse($apiResponse);
                 $novel->page_plan = $pagePlanObject;
-                $novel->status   = NovelHelper::STATUS_ONGOING;
+                $novel->status    = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
 
@@ -637,39 +643,174 @@ class NovelService
         }
     }
 
-    public function generateCompleteNovel(NovelCompleteNovelRequest $request, Novel $novel): array
+    public function generateChapterSummaries(NovelChapterSummaryRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_COMPLETE_NOVEL_GENERATOR));
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_SUMMARY_GENERATOR));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->completeNovelRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $chapterPlan = $novel->chapter_plan ?? [];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            if (! is_array($chapterPlan) || empty($chapterPlan)) {
+                throw new Exception('Chapter plan is empty.');
+            }
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $completeNovelObject = $this->extractCompleteNovelFromResponse($apiResponse);
-                $novel->complete_novel = $completeNovelObject;
-                $novel->status       = NovelHelper::STATUS_COMPLETE;
-                $novel->save();
-            });
+            $context               = $this->chapterSummaryContextFormatter($novel);
+            $additionalInformation = $request->input("additional_information", "Auto");
+
+            foreach ($chapterPlan as $chapterPlanEntry) {
+                $this->novelChapterService->generateSummary($novel, $context, (array) $chapterPlanEntry, $aiPrompt->prompt, $aiBrain, $additionalInformation);
+            }
 
             return [
                 'status'  => 'success',
-                'message' => 'Complete novel generated successfully.',
+                'message' => 'Chapter summaries generated successfully.',
             ];
         } catch (Exception $exception) {
 
-            Log::error("Failed to generate Complete novel", [
+            Log::error("Failed to generate Chapter summaries", [
                 "exception" => $exception->getMessage(),
             ]);
 
             return [
                 'status'  => 'error',
-                'message' => 'Failed to generate Complete novel. Please try again.',
+                'message' => 'Failed to generate Chapter summaries. Please try again.',
             ];
         }
+    }
+
+    public function generateChapterContent(NovelChapterContentRequest $request, Novel $novel): array
+    {
+        try {
+            $chapterNo = $request->input("chapter_no");
+
+            $novelChapter = $novel->novelChapters()
+                ->where('no', (string) $chapterNo)
+                ->first();
+
+            if (! $novelChapter) {
+                throw new Exception('Novel chapter ' . $chapterNo . ' not found.');
+            }
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT_GENERATOR));
+            $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
+
+            $context               = $this->chapterContentContextFormatter($novel);
+            $additionalInformation = $request->input("additional_information", "Auto");
+
+            $this->novelChapterService->generateContent($novel, $novelChapter, $context, $aiPrompt->prompt, $aiBrain, $additionalInformation);
+
+            return [
+                'status'  => 'success',
+                'message' => 'Chapter ' . $chapterNo . ' content generated successfully.',
+                'chapter' => $novelChapter,
+            ];
+        } catch (Exception $exception) {
+
+            Log::error("Failed to generate Chapter content", [
+                "exception" => $exception->getMessage(),
+            ]);
+
+            return [
+                'status'  => 'error',
+                'message' => 'Failed to generate Chapter content. Please try again.',
+            ];
+        }
+    }
+
+    public function reviewNovel(Novel $novel): array
+    {
+        $chapterPlan = $novel->chapter_plan ?? [];
+
+        if (! is_array($chapterPlan) || empty($chapterPlan)) {
+            return [
+                'status'  => 'error',
+                'message' => 'Novel has no chapter plan. Generate the chapter plan first.',
+            ];
+        }
+
+        $chapters = $novel->novelChapters()
+            ->orderByRaw('CAST(no AS UNSIGNED) ASC')
+            ->get();
+
+        if ($chapters->isEmpty()) {
+            return [
+                'status'  => 'error',
+                'message' => 'No novel chapters found. Generate chapter summaries first.',
+            ];
+        }
+
+        $expectedNumbers = collect($chapterPlan)
+            ->map(fn($entry) => (string) ($entry['chapter_number'] ?? ''))
+            ->filter(fn($no) => $no !== '')
+            ->values();
+
+        $orderedExpectedNumbers = $expectedNumbers->implode(',');
+        $sortedExpectedNumbers  = $expectedNumbers
+            ->sortBy(fn($no) => (int) $no, SORT_REGULAR)
+            ->values()
+            ->implode(',');
+
+        $orderingInvalid = $orderedExpectedNumbers !== $sortedExpectedNumbers;
+
+        $actualNumbers = $chapters->map(fn($chapter) => (string) $chapter->no)->values();
+
+        $missingChapters = $expectedNumbers
+            ->diff($actualNumbers)
+            ->unique()
+            ->values();
+
+        $duplicateChapters = $chapters
+            ->groupBy('no')
+            ->filter(fn($group) => $group->count() > 1)
+            ->keys()
+            ->map(fn($no) => (string) $no)
+            ->values();
+
+        $extraChapters = $actualNumbers
+            ->diff($expectedNumbers)
+            ->unique()
+            ->values();
+
+        $missingSummaries = collect();
+        $missingContents  = collect();
+
+        foreach ($chapters as $chapter) {
+            if (! $this->novelChapterService->hasSummary($chapter)) {
+                $missingSummaries->push((string) $chapter->no);
+            }
+
+            if (! $this->novelChapterService->hasContent($chapter)) {
+                $missingContents->push((string) $chapter->no);
+            }
+        }
+
+        if (
+            $orderingInvalid ||
+            $missingChapters->isNotEmpty() ||
+            $duplicateChapters->isNotEmpty() ||
+            $extraChapters->isNotEmpty() ||
+            $missingSummaries->isNotEmpty() ||
+            $missingContents->isNotEmpty()
+        ) {
+            return [
+                'status'  => 'error',
+                'message' => $this->reviewFindingsMessage($orderingInvalid, $missingChapters, $missingSummaries, $missingContents, $duplicateChapters, $extraChapters),
+            ];
+        }
+
+        $novel = DB::transaction(function () use ($novel) {
+            $novel->status = NovelHelper::STATUS_COMPLETE;
+            $novel->save();
+
+            return $novel;
+        });
+
+        return [
+            'status'  => 'success',
+            'message' => 'Novel completed successfully.',
+            'novel'   => $novel,
+        ];
     }
 
     public function delete(Novel $novel): array
@@ -734,13 +875,13 @@ class NovelService
         }
 
         return (object) [
-            'title'    => $decoded['novel_title'] ?? null,
-            'subtitle' => $decoded['novel_subtitle'] ?? null,
-            'foundation'     => $decoded['novel_foundation'] ?? null,
+            'title'      => $decoded['novel_title'] ?? null,
+            'subtitle'   => $decoded['novel_subtitle'] ?? null,
+            'foundation' => $decoded['novel_foundation'] ?? null,
         ];
     }
 
-    private function foundationRequestInputsFormatter(int | string $languageId, int | string $audienceId, int | string $novelTypeId, array $genreIds, string $additionalInformation): array
+    private function foundationRequestInputsFormatter(int | string $languageId, int | string $audienceId, int | string $novelTypeId, array $genreIds, string | null $additionalInformation): array
     {
         $receivedInputs = [];
 
@@ -776,14 +917,14 @@ class NovelService
         return $receivedInputs;
     }
 
-    private function charactersRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function charactersRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
     {
         $requestInputs = [];
 
-        $formatedFoundation  = json_encode($novel->foundation, JSON_PRETTY_PRINT);
-        $requestInputs = [
-            "foundation"                             => $formatedFoundation,
-            "additional_information" => $additionalIinformation,
+        $formatedFoundation = json_encode($novel->foundation, JSON_PRETTY_PRINT);
+        $requestInputs      = [
+            "foundation"             => $formatedFoundation,
+            "additional_information" => $additionalInformation,
         ];
 
         return $requestInputs;
@@ -830,140 +971,172 @@ class NovelService
         ];
     }
 
-    private function worldBibleRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function worldBibleRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
     {
         return [
             "foundation"             => json_encode($novel->foundation, JSON_PRETTY_PRINT),
             "characters"             => json_encode($novel->characters, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalIinformation,
+            "additional_information" => $additionalInformation,
         ];
     }
 
-    private function locationsRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function locationsRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
     {
         return [
             "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
             "characters"             => json_encode($novel->characters, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalIinformation,
+            "additional_information" => $additionalInformation,
         ];
     }
 
-    private function factionsRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function factionsRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
     {
         return [
             "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
             "locations"              => json_encode($novel->locations, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalIinformation,
+            "additional_information" => $additionalInformation,
         ];
     }
 
-    private function creaturesRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function creaturesRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
     {
         return [
             "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
             "locations"              => json_encode($novel->locations, JSON_PRETTY_PRINT),
             "factions"               => json_encode($novel->factions, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalIinformation,
+            "additional_information" => $additionalInformation,
         ];
     }
 
-    private function systemsRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function systemsRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
     {
         return [
             "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
             "creatures"              => json_encode($novel->creatures, JSON_PRETTY_PRINT),
             "factions"               => json_encode($novel->factions, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalIinformation,
+            "additional_information" => $additionalInformation,
         ];
     }
 
-    private function timelineRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function timelineRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
     {
         return [
             "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
             "factions"               => json_encode($novel->factions, JSON_PRETTY_PRINT),
             "foundation"             => json_encode($novel->foundation, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalIinformation,
+            "additional_information" => $additionalInformation,
         ];
     }
 
-    private function storyStructureRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function storyStructureRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
     {
         return [
             "foundation"             => json_encode($novel->foundation, JSON_PRETTY_PRINT),
             "characters"             => json_encode($novel->characters, JSON_PRETTY_PRINT),
             "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
             "timeline"               => json_encode($novel->timeline, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalIinformation,
+            "additional_information" => $additionalInformation,
         ];
     }
 
-    private function twistsAndForeshadowingRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function twistsAndForeshadowingRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
     {
         return [
             "story_structure"        => json_encode($novel->story_structure, JSON_PRETTY_PRINT),
             "characters"             => json_encode($novel->characters, JSON_PRETTY_PRINT),
             "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalIinformation,
+            "additional_information" => $additionalInformation,
         ];
     }
 
-    private function scenePlannerRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function scenePlannerRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
     {
         return [
-            "story_structure"        => json_encode($novel->story_structure, JSON_PRETTY_PRINT),
+            "story_structure"          => json_encode($novel->story_structure, JSON_PRETTY_PRINT),
             "twists_and_foreshadowing" => json_encode($novel->twists_and_foreshadowing, JSON_PRETTY_PRINT),
-            "locations"              => json_encode($novel->locations, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalIinformation,
+            "locations"                => json_encode($novel->locations, JSON_PRETTY_PRINT),
+            "additional_information"   => $additionalInformation,
         ];
     }
 
-    private function dialoguePlannerRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function dialoguePlannerRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
     {
         return [
             "characters"             => json_encode($novel->characters, JSON_PRETTY_PRINT),
             "scene_plans"            => json_encode($novel->scene_plans, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalIinformation,
+            "additional_information" => $additionalInformation,
         ];
     }
 
-    private function chapterPlannerRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function chapterPlannerRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
     {
         return [
             "scene_plans"            => json_encode($novel->scene_plans, JSON_PRETTY_PRINT),
             "story_structure"        => json_encode($novel->story_structure, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalIinformation,
+            "additional_information" => $additionalInformation,
         ];
     }
 
-    private function pagePlannerRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function pagePlannerRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
     {
         return [
             "chapter_plan"           => json_encode($novel->chapter_plan, JSON_PRETTY_PRINT),
             "scene_plans"            => json_encode($novel->scene_plans, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalIinformation,
+            "additional_information" => $additionalInformation,
         ];
     }
 
-    private function completeNovelRequestInputsFormatter(Novel $novel, string $additionalIinformation): array
+    private function chapterSummaryContextFormatter(Novel $novel): array
     {
         return [
-            "foundation"                  => json_encode($novel->foundation, JSON_PRETTY_PRINT),
-            "characters"                  => json_encode($novel->characters, JSON_PRETTY_PRINT),
-            "world_bible"                 => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
-            "locations"                   => json_encode($novel->locations, JSON_PRETTY_PRINT),
-            "factions"                    => json_encode($novel->factions, JSON_PRETTY_PRINT),
-            "creatures"                   => json_encode($novel->creatures, JSON_PRETTY_PRINT),
-            "systems"                     => json_encode($novel->systems, JSON_PRETTY_PRINT),
-            "timeline"                    => json_encode($novel->timeline, JSON_PRETTY_PRINT),
-            "story_structure"             => json_encode($novel->story_structure, JSON_PRETTY_PRINT),
-            "twists_and_foreshadowing"    => json_encode($novel->twists_and_foreshadowing, JSON_PRETTY_PRINT),
-            "scene_plans"                 => json_encode($novel->scene_plans, JSON_PRETTY_PRINT),
-            "dialogue_plans"              => json_encode($novel->dialogue_plans, JSON_PRETTY_PRINT),
-            "chapter_plan"                => json_encode($novel->chapter_plan, JSON_PRETTY_PRINT),
-            "page_plan"                   => json_encode($novel->page_plan, JSON_PRETTY_PRINT),
-            "additional_information"      => $additionalIinformation,
+            "foundation"               => json_encode($novel->foundation, JSON_PRETTY_PRINT),
+            "characters"               => json_encode($novel->characters, JSON_PRETTY_PRINT),
+            "story_structure"          => json_encode($novel->story_structure, JSON_PRETTY_PRINT),
+            "twists_and_foreshadowing" => json_encode($novel->twists_and_foreshadowing, JSON_PRETTY_PRINT),
         ];
+    }
+
+    private function chapterContentContextFormatter(Novel $novel): array
+    {
+        return [
+            "language"                 => $novel->language?->name,
+            "foundation"               => json_encode($novel->foundation, JSON_PRETTY_PRINT),
+            "characters"               => json_encode($novel->characters, JSON_PRETTY_PRINT),
+            "world_bible"              => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
+            "story_structure"          => json_encode($novel->story_structure, JSON_PRETTY_PRINT),
+            "twists_and_foreshadowing" => json_encode($novel->twists_and_foreshadowing, JSON_PRETTY_PRINT),
+        ];
+    }
+
+    private function reviewFindingsMessage(bool $orderingInvalid, $missingChapters, $missingSummaries, $missingContents, $duplicateChapters, $extraChapters): string
+    {
+        $findings = [];
+
+        if ($orderingInvalid) {
+            $findings[] = 'Chapter plan ordering is invalid.';
+        }
+
+        if ($missingChapters->isNotEmpty()) {
+            $findings[] = 'Missing chapters: ' . $missingChapters->implode(', ') . '.';
+        }
+
+        if ($missingSummaries->isNotEmpty()) {
+            $findings[] = 'Missing summaries: ' . $missingSummaries->implode(', ') . '.';
+        }
+
+        if ($missingContents->isNotEmpty()) {
+            $findings[] = 'Missing contents: ' . $missingContents->implode(', ') . '.';
+        }
+
+        if ($duplicateChapters->isNotEmpty()) {
+            $findings[] = 'Duplicate chapters: ' . $duplicateChapters->implode(', ') . '.';
+        }
+
+        if ($extraChapters->isNotEmpty()) {
+            $findings[] = 'Unexpected chapters: ' . $extraChapters->implode(', ') . '.';
+        }
+
+        return 'Novel review incomplete. ' . implode(' ', $findings);
     }
 
     private function extractWorldBibleFromResponse($apiResponse): object
@@ -1002,7 +1175,7 @@ class NovelService
         }
 
         return (object) [
-            'world_bible' => $decoded['world_bible'] ?? [],
+            $decoded['world_bible'] ?? [],
         ];
     }
 
@@ -1042,7 +1215,7 @@ class NovelService
         }
 
         return (object) [
-            'locations' => $decoded['locations'] ?? [],
+            $decoded['locations'] ?? [],
         ];
     }
 
@@ -1082,7 +1255,7 @@ class NovelService
         }
 
         return (object) [
-            'factions' => $decoded['factions'] ?? [],
+            $decoded['factions'] ?? [],
         ];
     }
 
@@ -1122,7 +1295,7 @@ class NovelService
         }
 
         return (object) [
-            'creatures' => $decoded['creatures'] ?? [],
+            $decoded['creatures'] ?? [],
         ];
     }
 
@@ -1162,7 +1335,7 @@ class NovelService
         }
 
         return (object) [
-            'systems' => $decoded['systems'] ?? [],
+            $decoded['systems'] ?? [],
         ];
     }
 
@@ -1202,7 +1375,7 @@ class NovelService
         }
 
         return (object) [
-            'timeline' => $decoded['timeline'] ?? [],
+            $decoded['timeline'] ?? [],
         ];
     }
 
@@ -1242,7 +1415,7 @@ class NovelService
         }
 
         return (object) [
-            'story_structure' => $decoded['story_structure'] ?? [],
+            $decoded['story_structure'] ?? [],
         ];
     }
 
@@ -1282,7 +1455,7 @@ class NovelService
         }
 
         return (object) [
-            'twists_and_foreshadowing' => $decoded['twists_and_foreshadowing'] ?? [],
+            $decoded['twists_and_foreshadowing'] ?? [],
         ];
     }
 
@@ -1322,7 +1495,7 @@ class NovelService
         }
 
         return (object) [
-            'scene_plans' => $decoded['scene_plans'] ?? [],
+            $decoded['scene_plans'] ?? [],
         ];
     }
 
@@ -1362,7 +1535,7 @@ class NovelService
         }
 
         return (object) [
-            'dialogue_plans' => $decoded['dialogue_plans'] ?? [],
+            $decoded['dialogue_plans'] ?? [],
         ];
     }
 
@@ -1402,7 +1575,7 @@ class NovelService
         }
 
         return (object) [
-            'chapter_plan' => $decoded['chapter_plan'] ?? [],
+            $decoded['chapter_plan'] ?? [],
         ];
     }
 
@@ -1442,47 +1615,7 @@ class NovelService
         }
 
         return (object) [
-            'page_plan' => $decoded['page_plan'] ?? [],
-        ];
-    }
-
-    private function extractCompleteNovelFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            'complete_novel' => $decoded['complete_novel'] ?? [],
+            $decoded['page_plan'] ?? [],
         ];
     }
 }

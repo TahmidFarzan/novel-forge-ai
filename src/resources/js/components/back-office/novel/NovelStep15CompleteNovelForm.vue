@@ -1,21 +1,18 @@
 <script setup>
-import InfiniteScrollApiSelect from "@/components/common/multi-select/InfiniteScrollApiSelect.vue";
-import { AiBrainOutputTypes } from "@/composables/useAiBrain";
+import NovelStep15ChapterSummaryForm from "@/components/back-office/novel/NovelStep15ChapterSummaryForm.vue";
+import NovelStep15ChapterContentForm from "@/components/back-office/novel/NovelStep15ChapterContentForm.vue";
 
-import { computed } from "vue";
-import { useForm, router as inertiaRoute } from "@inertiajs/vue3";
+import { ref, computed } from "vue";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library as FontAwesomeLibrary } from "@fortawesome/fontawesome-svg-core";
 import {
-    faBrain,
-    faSpinner,
-    faWandMagicSparkles,
+    faBookOpen,
+    faCheck,
+    faFeatherPointed,
 } from "@fortawesome/free-solid-svg-icons";
 
-FontAwesomeLibrary.add(faBrain, faSpinner, faWandMagicSparkles);
-
-const emit = defineEmits(["completed"]);
+FontAwesomeLibrary.add(faBookOpen, faCheck, faFeatherPointed);
 
 const { novel } = defineProps({
     novel: {
@@ -24,112 +21,49 @@ const { novel } = defineProps({
     },
 });
 
-const isUpdate = computed(() => !!novel?.id);
+const currentTab = ref("summaries");
+const tabRef = ref(null);
 
-const serializeField = (name) => {
-    const value = novel?.[name];
-    return value
-        ? typeof value === "string"
-            ? value
-            : JSON.stringify(value)
-        : null;
+const hasStringValue = (value) => {
+    return !!value && typeof value === "string" && value.trim() !== "";
 };
 
-const completeNovelForm = useForm({
-    foundation: serializeField("foundation"),
-    characters: serializeField("characters"),
-    world_bible: serializeField("world_bible"),
-    locations: serializeField("locations"),
-    factions: serializeField("factions"),
-    creatures: serializeField("creatures"),
-    systems: serializeField("systems"),
-    timeline: serializeField("timeline"),
-    story_structure: serializeField("story_structure"),
-    twists_and_foreshadowing: serializeField("twists_and_foreshadowing"),
-    scene_plans: serializeField("scene_plans"),
-    dialogue_plans: serializeField("dialogue_plans"),
-    chapter_plan: serializeField("chapter_plan"),
-    page_plan: serializeField("page_plan"),
-    additional_information: null,
-    ai_brain_id: null,
+const chapters = computed(() => {
+    return Array.isArray(novel?.novel_chapters) ? novel.novel_chapters : [];
 });
 
-function buildAiBrainSearchUrl() {
-    return route("search.ai-brains", {
-        ai_brain_output_type_code: AiBrainOutputTypes.Text,
-    });
-}
+const isNovelCompleted = computed(() => {
+    return novel?.status === "Complete";
+});
 
-const dependencyFields = [
-    "foundation",
-    "characters",
-    "world_bible",
-    "locations",
-    "factions",
-    "creatures",
-    "systems",
-    "timeline",
-    "story_structure",
-    "twists_and_foreshadowing",
-    "scene_plans",
-    "dialogue_plans",
-    "chapter_plan",
-    "page_plan",
-];
+const summariesGenerated = computed(() => {
+    return chapters.value.every((chapter) => hasStringValue(chapter?.summery));
+});
 
-const validate = () => {
-    completeNovelForm.clearErrors();
+const contentsGenerated = computed(() => {
+    return chapters.value.every((chapter) => hasStringValue(chapter?.content));
+});
 
-    let valid = true;
+const isContentsAccessible = computed(() => {
+    return summariesGenerated.value || contentsGenerated.value;
+});
 
-    if (!completeNovelForm.ai_brain_id) {
-        completeNovelForm.setError(
-            "ai_brain_id",
-            "AI Brain selection is required",
-        );
-        valid = false;
-    }
-
-    dependencyFields.forEach((field) => {
-        if (!completeNovelForm[field]) {
-            const label = field
-                .split("_")
-                .map((word) => word[0].toUpperCase() + word.slice(1))
-                .join(" ");
-            completeNovelForm.setError(field, `${label} is required`);
-            valid = false;
-        }
-    });
-
-    return valid;
-};
-
-const handleSuccess = () => {
-    completeNovelForm.clearErrors();
-    emit("completed", novel);
-};
-
-const submit = () => {
-    if (!isUpdate.value || completeNovelForm.processing || !validate()) {
+const setTab = (tab) => {
+    if (tab === "contents" && !isContentsAccessible.value) {
         return;
     }
 
-    const requestConfig = {
-        preserveScroll: true,
-        preserveState: true,
-        onSuccess: handleSuccess,
-    };
+    currentTab.value = tab;
+};
 
-    inertiaRoute.patch(
-        route("back-office.novels.generate.complete-novel", {
-            slug: novel?.slug,
-        }),
-        {
-            ...completeNovelForm.data(),
-            _method: "patch",
-        },
-        requestConfig,
-    );
+const handleSummariesCompleted = () => {
+    if (summariesGenerated.value) {
+        currentTab.value = "contents";
+    }
+};
+
+const submit = () => {
+    tabRef.value?.submit?.();
 };
 
 defineExpose({ submit });
@@ -139,97 +73,72 @@ defineExpose({ submit });
     <div class="space-y-6">
         <div class="bg-white border rounded-xl p-5 shadow-sm space-y-4">
             <h3 class="text-base font-semibold flex items-center gap-2">
-                <FontAwesomeIcon icon="wand-magic-sparkles" class="text-blue-600" />
-                Complete Novel Generator
+                <FontAwesomeIcon icon="book-open" class="text-blue-600" />
+                Complete Novel
             </h3>
 
             <p class="text-sm text-gray-500">
-                Generate the complete novel
+                Build the novel one chapter at a time: generate chapter summaries first, then generate each chapter content independently until the final novel is completed.
             </p>
 
-            <div>
-                <label class="block text-sm font-medium mb-1">
-                    Complete Novel Additional Information
-                </label>
-
-                <textarea v-model="completeNovelForm.additional_information" rows="3"
-                    placeholder="Any additional context or instructions for the AI..."
-                    class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none border-gray-300"></textarea>
-
-                <p v-if="completeNovelForm.errors.additional_information">
-                    {{ completeNovelForm.errors.additional_information }}
-                </p>
+            <div v-if="isNovelCompleted"
+                class="flex items-center gap-2 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
+                <FontAwesomeIcon icon="check" />
+                Final novel completed. The novel is composed of its ordered chapter records.
             </div>
 
-            <p v-for="field in dependencyFields" :key="field"
-                v-if="completeNovelForm.errors[field]" class="text-red-500 text-sm">
-                {{ completeNovelForm.errors[field] }}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <button type="button" @click="setTab('summaries')"
+                    class="flex items-center gap-3 rounded-xl border p-4 text-left transition"
+                    :class="currentTab === 'summaries'
+                        ? 'border-blue-600 bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300'">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold shrink-0"
+                        :class="currentTab === 'summaries' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'">
+                        <FontAwesomeIcon v-if="summariesGenerated" icon="check" class="text-xs" />
+                        <span v-else>1</span>
+                    </span>
+
+                    <span class="flex-1">
+                        <span class="block text-sm font-semibold text-gray-800">Chapter Summary Generation</span>
+                        <span class="block text-xs text-gray-500">Generate a summary for every planned chapter.</span>
+                    </span>
+                </button>
+
+                <button type="button" @click="setTab('contents')" :disabled="!isContentsAccessible"
+                    class="flex items-center gap-3 rounded-xl border p-4 text-left transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    :class="currentTab === 'contents'
+                        ? 'border-emerald-600 bg-emerald-50'
+                        : 'border-gray-200 hover:border-gray-300'">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold shrink-0"
+                        :class="currentTab === 'contents' ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-600'">
+                        <FontAwesomeIcon v-if="contentsGenerated" icon="check" class="text-xs" />
+                        <span v-else>2</span>
+                    </span>
+
+                    <span class="flex-1">
+                        <span class="block text-sm font-semibold text-gray-800">Chapter Content Generation</span>
+                        <span class="block text-xs text-gray-500">Generate the prose for every chapter independently.</span>
+                    </span>
+                </button>
+            </div>
+
+            <p v-if="!isContentsAccessible" class="text-xs text-gray-400">
+                Generate all chapter summaries first to unlock Chapter Content Generation.
             </p>
         </div>
 
-        <div class="bg-white border rounded-xl p-5 shadow-sm space-y-4">
-            <div class="flex items-center gap-2">
-                <FontAwesomeIcon icon="brain" class="text-purple-600" />
-                <h3 class="text-base font-semibold">AI Brain Configuration</h3>
-            </div>
+        <NovelStep15ChapterSummaryForm
+            v-if="currentTab === 'summaries'"
+            ref="tabRef"
+            :novel="novel"
+            @completed="handleSummariesCompleted"
+        />
 
-            <p class="text-sm text-gray-500">
-                Select the AI model that will generate the complete novel.
-            </p>
-
-            <div class="border-2 border-dashed border-purple-200 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-blue-50" >
-                <InfiniteScrollApiSelect :form="completeNovelForm" fieldName="ai_brain_id"
-                    :selectedItem="null" :apiUrl="buildAiBrainSearchUrl()" :multiple="false"
-                    placeholder="Select AI Brain" :error="completeNovelForm.errors.ai_brain_id"
-                    class="ai-brain-select"/>
-            </div>
-
-            <p v-if="completeNovelForm.errors.ai_brain_id" class="text-red-500 text-sm">
-                {{ completeNovelForm.errors.ai_brain_id }}
-            </p>
-        </div>
-
-        <div class="flex justify-end">
-            <button type="button" @click="submit" :disabled="!isUpdate || completeNovelForm.processing"
-                class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed">
-                <FontAwesomeIcon v-if="completeNovelForm.processing" icon="spinner" spin/>
-                <FontAwesomeIcon v-else icon="wand-magic-sparkles" />
-                {{ completeNovelForm.processing ? "Generating..." : "Generate Complete Novel" }}
-            </button>
-        </div>
+        <NovelStep15ChapterContentForm
+            v-else
+            ref="tabRef"
+            :novel="novel"
+        />
     </div>
 </template>
-
-<style scoped>
-.ai-brain-select :deep(.multiselect) {
-    min-height: 44px;
-}
-
-.ai-brain-select :deep(.multiselect__tags) {
-    min-height: 44px;
-    padding: 8px 40px 0 12px;
-    border-color: #a78bfa;
-    border-width: 1px;
-    border-radius: 0.5rem;
-    background: white;
-}
-
-.ai-brain-select :deep(.multiselect__single) {
-    padding: 4px 0 0 0;
-    margin-bottom: 0;
-    color: #1f2937;
-}
-
-.ai-brain-select :deep(.multiselect__placeholder) {
-    padding: 4px 0 0 0;
-    color: #9ca3af;
-}
-
-.ai-brain-select :deep(.multiselect__select) {
-    height: 44px;
-}
-
-.ai-brain-select :deep(.multiselect__content-wrapper) {
-    border-color: #a78bfa;
-}
-</style>

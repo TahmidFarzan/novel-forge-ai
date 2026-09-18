@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
@@ -28,8 +28,8 @@ use Spatie\Sluggable\SlugOptions;
     'datetime',
     'slug',
     'status',
-    "audience_id",
-    "novel_type_id",
+    'audience_id',
+    'novel_type_id',
     'language_id',
     'ai_prompt',
 
@@ -54,7 +54,7 @@ use Spatie\Sluggable\SlugOptions;
 #[ObservedBy([NovelObserver::class])]
 class Novel extends Model
 {
-    use HasFactory, LogsActivity, HasSlug;
+    use HasFactory, HasSlug, LogsActivity;
 
     protected $appends = [];
 
@@ -78,7 +78,7 @@ class Novel extends Model
             'chapter_plan' => 'array',
             'complete_novel' => 'array',
 
-            'datetime'   => 'datetime',
+            'datetime' => 'datetime',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
@@ -93,8 +93,8 @@ class Novel extends Model
                 'datetime',
                 'slug',
                 'status',
-                "audience_id",
-                "novel_type_id",
+                'audience_id',
+                'novel_type_id',
                 'language_id',
                 'ai_prompt',
                 'foundation',
@@ -114,7 +114,7 @@ class Novel extends Model
                 'complete_novel',
             ])
             ->useLogName('Novel')
-            ->setDescriptionForEvent(fn(string $eventName) => "The record has been {$eventName}.")
+            ->setDescriptionForEvent(fn (string $eventName) => "The record has been {$eventName}.")
             ->logOnlyDirty()
             ->logExcept([
                 'id',
@@ -128,10 +128,10 @@ class Novel extends Model
     {
         return SlugOptions::create()
             ->saveSlugsTo('slug')
-            ->generateSlugsFrom(["title", "sub_title"])
+            ->generateSlugsFrom(['title', 'sub_title'])
             ->doNotGenerateSlugsOnUpdate()
             ->slugsShouldBeNoLongerThan(255)
-            ->usingSuffixGenerator(fn() => Str::lower(Str::random(5)));
+            ->usingSuffixGenerator(fn () => Str::lower(Str::random(5)));
     }
 
     public function getRouteKeyName(): string
@@ -167,5 +167,15 @@ class Novel extends Model
     public function latestActivityLog(): MorphOne
     {
         return $this->morphOne(Activity::class, 'subject')->latestOfMany();
+    }
+
+    public function novelChapters(): HasMany
+    {
+        return $this->hasMany(NovelChapter::class);
+    }
+
+    public function novelType(): BelongsTo
+    {
+        return $this->belongsTo(NovelType::class);
     }
 }

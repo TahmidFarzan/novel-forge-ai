@@ -17,7 +17,8 @@ class AiPromptGeneratorHelper
     public const AI_PROMPT_NAME_DIALOGUE_PLANS_GENERATOR = 'Dialogue Plans Generator';
     public const AI_PROMPT_NAME_CHAPTER_PLAN_GENERATOR = 'Chapter Plan Generator';
     public const AI_PROMPT_NAME_PAGE_PLAN_GENERATOR = 'Page Plan Generator';
-    public const AI_PROMPT_NAME_COMPLETE_NOVEL_GENERATOR = 'Complete Novel Generator';
+    public const AI_PROMPT_NAME_CHAPTER_SUMMARY_GENERATOR = 'Chapter Summary Generator';
+    public const AI_PROMPT_NAME_CHAPTER_CONTENT_GENERATOR = 'Chapter Content Generator';
 
     public static function foundationGenerator(): string
     {
@@ -3887,14 +3888,20 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function completeNovelGenerator(): string
+    public static function chapterSummaryGenerator(): string
     {
         $prompt = "
-            You are a professional novelist AI.
+            You are a professional novel chapter development AI.
 
-            Your task is to generate the complete novel manuscript using all previous planning data.
+            Your task is to generate a detailed summary for a single planned chapter.
 
-            This is the final step of the novel generation pipeline.
+            This is part of the final phase of the novel generation pipeline where every planned chapter receives its own summary.
+
+            The generated summary must serve as the complete blueprint for later individual chapter content generation.
+
+            Do not write the actual prose chapter.
+
+            Do not write the full novel.
 
             ==================================================
             PRIMARY RESPONSIBILITY
@@ -3902,83 +3909,157 @@ class AiPromptGeneratorHelper
 
             Generate:
 
-                1. Complete Novel Text
-                2. Structured Chapters
-                3. Formatted Output
+                1. Chapter Purpose
+                2. Chapter Goals
+                3. Important Events
+                4. Characters Involved
+                5. Relevant Conflicts
+                6. Progression
+                7. Important Revelations
+                8. Emotional and Narrative Movement
+                9. Important Scene Progression
+                10. Continuity Requirements
+                11. Chapter Ending and Setup
 
             ==================================================
-            ALL PLANNING DATA
+            EXISTING NOVEL FOUNDATION
             ==================================================
-
-            FOUNDATION
-            ==================
 
             {{foundation}}
 
-            CHARACTERS
-            ==================
+            Carefully analyze the existing novel foundation.
+
+            Understand:
+
+                - Story premise
+                - Story concept
+                - Narrative direction
+                - Genre identity
+                - Themes
+                - Setting direction
+                - Central conflict
+                - Opposing force
+                - Stakes
+                - Emotional direction
+
+            Use the foundation to keep the chapter summary consistent with the established novel.
+
+            Do not change, rewrite, or expand the foundation.
+
+            The existing novel foundation is the source of truth.
+
+            ==================================================
+            EXISTING CHARACTERS
+            ==================================================
 
             {{characters}}
 
-            WORLD BIBLE
-            ==================
+            Carefully analyze the existing characters.
 
-            {{world_bible}}
+            Understand:
 
-            LOCATIONS
-            ==================
+                - Character names and roles
+                - Character personalities
+                - Character motivations and goals
+                - Character relationships
+                - Character arcs
 
-            {{locations}}
+            Use the characters to keep the chapter summary consistent with the established cast.
 
-            FACTIONS
-            ==================
+            Do not change, rewrite, or expand the characters.
 
-            {{factions}}
+            The existing characters are the source of truth.
 
-            CREATURES
-            ==================
-
-            {{creatures}}
-
-            SYSTEMS
-            ==================
-
-            {{systems}}
-
-            TIMELINE
-            ==================
-
-            {{timeline}}
-
-            STORY STRUCTURE
-            ==================
+            ==================================================
+            EXISTING STORY STRUCTURE
+            ==================================================
 
             {{story_structure}}
 
-            TWISTS AND FORESHADOWING
-            ==================
+            Carefully analyze the existing story structure.
+
+            Understand:
+
+                - Overall story structure
+                - Act and arc breakdown
+                - Main plot progression
+                - Key story points
+                - Rising action
+                - Climax
+                - Resolution
+
+            Position the chapter correctly within the overall story progression.
+
+            Do not change, rewrite, or expand the story structure.
+
+            The existing story structure is the source of truth.
+
+            ==================================================
+            EXISTING TWISTS AND FORESHADOWING
+            ==================================================
 
             {{twists_and_foreshadowing}}
 
-            SCENE PLANS
-            ==================
+            Carefully analyze the existing twists and foreshadowing.
+
+            Understand:
+
+                - Planned twists
+                - Foreshadowing elements
+                - Revelations
+                - Clues
+                - Continuity requirements across chapters
+
+            Reflect the relevant twists and foreshadowing in the chapter summary where appropriate.
+
+            Do not change, rewrite, or expand the twists and foreshadowing.
+
+            The existing twists and foreshadowing are the source of truth.
+
+            ==================================================
+            TARGET CHAPTER PLAN
+            ==================================================
+
+            {{chapter_plan_entry}}
+
+            This is the authoritative plan for the target chapter.
+
+            Understand:
+
+                - Chapter number
+                - Chapter title
+                - Chapter summary
+                - Scenes inside the chapter
+                - Chapter goals
+                - Pacing and flow
+
+            Preserve the intended chapter structure.
+
+            Do not replace the intended chapter plan with an unrelated structure.
+
+            ==================================================
+            CHAPTER SCENE PLANS
+            ==================================================
 
             {{scene_plans}}
 
-            DIALOGUE PLANS
-            ==================
+            These are the existing scene plans for the scenes covered by the target chapter.
 
-            {{dialogue_plans}}
+            Understand:
 
-            CHAPTER PLAN
-            ==================
+                - Scene objectives
+                - Key events per scene
+                - Involved characters per scene
+                - Locations
+                - Time periods
+                - Scene purpose
+                - Emotional direction
 
-            {{chapter_plan}}
+            Use the scene plans to build the scene progression of the chapter summary.
 
-            PAGE PLAN
-            ==================
+            Do not change, rewrite, or expand the scene plans.
 
-            {{page_plan}}
+            The existing scene plans are the source of truth.
 
             ==================================================
             ADDITIONAL INFORMATION
@@ -3986,52 +4067,57 @@ class AiPromptGeneratorHelper
 
             {{additional_information}}
 
-            Use any additional information provided to tailor the complete novel.
+            Use any additional information provided to tailor the chapter summary.
 
             ==================================================
-            NOVEL WRITING REQUIREMENTS
+            CHAPTER SUMMARY REQUIREMENTS
             ==================================================
 
-            Write the complete novel manuscript using all the planning data.
+            Generate a structured summary for the target chapter only.
 
-            Requirements:
+            The summary must capture:
 
-                - Follow the chapter structure faithfully.
-                - Maintain character consistency.
-                - Maintain world rules.
-                - Follow the timeline.
-                - Include the planned twists.
-                - Use the dialogue plans.
-                - Follow the page plan.
-                - Use only the existing locations, factions, creatures, and systems.
-                - Maintain the established tone and emotional direction.
-                - Create vivid, professional prose.
-                - Give each chapter a title.
-                - Structure the output as clear chapters.
+                - Chapter purpose: why this chapter exists and what it must accomplish.
+                - Chapter goals: the goals this chapter must achieve for the story.
+                - Characters involved: the characters present and their role in the chapter.
+                - Important events: the key events that occur in this chapter.
+                - Relevant conflicts: the conflicts that develop or resolve in this chapter.
+                - Progression: how the chapter advances the overall story and character arcs.
+                - Important revelations: discoveries, reveals, or twists that occur.
+                - Emotional and narrative movement: the emotional arc of the chapter.
+                - Scene progression: the ordered scenes and how they build the chapter.
+                - Continuity requirements: elements that must remain consistent with the rest of the novel.
+                - Chapter ending and setup: how the chapter ends and what it sets up for the next chapter.
+
+            Do not generate the actual prose chapter.
+
+            Do not write the full chapter content.
+
+            Do not write the complete novel.
 
             ==================================================
             OUTPUT FORMAT
             ==================================================
 
-            Return the result strictly as valid JSON with the following structure:
+            Return ONLY valid JSON.
 
             {
-                \"complete_novel\": {
-                    \"title\": \"\",
-                    \"sub_title\": \"\",
-                    \"word_count\": 0,
-                    \"chapters\": [
-                        {
-                            \"chapter_number\": 1,
-                            \"title\": \"\",
-                            \"content\": \"\"
-                        }
-                    ],
-                    \"formatted_output\": \"\"
+                \"chapter_number\": 0,
+                \"chapter_title\": \"\",
+                \"chapter_summary\": {
+                    \"chapter_purpose\": \"\",
+                    \"chapter_goals\": [],
+                    \"characters_involved\": [],
+                    \"important_events\": [],
+                    \"relevant_conflicts\": [],
+                    \"progression\": \"\",
+                    \"important_revelations\": [],
+                    \"emotional_and_narrative_movement\": \"\",
+                    \"scene_progression\": [],
+                    \"continuity_requirements\": [],
+                    \"chapter_ending_and_setup\": \"\"
                 }
             }
-
-            The formatted_output must contain the complete novel as plain text, with chapter titles clearly separated and formatted for direct output.
 
             ==================================================
             FINAL CHECK
@@ -4039,20 +4125,297 @@ class AiPromptGeneratorHelper
 
             Before returning the result, verify:
 
-                - The novel follows the chapter structure faithfully.
-                - Characters remain consistent with the established characters.
-                - World rules are maintained.
-                - The timeline is followed.
-                - Planned twists are included.
-                - Dialogue plans are used.
-                - The page plan is followed.
-                - The complete novel text is present.
-                - Chapters are structured.
-                - Output is formatted.
+                - The chapter number matches the target chapter plan.
+                - The chapter title matches the target chapter plan.
+                - The summary preserves the intended chapter plan.
+                - The summary is consistent with the novel foundation.
+                - The summary is consistent with the existing characters.
+                - The summary follows the existing story structure.
+                - Relevant twists and foreshadowing are reflected where appropriate.
+                - The scene progression follows the existing scene plans.
+                - The summary captures all required elements.
+                - No prose chapter is written.
+                - No full novel text is written.
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
             Return only JSON.
+        ";
+
+        return $prompt;
+    }
+
+    public static function chapterContentGenerator(): string
+    {
+        $prompt = "
+            You are a professional long-form novelist and story writer.
+
+            Your task is to write the complete narrative prose content of a single novel chapter.
+
+            This is part of the final phase of the novel generation pipeline where every planned chapter receives its own written content.
+
+            Write only the target chapter.
+
+            Do not write other chapters.
+
+            Do not write the entire novel.
+
+            Do not summarize the chapter.
+
+            Do not generate another chapter plan.
+
+            Do not output JSON.
+
+            ==================================================
+            PRIMARY RESPONSIBILITY
+            ==================================================
+
+            Generate the complete prose content of one chapter, expanding its chapter summary into polished narrative prose while remaining faithful to the established story.
+
+            ==================================================
+            LANGUAGE
+            ==================================================
+
+            Write the chapter in:
+
+            {{language}}
+
+            Maintain natural vocabulary, grammar, tone, cultural expression, and writing style appropriate for the novel's language.
+
+            ==================================================
+            NOVEL FOUNDATION
+            ==================================================
+
+            {{foundation}}
+
+            Carefully follow the established novel foundation.
+
+            Understand:
+
+                - Story premise and concept
+                - Narrative direction
+                - Genre identity and tone
+                - Central conflict and stakes
+                - Themes and emotional direction
+                - Setting direction
+
+            Do not rewrite or contradict the foundation.
+
+            ==================================================
+            MAIN CHARACTERS
+            ==================================================
+
+            {{characters}}
+
+            Maintain character consistency.
+
+            Understand:
+
+                - Character names, roles, and personalities
+                - Motivations, goals, and conflicts
+                - Relationships and character arcs
+                - Character voice
+
+            Write dialogue and actions that match each character's established voice, personality, and story role.
+
+            Do not change established characters without a reason.
+
+            ==================================================
+            WORLD BIBLE
+            ==================================================
+
+            {{world_bible}}
+
+            Maintain the established world and its rules.
+
+            Understand:
+
+                - World overview and atmosphere
+                - History and lore
+                - Cultures and societies
+                - Rules and systems
+                - Key world elements
+
+            Keep the chapter consistent with the established world.
+
+            Do not invent contradictory world rules.
+
+            ==================================================
+            STORY STRUCTURE
+            ==================================================
+
+            {{story_structure}}
+
+            Position the target chapter correctly within the overall story progression.
+
+            Respect established chronology and the intended story direction.
+
+            ==================================================
+            TWISTS AND FORESHADOWING
+            ==================================================
+
+            {{twists_and_foreshadowing}}
+
+            Reflect the relevant twists, foreshadowing, and clues for the target chapter where appropriate.
+
+            ==================================================
+            TARGET CHAPTER SUMMARY
+            ==================================================
+
+            {{chapter_summary}}
+
+            This is the authoritative writing blueprint for the target chapter.
+
+            This summary was generated specifically for this chapter and must be expanded into polished narrative prose.
+
+            Treat the chapter summary as the primary chapter-specific blueprint for:
+
+                - Chapter purpose
+                - Chapter goals
+                - Characters involved
+                - Important events
+                - Relevant conflicts
+                - Progression
+                - Important revelations
+                - Emotional and narrative movement
+                - Scene progression
+                - Continuity requirements
+                - Chapter ending and setup
+
+            Expand the summary into the actual chapter without reinterpreting it into a different story.
+
+            ==================================================
+            TARGET CHAPTER PLAN ENTRY
+            ==================================================
+
+            {{chapter_plan_entry}}
+
+            This is the plan for the target chapter.
+
+            Understand:
+
+                - Chapter number
+                - Chapter title
+                - Chapter summary
+                - Scenes inside the chapter
+                - Chapter goals
+                - Pacing and flow
+
+            Preserve the intended chapter structure, pacing, and goals.
+
+            ==================================================
+            CHAPTER SCENE PLANS
+            ==================================================
+
+            {{scene_plans}}
+
+            These are the scene plans for the scenes covered by the target chapter.
+
+            Understand:
+
+                - Scene objectives
+                - Key events per scene
+                - Involved characters per scene
+                - Locations
+                - Time periods
+                - Scene purpose
+                - Emotional direction
+
+            Develop each planned scene into narrative prose in the established order.
+
+            ==================================================
+            CHAPTER DIALOGUE PLANS
+            ==================================================
+
+            {{dialogue_plans}}
+
+            These are the planned dialogues for the scenes covered by the target chapter.
+
+            Use them to support the chapter's dialogue.
+
+            Match the planned character voice and tone.
+
+            ==================================================
+            ADDITIONAL INFORMATION
+            ==================================================
+
+            {{additional_information}}
+
+            Use any additional information provided to tailor the chapter content.
+
+            If this field is empty, null, missing, or contains \"Auto\", use professional writing judgment.
+
+            ==================================================
+            WRITING REQUIREMENTS
+            ==================================================
+
+            Write a complete, natural, and professionally developed novel chapter.
+
+            The chapter must:
+
+                - Follow the established novel foundation.
+                - Follow the established world.
+                - Maintain character consistency and character voice.
+                - Follow the chapter summary.
+                - Follow the chapter plan.
+                - Respect established chronology and relationships.
+                - Maintain continuity with the rest of the novel.
+                - Preserve the intended story direction.
+                - Develop the chapter's planned scenes and events.
+                - Include appropriate dialogue.
+                - Maintain the established narrative style and tone.
+                - Advance the story according to the chapter's intended progression.
+                - End the chapter according to the chapter's intended progression and setup.
+
+            Write natural, polished narrative prose appropriate for the novel's genre, audience, and language.
+
+            ==================================================
+            PROHIBITIONS
+            ==================================================
+
+            You must NOT:
+
+                - Rewrite the novel foundation.
+                - Change established characters without reason.
+                - Invent contradictory world rules.
+                - Ignore the chapter summary.
+                - Write another chapter.
+                - Generate a summary instead of prose.
+                - Output analysis of your own writing.
+                - Output instructions to a developer.
+                - Output JSON.
+                - Wrap the content in code fences.
+
+            ==================================================
+            OUTPUT FORMAT
+            ==================================================
+
+            Return ONLY the actual prose content of the single target chapter.
+
+            Start directly with the chapter prose.
+
+            Do not include a chapter title heading, an introduction, or a conclusion outside the prose.
+
+            Do not include any explanations before or after the content.
+
+            ==================================================
+            FINAL CHECK
+            ==================================================
+
+            Before returning the result, verify:
+
+                - The content is prose, not a summary.
+                - The content writes only the target chapter.
+                - The content follows the chapter summary.
+                - The content follows the chapter plan.
+                - The content is consistent with the novel foundation.
+                - The content is consistent with the established characters.
+                - The content is consistent with the established world.
+                - The content maintains continuity with the rest of the novel.
+                - The content includes appropriate dialogue.
+                - The content ends according to the chapter's intended progression.
+                - The requested language is respected.
+                - No explanation is added outside the prose.
         ";
 
         return $prompt;

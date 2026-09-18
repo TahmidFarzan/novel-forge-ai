@@ -89,7 +89,7 @@ const STEP_DEFINITIONS = [
     { id: 12, name: "Dialogue Planner" },
     { id: 13, name: "Chapter Planner" },
     { id: 14, name: "Page Planner" },
-    { id: 15, name: "Complete Novel Generator" },
+    { id: 15, name: "Complete Novel" },
 ];
 
 const activeStep = ref(1);

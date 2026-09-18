@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\BackOffice;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\NovelHelper;
+use App\Http\Requests\NovelChapterContentRequest;
 use App\Http\Requests\NovelChapterPlannerRequest;
-use App\Http\Requests\NovelCharactersRequest;
-use App\Http\Requests\NovelCompleteNovelRequest;
+use App\Http\Requests\NovelChapterSummaryRequest;
 use App\Http\Requests\NovelCreaturesRequest;
 use App\Http\Requests\NovelDialoguePlannerRequest;
 use App\Http\Requests\NovelFactionsRequest;
@@ -16,6 +17,7 @@ use App\Http\Requests\NovelScenePlannerRequest;
 use App\Http\Requests\NovelStoryStructureRequest;
 use App\Http\Requests\NovelSystemsRequest;
 use App\Http\Requests\NovelTimelineRequest;
+use App\Http\Requests\NovelCharactersRequest;
 use App\Http\Requests\NovelTwistsAndForeshadowingRequest;
 use App\Http\Requests\NovelWorldBibleRequest;
 use App\Services\BackOffice\NovelService;
@@ -55,10 +57,17 @@ class NovelController extends Controller
         ]);
     }
 
-    public function edit(string $slug): InertiaResponse
+    public function edit(string $slug): RedirectResponse|InertiaResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
+
+        if ($novel->status === NovelHelper::STATUS_COMPLETE) {
+            return to_route('back-office.novels.index')->with('flash_message', [
+                'message' => 'This novel is already completed and locked from further generation.',
+                'status'  => 'info',
+            ]);
+        }
 
         return Inertia::render('back-office/novels/Create', [
             'novel' => $novel,
@@ -267,12 +276,45 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateCompleteNovel(NovelCompleteNovelRequest $request, string $slug): RedirectResponse
+    public function generateChapterSummaries(NovelChapterSummaryRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateCompleteNovel($request, $novel);
+        $result = $this->novelService->generateChapterSummaries($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function generateChapterContent(NovelChapterContentRequest $request, string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->generateChapterContent($request, $novel);
+
+        return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
+            'message' => $result['message'],
+            'status'  => $result['status'],
+        ]);
+    }
+
+    public function reviewNovel(string $slug): RedirectResponse
+    {
+        $novel = $this->novelService->find($slug);
+        Gate::authorize('update', $novel);
+
+        $result = $this->novelService->reviewNovel($novel);
+
+        if ($result['status'] === 'success') {
+            return to_route('back-office.novels.index')->with('flash_message', [
+                'message' => $result['message'],
+                'status'  => $result['status'],
+            ]);
+        }
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],

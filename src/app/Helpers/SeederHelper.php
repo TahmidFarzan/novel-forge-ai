@@ -463,11 +463,19 @@ class SeederHelper
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_COMPLETE_NOVEL_GENERATOR,
-                'code'                 => "CompleteNovelGenerator",
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_SUMMARY_GENERATOR,
+                'code'                 => "ChapterSummaryGenerator",
                 'step_number'          => 15,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::completeNovelGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::chapterSummaryGenerator(),
+            ],
+
+            (object) [
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT_GENERATOR,
+                'code'                 => "ChapterContentGenerator",
+                'step_number'          => 15,
+                'depend_on_prompt_ids' => null,
+                'prompt'               => AiPromptGeneratorHelper::chapterContentGenerator(),
             ],
 
         ]);
