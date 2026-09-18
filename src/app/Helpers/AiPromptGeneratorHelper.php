@@ -483,91 +483,91 @@ class AiPromptGeneratorHelper
                 - Character stereotypes without purpose
 
 
-        ==================================================
-        OUTPUT SCOPE
-        ==================================================
+            ==================================================
+            OUTPUT SCOPE
+            ==================================================
 
-        This generation creates only the initial character foundation.
+                This generation creates only the initial character foundation.
 
-        Do not generate:
+                Do not generate:
 
-            - Complete biographies
-            - Childhood histories
-            - Family trees
-            - Detailed life timelines
-            - Character databases
-            - World-building documents
-            - Chapter plans
-            - Scene plans
-            - Dialogue scripts
-
-
-        Keep characters focused on information required for future novel development.
+                    - Complete biographies
+                    - Childhood histories
+                    - Family trees
+                    - Detailed life timelines
+                   - Character databases
+                  - World-building documents
+                  - Chapter plans
+                  - Scene plans
+                  - Dialogue scripts
 
 
-        ==================================================
-        OUTPUT FORMAT
-        ==================================================
-
-        Return ONLY valid JSON.
+                Keep characters focused on information required for future novel development.
 
 
-        {
-            \"characters\": [
+            ==================================================
+            OUTPUT FORMAT
+            ==================================================
 
-                {
-                    \"name\": \"\",
-                    \"role\": \"\",
-                    \"character_type\": \"\",
-                    \"personality\": \"\",
-                    \"appearance_direction\": \"\",
-                    \"background_direction\": \"\",
-                    \"motivation\": \"\",
-                    \"goal\": \"\",
-                    \"strengths\": [],
-                    \"weaknesses\": [],
-                    \"internal_conflict\": \"\",
-                    \"external_conflict\": \"\",
-                    \"relationship_to_main_character\": \"\",
-                    \"character_arc_direction\": \"\"
-                }
-
-            ],
-
-            \"relationships\": [
-
-                {
-                    \"characters\": \"\",
-                    \"relationship\": \"\",
-                    \"story_purpose\": \"\"
-                }
-
-            ]
-        }
+            Return ONLY valid JSON.
 
 
-        ==================================================
-        FINAL CHECK
-        ==================================================
+            {
+                \"characters\": [
 
-        Before returning the result, verify:
+                    {
+                        \"name\": \"\",
+                        \"role\": \"\",
+                        \"character_type\": \"\",
+                        \"personality\": \"\",
+                        \"appearance_direction\": \"\",
+                        \"background_direction\": \"\",
+                        \"motivation\": \"\",
+                        \"goal\": \"\",
+                        \"strengths\": [],
+                        \"weaknesses\": [],
+                        \"internal_conflict\": \"\",
+                        \"external_conflict\": \"\",
+                        \"relationship_to_main_character\": \"\",
+                        \"character_arc_direction\": \"\"
+                    }
 
-            - Characters directly support the existing foundation.
-            - Main character supports the central conflict.
-            - Supporting characters have clear narrative purposes.
-            - Opposing characters create meaningful obstacles.
-            - Character motivations are believable.
-            - Character relationships support the story.
-            - Character arcs connect with themes.
-            - No unnecessary characters are created.
-            - No complete biographies are created.
-            - No world-building is created.
-            - Output contains only valid JSON.
-            - No explanation is added outside JSON.
+                ],
+
+               \"relationships\": [
+
+                    {
+                        \"characters\": \"\",
+                        \"relationship\": \"\",
+                        \"story_purpose\": \"\"
+                    }
+
+                ]
+            }
 
 
-        Return only JSON.
-    ";
+            ==================================================
+            FINAL CHECK
+            ==================================================
+
+            Before returning the result, verify:
+
+                - Characters directly support the existing foundation.
+                - Main character supports the central conflict.
+                - Supporting characters have clear narrative purposes.
+                - Opposing characters create meaningful obstacles.
+                - Character motivations are believable.
+                - Character relationships support the story.
+                - Character arcs connect with themes.
+                - No unnecessary characters are created.
+                - No complete biographies are created.
+                - No world-building is created.
+                - Output contains only valid JSON.
+                - No explanation is added outside JSON.
+
+
+            Return only JSON.
+        ";
 
         return $prompt;
     }
