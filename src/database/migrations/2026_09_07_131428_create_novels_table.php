@@ -22,9 +22,6 @@ return new class extends Migration
             $table->foreignId('novel_type_id')->constrained('novel_types')->cascadeOnDelete();
             $table->foreignId('language_id')->constrained('languages')->cascadeOnDelete();
 
-            $table->string('novel_continuity', 255);
-            $table->boolean('is_18_plus')->default(false);
-            $table->boolean('enable_mature_content')->default(false);
             $table->longText('additional_information')->nullable();
 
 
@@ -42,6 +39,7 @@ return new class extends Migration
             $table->jsonb('dialogue_plans')->nullable();
             $table->jsonb('chapter_plan')->nullable();
             $table->jsonb('page_plan')->nullable();
+            $table->jsonb('complete_novel')->nullable();
 
             $table->string('status', 50)->nullable();
             $table->string('slug')->unique();
