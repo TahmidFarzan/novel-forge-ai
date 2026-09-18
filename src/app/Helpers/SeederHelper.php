@@ -304,7 +304,7 @@ class SeederHelper
             (object) [
                 'name'              => 'Google: Gemma 4 26B A4B',
                 'model'             => 'google/gemma-4-26B-A4B-it',
-                'api_url'           => 'https://router.huggingface.co/v1',
+                'api_url'           => 'https://router.huggingface.co/v1/chat/completions',
                 'api_key'           => null,
                 'brief'             => 'AI writing model for generating documents, workbooks, ebooks and structured educational content.',
                 'focus'             => 'Premium document generation, chapter writing, workbook creation, story generation, educational materials',
@@ -318,7 +318,7 @@ class SeederHelper
             (object) [
                 'name'              => 'Qwen: Qwen3 8B',
                 'model'             => 'Qwen/Qwen3-8B',
-                'api_url'           => 'https://router.huggingface.co/v1',
+                'api_url'           => 'https://router.huggingface.co/v1/chat/completions',
                 'api_key'           => null,
                 'brief'             => 'Multilingual AI writing model for stories, documents, educational content and structured generation.',
                 'focus'             => 'Story writing, creative writing, long-form content, educational materials, reasoning and multilingual generation',
@@ -332,7 +332,7 @@ class SeederHelper
             (object) [
                 'name'              => 'Mistral AI: Mistral Small 3.2 24B Instruct',
                 'model'             => 'mistralai/Mistral-Small-3.2-24B-Instruct-2506',
-                'api_url'           => 'https://router.huggingface.co/v1',
+                'api_url'           => 'https://router.huggingface.co/v1/chat/completions',
                 'api_key'           => null,
                 'brief'             => 'Strong instruction-following model for stories, documents, educational content and long-form generation.',
                 'focus'             => 'Story writing, creative writing, long-form documents, educational content, structured generation',
