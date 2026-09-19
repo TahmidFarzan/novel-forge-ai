@@ -175,7 +175,7 @@ class SeederHelper
             (object) [
                 'name'               => 'Young Adult',
                 'brief'              => 'Stories for young adult readers',
-                'prompt_instruction' => 'Focus on exploring identity, personal growth, relationships, independence, and challenges connected to adolescence or early adulthood. Planning should consider the characters’ stage of life, personal struggles, social pressures, friendships, family relationships, and questions of belonging and self-discovery. Character planning should create relatable protagonists with authentic emotions, weaknesses, dreams, and evolving understanding of themselves and the world. Story structure should consider meaningful challenges, emotional growth, consequences of choices, and a resolution that reflects earned maturity and personal development. When combined with other genres, integrate these coming-of-age and identity-development elements with the requirements of the additional genres while avoiding duplicate planning elements.',
+                'prompt_instruction' => 'Focus on exploring identity, personal growth, relationships, independence, and challenges connected to adolescence or early adulthood. Planning should consider the characters’ stage of life, personal struggles, social pressures, friendships, family relationships, and questions of belonging or self-discovery. Character planning should create relatable protagonists with authentic emotions, weaknesses, dreams, and evolving understanding of themselves and the world. Story structure should consider meaningful challenges, emotional growth, consequences of choices, and a resolution that reflects earned maturity and personal development. When combined with other genres, integrate these coming-of-age and identity-development elements with the requirements of the additional genres while avoiding duplicate planning elements.',
             ],
 
             (object) [
@@ -351,131 +351,131 @@ class SeederHelper
         return collect([
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1_FOUNDATION_GENERATOR,
                 'code'                 => "FoundationGenerator",
                 'step_number'          => 1,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::foundationGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step1FoundationGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_CHARACTER_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2_CHARACTERS_GENERATOR,
                 'code'                 => "CharacterGenerator",
-                'step_number'          => 1,
+                'step_number'          => 2,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::characterGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step2CharactersGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_WORLD_BIBLE_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3_WORLD_BIBLE_GENERATOR,
                 'code'                 => "WorldBibleGenerator",
                 'step_number'          => 3,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::worldBibleGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step3WorldBibleGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_LOCATION_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4_LOCATIONS_GENERATOR,
                 'code'                 => "LocationGenerator",
                 'step_number'          => 4,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::locationGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step4LocationsGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_FACTION_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5_FACTIONS_GENERATOR,
                 'code'                 => "FactionGenerator",
                 'step_number'          => 5,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::factionGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step5FactionsGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_CREATURE_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6_CREATURES_GENERATOR,
                 'code'                 => "CreatureGenerator",
                 'step_number'          => 6,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::creatureGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step6CreaturesGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_SYSTEM_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP7_SYSTEMS_GENERATOR,
                 'code'                 => "SystemGenerator",
                 'step_number'          => 7,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::systemGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step7SystemsGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_TIMELINE_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8_TIMELINE_GENERATOR,
                 'code'                 => "TimelineGenerator",
                 'step_number'          => 8,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::timelineGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step8TimelineGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STORY_STRUCTURE_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9_STORY_STRUCTURE_GENERATOR,
                 'code'                 => "StoryStructureGenerator",
                 'step_number'          => 9,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::storyStructureGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step9StoryStructureGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_TWISTS_AND_FORESHADOWING_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10_TWISTS_AND_FORESHADOWING_GENERATOR,
                 'code'                 => "TwistsAndForeshadowingGenerator",
                 'step_number'          => 10,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::twistsAndForeshadowingGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step10TwistsAndForeshadowingGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_SCENE_PLANS_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11_SCENE_PLANS_GENERATOR,
                 'code'                 => "ScenePlansGenerator",
                 'step_number'          => 11,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::scenePlannerGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step11ScenePlansGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_DIALOGUE_PLANS_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12_DIALOGUE_PLANS_GENERATOR,
                 'code'                 => "DialoguePlansGenerator",
                 'step_number'          => 12,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::dialoguePlannerGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step12DialoguePlansGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_PLAN_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13_CHAPTER_PLAN_GENERATOR,
                 'code'                 => "ChapterPlanGenerator",
                 'step_number'          => 13,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::chapterPlannerGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step13ChapterPlanGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_PAGE_PLAN_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14_PAGE_PLAN_GENERATOR,
                 'code'                 => "PagePlanGenerator",
                 'step_number'          => 14,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::pagePlannerGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step14PagePlanGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_SUMMARY_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_1_CHAPTER_SUMMARY_GENERATOR,
                 'code'                 => "ChapterSummaryGenerator",
                 'step_number'          => 15,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::chapterSummaryGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step15_1ChapterSummaryGenerator(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT_GENERATOR,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_2_CHAPTER_CONTENT_GENERATOR,
                 'code'                 => "ChapterContentGenerator",
                 'step_number'          => 15,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::chapterContentGenerator(),
+                'prompt'               => AiPromptGeneratorHelper::step15_2ChapterContentGenerator(),
             ],
 
         ]);

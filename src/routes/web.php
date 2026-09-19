@@ -227,29 +227,29 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
         Route::get('create', [NovelController::class, 'create'])->name('create');
 
         Route::prefix('create')->name('create.')->group(function () {
-            Route::post('foundation', [NovelController::class, 'createFoundation'])->name('foundation');
+            Route::post('foundation', [NovelController::class, 'createStep1Foundation'])->name('foundation');
         });
 
         Route::prefix('{slug}')->group(function () {
             Route::get('edit', [NovelController::class, 'edit'])->name('edit');
 
             Route::prefix('generate')->name('generate.')->group(function () {
-                Route::patch('foundation', [NovelController::class, 'generateFoundation'])->name('foundation');
-                Route::patch('characters', [NovelController::class, 'generateCharacters'])->name('characters');
-                Route::patch('world-bible', [NovelController::class, 'generateWorldBible'])->name('world-bible');
-                Route::patch('locations', [NovelController::class, 'generateLocations'])->name('locations');
-                Route::patch('factions', [NovelController::class, 'generateFactions'])->name('factions');
-                Route::patch('creature', [NovelController::class, 'generateCreature'])->name('creature');
-                Route::patch('system', [NovelController::class, 'generateSystem'])->name('system');
-                Route::patch('timeline', [NovelController::class, 'generateTimeline'])->name('timeline');
-                Route::patch('story-structure', [NovelController::class, 'generateStoryStructure'])->name('story-structure');
-                Route::patch('twists-and-foreshadowing', [NovelController::class, 'generateTwistsAndForeshadowing'])->name('twists-and-foreshadowing');
-                Route::patch('scene-planner', [NovelController::class, 'generateScenePlanner'])->name('scene-planner');
-                Route::patch('dialogue-planner', [NovelController::class, 'generateDialoguePlanner'])->name('dialogue-planner');
-                Route::patch('chapter-planner', [NovelController::class, 'generateChapterPlanner'])->name('chapter-planner');
-                Route::patch('page-planner', [NovelController::class, 'generatePagePlanner'])->name('page-planner');
-                Route::patch('chapter-summaries', [NovelController::class, 'generateChapterSummaries'])->name('chapter-summaries');
-                Route::patch('chapter-content', [NovelController::class, 'generateChapterContent'])->name('chapter-content');
+                Route::patch('foundation', [NovelController::class, 'generateStep1Foundation'])->name('foundation');
+                Route::patch('characters', [NovelController::class, 'generateStep2Characters'])->name('characters');
+                Route::patch('world-bible', [NovelController::class, 'generateStep3WorldBible'])->name('world-bible');
+                Route::patch('locations', [NovelController::class, 'generateStep4Locations'])->name('locations');
+                Route::patch('factions', [NovelController::class, 'generateStep5Factions'])->name('factions');
+                Route::patch('creature', [NovelController::class, 'generateStep6Creatures'])->name('creature');
+                Route::patch('system', [NovelController::class, 'generateStep7Systems'])->name('system');
+                Route::patch('timeline', [NovelController::class, 'generateStep8Timeline'])->name('timeline');
+                Route::patch('story-structure', [NovelController::class, 'generateStep9StoryStructure'])->name('story-structure');
+                Route::patch('twists-and-foreshadowing', [NovelController::class, 'generateStep10TwistsAndForeshadowing'])->name('twists-and-foreshadowing');
+                Route::patch('scene-planner', [NovelController::class, 'generateStep11ScenePlans'])->name('scene-planner');
+                Route::patch('dialogue-planner', [NovelController::class, 'generateStep12DialoguePlans'])->name('dialogue-planner');
+                Route::patch('chapter-planner', [NovelController::class, 'generateStep13ChapterPlan'])->name('chapter-planner');
+                Route::patch('page-planner', [NovelController::class, 'generateStep14PagePlan'])->name('page-planner');
+                Route::patch('chapter-summaries', [NovelController::class, 'generateStep15_1ChapterSummaries'])->name('chapter-summaries');
+                Route::patch('chapter-content', [NovelController::class, 'generateStep15_2ChapterContent'])->name('chapter-content');
             });
 
             Route::patch('review', [NovelController::class, 'reviewNovel'])->name('review');

@@ -124,26 +124,31 @@ class NovelService
             ->appends($request->all());
     }
 
-    public function generateFoundation(NovelFoundationRequest $request, Novel $novel): array
+    public function generateStep1Foundation(NovelFoundationRequest $request, Novel $novel): array
     {
         $isNew       = empty($novel->id);
         $statusEvent = $isNew ? "save" : "update";
 
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1_FOUNDATION_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $receivedInputs = $this->foundationRequestInputsFormatter($request->input("language_id"), $request->input("audience_id"), $request->input("novel_type_id"), $request->input("genre_ids"), $request->input("additional_information", "Auto"));
-            $prompt         = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $receivedInputs);
+            $inputs = [
+                "language"               => $this->languageService->findByIdsOrEnglish($request->input("language_id")),
+                "audience"               => $this->audienceService->findById($request->input("audience_id")),
+                "novel_type"             => $this->novelTypeService->findById($request->input("novel_type_id")),
+                "genres"                 => $this->genreService->findByIdsOrRandom($request->input("genre_ids")),
+                "additional_information" => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            $novel = DB::transaction(function () use ($request, $apiResponse, $novel, $isNew) {
-                $foundationObject = $this->extractFoundationFromResponse($apiResponse);
-
-                $novel->title      = $foundationObject->title;
-                $novel->sub_title  = $foundationObject->subtitle;
-                $novel->foundation = $foundationObject->foundation;
+            $novel = DB::transaction(function () use ($request, $stepData, $novel, $isNew) {
+                $novel->title      = $stepData['title'];
+                $novel->sub_title  = $stepData['subtitle'];
+                $novel->foundation = $stepData['foundation'];
 
                 $novel->audience_id   = $request->input("audience_id");
                 $novel->novel_type_id = $request->input("novel_type_id");
@@ -188,20 +193,23 @@ class NovelService
         }
     }
 
-    public function generateCharacters(NovelCharactersRequest $request, Novel $novel): array
+    public function generateStep2Characters(NovelCharactersRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_CHARACTER_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2_CHARACTERS_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->charactersRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $inputs = [
+                "foundation"             => $novel->foundation ?? [],
+                "additional_information" => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $characterObject   = $this->extractCharactersFromResponse($apiResponse);
-                $novel->characters = $characterObject;
+            DB::transaction(function () use ($stepData, $novel) {
+                $novel->characters = $stepData['characters'];
                 $novel->status     = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
@@ -223,20 +231,24 @@ class NovelService
         }
     }
 
-    public function generateWorldBible(NovelWorldBibleRequest $request, Novel $novel): array
+    public function generateStep3WorldBible(NovelWorldBibleRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_WORLD_BIBLE_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3_WORLD_BIBLE_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3_WORLD_BIBLE_GENERATOR));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->worldBibleRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $inputs = [
+                "foundation"             => $novel->foundation ?? [],
+                "characters"             => $novel->characters ?? [],
+                "additional_information" => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $worldBibleObject   = $this->extractWorldBibleFromResponse($apiResponse);
-                $novel->world_bible = $worldBibleObject;
+            DB::transaction(function () use ($stepData, $novel) {
+                $novel->world_bible = $stepData['world_bible'];
                 $novel->status      = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
@@ -258,20 +270,24 @@ class NovelService
         }
     }
 
-    public function generateLocations(NovelLocationsRequest $request, Novel $novel): array
+    public function generateStep4Locations(NovelLocationsRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_LOCATION_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4_LOCATIONS_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->locationsRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $inputs = [
+                "world_bible"            => $novel->world_bible ?? [],
+                "characters"             => $novel->characters ?? [],
+                "additional_information" => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $locationsObject  = $this->extractLocationsFromResponse($apiResponse);
-                $novel->locations = $locationsObject;
+            DB::transaction(function () use ($stepData, $novel) {
+                $novel->locations = $stepData['locations'];
                 $novel->status    = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
@@ -293,20 +309,24 @@ class NovelService
         }
     }
 
-    public function generateFactions(NovelFactionsRequest $request, Novel $novel): array
+    public function generateStep5Factions(NovelFactionsRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_FACTION_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5_FACTIONS_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->factionsRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $inputs = [
+                "world_bible"            => $novel->world_bible ?? [],
+                "locations"              => $novel->locations ?? [],
+                "additional_information" => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $factionsObject  = $this->extractFactionsFromResponse($apiResponse);
-                $novel->factions = $factionsObject;
+            DB::transaction(function () use ($stepData, $novel) {
+                $novel->factions = $stepData['factions'];
                 $novel->status   = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
@@ -328,20 +348,25 @@ class NovelService
         }
     }
 
-    public function generateCreature(NovelCreaturesRequest $request, Novel $novel): array
+    public function generateStep6Creatures(NovelCreaturesRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_CREATURE_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6_CREATURES_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->creaturesRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $inputs = [
+                "world_bible"            => $novel->world_bible ?? [],
+                "locations"              => $novel->locations ?? [],
+                "factions"               => $novel->factions ?? [],
+                "additional_information" => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $creaturesObject  = $this->extractCreaturesFromResponse($apiResponse);
-                $novel->creatures = $creaturesObject;
+            DB::transaction(function () use ($stepData, $novel) {
+                $novel->creatures = $stepData['creatures'];
                 $novel->status    = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
@@ -363,20 +388,25 @@ class NovelService
         }
     }
 
-    public function generateSystem(NovelSystemsRequest $request, Novel $novel): array
+    public function generateStep7Systems(NovelSystemsRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_SYSTEM_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP7_SYSTEMS_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->systemsRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $inputs = [
+                "world_bible"            => $novel->world_bible ?? [],
+                "creatures"              => $novel->creatures ?? [],
+                "factions"               => $novel->factions ?? [],
+                "additional_information" => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $systemsObject  = $this->extractSystemsFromResponse($apiResponse);
-                $novel->systems = $systemsObject;
+            DB::transaction(function () use ($stepData, $novel) {
+                $novel->systems = $stepData['systems'];
                 $novel->status  = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
@@ -398,20 +428,25 @@ class NovelService
         }
     }
 
-    public function generateTimeline(NovelTimelineRequest $request, Novel $novel): array
+    public function generateStep8Timeline(NovelTimelineRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_TIMELINE_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8_TIMELINE_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->timelineRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $inputs = [
+                "world_bible"            => $novel->world_bible ?? [],
+                "factions"               => $novel->factions ?? [],
+                "foundation"             => $novel->foundation ?? [],
+                "additional_information" => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $timelineObject  = $this->extractTimelineFromResponse($apiResponse);
-                $novel->timeline = $timelineObject;
+            DB::transaction(function () use ($stepData, $novel) {
+                $novel->timeline = $stepData['timeline'];
                 $novel->status   = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
@@ -433,20 +468,26 @@ class NovelService
         }
     }
 
-    public function generateStoryStructure(NovelStoryStructureRequest $request, Novel $novel): array
+    public function generateStep9StoryStructure(NovelStoryStructureRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_STORY_STRUCTURE_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9_STORY_STRUCTURE_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->storyStructureRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $inputs = [
+                "foundation"             => $novel->foundation ?? [],
+                "characters"             => $novel->characters ?? [],
+                "world_bible"            => $novel->world_bible ?? [],
+                "timeline"               => $novel->timeline ?? [],
+                "additional_information" => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $storyStructureObject   = $this->extractStoryStructureFromResponse($apiResponse);
-                $novel->story_structure = $storyStructureObject;
+            DB::transaction(function () use ($stepData, $novel) {
+                $novel->story_structure = $stepData['story_structure'];
                 $novel->status          = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
@@ -468,20 +509,25 @@ class NovelService
         }
     }
 
-    public function generateTwistsAndForeshadowing(NovelTwistsAndForeshadowingRequest $request, Novel $novel): array
+    public function generateStep10TwistsAndForeshadowing(NovelTwistsAndForeshadowingRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_TWISTS_AND_FORESHADOWING_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10_TWISTS_AND_FORESHADOWING_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->twistsAndForeshadowingRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $inputs = [
+                "story_structure"        => $novel->story_structure ?? [],
+                "characters"             => $novel->characters ?? [],
+                "world_bible"            => $novel->world_bible ?? [],
+                "additional_information" => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $twistsObject                    = $this->extractTwistsAndForeshadowingFromResponse($apiResponse);
-                $novel->twists_and_foreshadowing = $twistsObject;
+            DB::transaction(function () use ($stepData, $novel) {
+                $novel->twists_and_foreshadowing = $stepData['twists_and_foreshadowing'];
                 $novel->status                   = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
@@ -503,20 +549,25 @@ class NovelService
         }
     }
 
-    public function generateScenePlanner(NovelScenePlannerRequest $request, Novel $novel): array
+    public function generateStep11ScenePlans(NovelScenePlannerRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_SCENE_PLANS_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11_SCENE_PLANS_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->scenePlannerRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $inputs = [
+                "story_structure"          => $novel->story_structure ?? [],
+                "twists_and_foreshadowing" => $novel->twists_and_foreshadowing ?? [],
+                "locations"                => $novel->locations ?? [],
+                "additional_information"   => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $scenePlansObject   = $this->extractScenePlansFromResponse($apiResponse);
-                $novel->scene_plans = $scenePlansObject;
+            DB::transaction(function () use ($stepData, $novel) {
+                $novel->scene_plans = $stepData['scene_plans'];
                 $novel->status      = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
@@ -538,20 +589,24 @@ class NovelService
         }
     }
 
-    public function generateDialoguePlanner(NovelDialoguePlannerRequest $request, Novel $novel): array
+    public function generateStep12DialoguePlans(NovelDialoguePlannerRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_DIALOGUE_PLANS_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12_DIALOGUE_PLANS_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->dialoguePlannerRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $inputs = [
+                "characters"             => $novel->characters ?? [],
+                "scene_plans"            => $novel->scene_plans ?? [],
+                "additional_information" => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $dialoguePlansObject   = $this->extractDialoguePlansFromResponse($apiResponse);
-                $novel->dialogue_plans = $dialoguePlansObject;
+            DB::transaction(function () use ($stepData, $novel) {
+                $novel->dialogue_plans = $stepData['dialogue_plans'];
                 $novel->status         = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
@@ -573,20 +628,24 @@ class NovelService
         }
     }
 
-    public function generateChapterPlanner(NovelChapterPlannerRequest $request, Novel $novel): array
+    public function generateStep13ChapterPlan(NovelChapterPlannerRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_PLAN_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13_CHAPTER_PLAN_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->chapterPlannerRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $inputs = [
+                "scene_plans"            => $novel->scene_plans ?? [],
+                "story_structure"        => $novel->story_structure ?? [],
+                "additional_information" => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $chapterPlanObject   = $this->extractChapterPlanFromResponse($apiResponse);
-                $novel->chapter_plan = $chapterPlanObject;
+            DB::transaction(function () use ($stepData, $novel) {
+                $novel->chapter_plan = $stepData['chapter_plan'];
                 $novel->status       = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
@@ -608,20 +667,24 @@ class NovelService
         }
     }
 
-    public function generatePagePlanner(NovelPagePlannerRequest $request, Novel $novel): array
+    public function generateStep14PagePlan(NovelPagePlannerRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_PAGE_PLAN_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14_PAGE_PLAN_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $requestInputs = $this->pagePlannerRequestInputsFormatter($novel, $request->input("additional_information", "Auto"));
-            $prompt        = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $requestInputs);
+            $inputs = [
+                "chapter_plan"           => $novel->chapter_plan ?? [],
+                "scene_plans"            => $novel->scene_plans ?? [],
+                "additional_information" => $request->input("additional_information", "Auto"),
+            ];
 
-            $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $prompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
 
-            DB::transaction(function () use ($apiResponse, $novel) {
-                $pagePlanObject   = $this->extractPagePlanFromResponse($apiResponse);
-                $novel->page_plan = $pagePlanObject;
+            DB::transaction(function () use ($stepData, $novel) {
+                $novel->page_plan = $stepData['page_plan'];
                 $novel->status    = NovelHelper::STATUS_ONGOING;
                 $novel->save();
             });
@@ -643,10 +706,12 @@ class NovelService
         }
     }
 
-    public function generateChapterSummaries(NovelChapterSummaryRequest $request, Novel $novel): array
+    public function generateStep15_1ChapterSummaries(NovelChapterSummaryRequest $request, Novel $novel): array
     {
         try {
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_SUMMARY_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_1_CHAPTER_SUMMARY_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
             $chapterPlan = $novel->chapter_plan ?? [];
@@ -659,7 +724,7 @@ class NovelService
             $additionalInformation = $request->input("additional_information", "Auto");
 
             foreach ($chapterPlan as $chapterPlanEntry) {
-                $this->novelChapterService->generateSummary($novel, $context, (array) $chapterPlanEntry, $aiPrompt->prompt, $aiBrain, $additionalInformation);
+                $this->novelChapterService->generateStep15_1ChapterSummary($novel, $context, (array) $chapterPlanEntry, $aiPrompt->prompt, $aiBrain, $additionalInformation);
             }
 
             return [
@@ -679,7 +744,7 @@ class NovelService
         }
     }
 
-    public function generateChapterContent(NovelChapterContentRequest $request, Novel $novel): array
+    public function generateStep15_2ChapterContent(NovelChapterContentRequest $request, Novel $novel): array
     {
         try {
             $chapterNo = $request->input("chapter_no");
@@ -692,13 +757,15 @@ class NovelService
                 throw new Exception('Novel chapter ' . $chapterNo . ' not found.');
             }
 
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT_GENERATOR));
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_2_CHAPTER_CONTENT_GENERATOR;
+
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
             $context               = $this->chapterContentContextFormatter($novel);
             $additionalInformation = $request->input("additional_information", "Auto");
 
-            $this->novelChapterService->generateContent($novel, $novelChapter, $context, $aiPrompt->prompt, $aiBrain, $additionalInformation);
+            $this->novelChapterService->generateStep15_2ChapterContent($novel, $novelChapter, $context, $aiPrompt->prompt, $aiBrain, $additionalInformation);
 
             return [
                 'status'  => 'success',
@@ -839,253 +906,6 @@ class NovelService
         }
     }
 
-    private function extractFoundationFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            'title'      => $decoded['novel_title'] ?? null,
-            'subtitle'   => $decoded['novel_subtitle'] ?? null,
-            'foundation' => $decoded['novel_foundation'] ?? null,
-        ];
-    }
-
-    private function foundationRequestInputsFormatter(int | string $languageId, int | string $audienceId, int | string $novelTypeId, array $genreIds, string | null $additionalInformation): array
-    {
-        $receivedInputs = [];
-
-        $language  = $this->languageService->findByIdsOrEnglish($languageId);
-        $audience  = $this->audienceService->findById($audienceId);
-        $novelType = $this->audienceService->findById($novelTypeId);
-        $genres    = $this->genreService->findByIdsOrRandom($genreIds);
-
-        $genrePromptInstruction = '';
-        foreach ($genres as $genre) {
-
-            $gInstruction = trim($genre->prompt_instruction);
-
-            if (! str_ends_with($gInstruction, '.')) {
-                $gInstruction .= '.';
-            }
-
-            if ($genrePromptInstruction !== '') {
-                $genrePromptInstruction .= ' ';
-            }
-
-            $genrePromptInstruction .= $gInstruction;
-        }
-
-        $receivedInputs = [
-            "language"                 => $language?->name,
-            "additional_information"   => $additionalInformation,
-            "genre_prompt_instruction" => $genrePromptInstruction,
-            "audience_instruction"     => $audience->prompt_instruction,
-            "novel_type_instruction"   => $novelType->prompt_instruction,
-        ];
-
-        return $receivedInputs;
-    }
-
-    private function charactersRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
-    {
-        $requestInputs = [];
-
-        $formatedFoundation = json_encode($novel->foundation, JSON_PRETTY_PRINT);
-        $requestInputs      = [
-            "foundation"             => $formatedFoundation,
-            "additional_information" => $additionalInformation,
-        ];
-
-        return $requestInputs;
-    }
-
-    private function extractCharactersFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            'characters'            => $decoded['characters'] ?? [],
-            'relationship_dynamics' => $decoded['relationship_dynamics'] ?? [],
-        ];
-    }
-
-    private function worldBibleRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
-    {
-        return [
-            "foundation"             => json_encode($novel->foundation, JSON_PRETTY_PRINT),
-            "characters"             => json_encode($novel->characters, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalInformation,
-        ];
-    }
-
-    private function locationsRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
-    {
-        return [
-            "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
-            "characters"             => json_encode($novel->characters, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalInformation,
-        ];
-    }
-
-    private function factionsRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
-    {
-        return [
-            "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
-            "locations"              => json_encode($novel->locations, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalInformation,
-        ];
-    }
-
-    private function creaturesRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
-    {
-        return [
-            "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
-            "locations"              => json_encode($novel->locations, JSON_PRETTY_PRINT),
-            "factions"               => json_encode($novel->factions, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalInformation,
-        ];
-    }
-
-    private function systemsRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
-    {
-        return [
-            "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
-            "creatures"              => json_encode($novel->creatures, JSON_PRETTY_PRINT),
-            "factions"               => json_encode($novel->factions, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalInformation,
-        ];
-    }
-
-    private function timelineRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
-    {
-        return [
-            "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
-            "factions"               => json_encode($novel->factions, JSON_PRETTY_PRINT),
-            "foundation"             => json_encode($novel->foundation, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalInformation,
-        ];
-    }
-
-    private function storyStructureRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
-    {
-        return [
-            "foundation"             => json_encode($novel->foundation, JSON_PRETTY_PRINT),
-            "characters"             => json_encode($novel->characters, JSON_PRETTY_PRINT),
-            "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
-            "timeline"               => json_encode($novel->timeline, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalInformation,
-        ];
-    }
-
-    private function twistsAndForeshadowingRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
-    {
-        return [
-            "story_structure"        => json_encode($novel->story_structure, JSON_PRETTY_PRINT),
-            "characters"             => json_encode($novel->characters, JSON_PRETTY_PRINT),
-            "world_bible"            => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalInformation,
-        ];
-    }
-
-    private function scenePlannerRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
-    {
-        return [
-            "story_structure"          => json_encode($novel->story_structure, JSON_PRETTY_PRINT),
-            "twists_and_foreshadowing" => json_encode($novel->twists_and_foreshadowing, JSON_PRETTY_PRINT),
-            "locations"                => json_encode($novel->locations, JSON_PRETTY_PRINT),
-            "additional_information"   => $additionalInformation,
-        ];
-    }
-
-    private function dialoguePlannerRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
-    {
-        return [
-            "characters"             => json_encode($novel->characters, JSON_PRETTY_PRINT),
-            "scene_plans"            => json_encode($novel->scene_plans, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalInformation,
-        ];
-    }
-
-    private function chapterPlannerRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
-    {
-        return [
-            "scene_plans"            => json_encode($novel->scene_plans, JSON_PRETTY_PRINT),
-            "story_structure"        => json_encode($novel->story_structure, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalInformation,
-        ];
-    }
-
-    private function pagePlannerRequestInputsFormatter(Novel $novel, string|null $additionalInformation): array
-    {
-        return [
-            "chapter_plan"           => json_encode($novel->chapter_plan, JSON_PRETTY_PRINT),
-            "scene_plans"            => json_encode($novel->scene_plans, JSON_PRETTY_PRINT),
-            "additional_information" => $additionalInformation,
-        ];
-    }
-
     private function chapterSummaryContextFormatter(Novel $novel): array
     {
         return [
@@ -1137,485 +957,5 @@ class NovelService
         }
 
         return 'Novel review incomplete. ' . implode(' ', $findings);
-    }
-
-    private function extractWorldBibleFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            $decoded['world_bible'] ?? [],
-        ];
-    }
-
-    private function extractLocationsFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            $decoded['locations'] ?? [],
-        ];
-    }
-
-    private function extractFactionsFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            $decoded['factions'] ?? [],
-        ];
-    }
-
-    private function extractCreaturesFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            $decoded['creatures'] ?? [],
-        ];
-    }
-
-    private function extractSystemsFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            $decoded['systems'] ?? [],
-        ];
-    }
-
-    private function extractTimelineFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            $decoded['timeline'] ?? [],
-        ];
-    }
-
-    private function extractStoryStructureFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            $decoded['story_structure'] ?? [],
-        ];
-    }
-
-    private function extractTwistsAndForeshadowingFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            $decoded['twists_and_foreshadowing'] ?? [],
-        ];
-    }
-
-    private function extractScenePlansFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            $decoded['scene_plans'] ?? [],
-        ];
-    }
-
-    private function extractDialoguePlansFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            $decoded['dialogue_plans'] ?? [],
-        ];
-    }
-
-    private function extractChapterPlanFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            $decoded['chapter_plan'] ?? [],
-        ];
-    }
-
-    private function extractPagePlanFromResponse($apiResponse): object
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return (object) [
-            $decoded['page_plan'] ?? [],
-        ];
     }
 }

@@ -1,7 +1,6 @@
 <?php
 namespace App\Services\BackOffice;
 
-use App\Helpers\AiPromptGeneratorHelper;
 use App\Models\AiBrain;
 use App\Models\Novel;
 use App\Models\NovelChapter;
@@ -80,21 +79,26 @@ class NovelChapterService
             ->appends($request->all());
     }
 
-    public function generateSummary(Novel $novel, array $context, array $chapterPlanEntry, string $prompt, AiBrain $aiBrain, string $additionalInformation): void
+    public function generateStep15_1ChapterSummary(Novel $novel, array $context, array $chapterPlanEntry, string $prompt, AiBrain $aiBrain, string $additionalInformation): void
     {
         $scenePlans = $this->chapterScenePlans($novel, $chapterPlanEntry);
 
-        $requestInputs = $this->chapterSummaryRequestInputsFormatter($context, $chapterPlanEntry, $scenePlans, $additionalInformation);
-        $fullPrompt    = AiPromptGeneratorHelper::generateFullPrompt($prompt, $requestInputs);
+        $inputs = [
+            "foundation"               => $context['foundation'],
+            "characters"               => $context['characters'],
+            "story_structure"          => $context['story_structure'],
+            "twists_and_foreshadowing" => $context['twists_and_foreshadowing'],
+            "chapter_plan_entry"       => $chapterPlanEntry,
+            "scene_plans"              => $scenePlans,
+            "additional_information"   => $additionalInformation,
+        ];
 
-        $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+        $stepData = $this->huggingFaceApiService->generateStepData(HuggingFaceApiService::STEP15_1_CHAPTER_SUMMARY_GENERATOR, $prompt, $inputs, $aiBrain);
 
-        $summery = $this->extractChapterSummaryFromResponse($apiResponse);
-
-        $this->saveSummaryByNovel($novel, $chapterPlanEntry, $summery);
+        $this->saveSummaryByNovel($novel, $chapterPlanEntry, $stepData['chapter_summary']);
     }
 
-    public function generateContent(Novel $novel, NovelChapter $novelChapter, array $context, string $prompt, AiBrain $aiBrain, string $additionalInformation): void
+    public function generateStep15_2ChapterContent(Novel $novel, NovelChapter $novelChapter, array $context, string $prompt, AiBrain $aiBrain, string $additionalInformation): void
     {
         if (is_string($novelChapter->content) && trim($novelChapter->content) !== '') {
             return;
@@ -110,14 +114,23 @@ class NovelChapterService
         $scenePlans       = $this->chapterScenePlans($novel, $chapterPlanEntry);
         $dialoguePlans    = $this->chapterDialoguePlans($novel, $scenePlans);
 
-        $requestInputs = $this->chapterContentRequestInputsFormatter($context, $novelChapter, $chapterPlanEntry, $scenePlans, $dialoguePlans, $additionalInformation);
-        $fullPrompt    = AiPromptGeneratorHelper::generateFullPrompt($prompt, $requestInputs);
+        $inputs = [
+            "language"                 => $context['language'],
+            "foundation"               => $context['foundation'],
+            "characters"               => $context['characters'],
+            "world_bible"              => $context['world_bible'],
+            "story_structure"          => $context['story_structure'],
+            "twists_and_foreshadowing" => $context['twists_and_foreshadowing'],
+            "chapter_summary"          => $summery,
+            "chapter_plan_entry"       => $chapterPlanEntry,
+            "scene_plans"              => $scenePlans,
+            "dialogue_plans"           => $dialoguePlans,
+            "additional_information"   => $additionalInformation,
+        ];
 
-        $apiResponse = $this->huggingFaceApiService->sendPostRequest($aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+        $stepData = $this->huggingFaceApiService->generateStepData(HuggingFaceApiService::STEP15_2_CHAPTER_CONTENT_GENERATOR, $prompt, $inputs, $aiBrain);
 
-        $content = $this->extractChapterContentFromResponse($apiResponse);
-
-        $this->saveContentByNovel($novelChapter, $content);
+        $this->saveContentByNovel($novelChapter, $stepData['chapter_content']);
     }
 
     public function saveSummaryByNovel(Novel $novel, array $chapterPlanEntry, string $summery): void
@@ -193,36 +206,6 @@ class NovelChapterService
         }
     }
 
-    private function chapterSummaryRequestInputsFormatter(array $context, array $chapterPlanEntry, array $scenePlans, string $additionalInformation): array
-    {
-        return [
-            "foundation"                => $context['foundation'],
-            "characters"                => $context['characters'],
-            "story_structure"           => $context['story_structure'],
-            "twists_and_foreshadowing"  => $context['twists_and_foreshadowing'],
-            "chapter_plan_entry"        => json_encode($chapterPlanEntry, JSON_PRETTY_PRINT),
-            "scene_plans"               => json_encode($scenePlans, JSON_PRETTY_PRINT),
-            "additional_information"    => $additionalInformation,
-        ];
-    }
-
-    private function chapterContentRequestInputsFormatter(array $context, NovelChapter $novelChapter, array $chapterPlanEntry, array $scenePlans, array $dialoguePlans, string $additionalInformation): array
-    {
-        return [
-            "language"                  => $context['language'],
-            "foundation"                => $context['foundation'],
-            "characters"                => $context['characters'],
-            "world_bible"               => $context['world_bible'],
-            "story_structure"           => $context['story_structure'],
-            "twists_and_foreshadowing"  => $context['twists_and_foreshadowing'],
-            "chapter_summary"           => $novelChapter->summery,
-            "chapter_plan_entry"        => json_encode($chapterPlanEntry, JSON_PRETTY_PRINT),
-            "scene_plans"               => json_encode($scenePlans, JSON_PRETTY_PRINT),
-            "dialogue_plans"            => json_encode($dialoguePlans, JSON_PRETTY_PRINT),
-            "additional_information"    => $additionalInformation,
-        ];
-    }
-
     private function findChapterPlanEntry(Novel $novel, NovelChapter $novelChapter): array
     {
         $chapterPlan = $novel->chapter_plan ?? [];
@@ -279,87 +262,6 @@ class NovelChapterService
         return array_values(array_filter($scenePlans, function ($scene) use ($chapterNumber) {
             return isset($scene['chapter']) && (string) $scene['chapter'] === $chapterNumber;
         }));
-    }
-
-    private function extractChapterSummaryFromResponse($apiResponse): string
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return json_encode($decoded['chapter_summary'] ?? [], JSON_UNESCAPED_UNICODE);
-    }
-
-    private function extractChapterContentFromResponse($apiResponse): string
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json|markdown|md|txt)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (is_array($decoded)) {
-            $candidate = $decoded['chapter_content'] ?? null;
-
-            if (! is_string($candidate) || trim($candidate) === '') {
-                throw new Exception('AI response does not contain chapter content.');
-            }
-
-            return trim($candidate);
-        }
-
-        if ($content === '') {
-            throw new Exception('AI response is empty.');
-        }
-
-        return $content;
     }
 
     private function wordCount(string $content): int
