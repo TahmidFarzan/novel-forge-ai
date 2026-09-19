@@ -3,24 +3,24 @@ namespace App\Helpers;
 
 class AiPromptGeneratorHelper
 {
-    public const AI_PROMPT_NAME_STEP1_FOUNDATION_GENERATOR = 'Foundation Generator';
-    public const AI_PROMPT_NAME_STEP2_CHARACTERS_GENERATOR = 'CHARACTER Generator';
-    public const AI_PROMPT_NAME_STEP3_WORLD_BIBLE_GENERATOR = 'World Bible Generator';
-    public const AI_PROMPT_NAME_STEP4_LOCATIONS_GENERATOR = 'Location Generator';
-    public const AI_PROMPT_NAME_STEP5_FACTIONS_GENERATOR = 'Faction Generator';
-    public const AI_PROMPT_NAME_STEP6_CREATURES_GENERATOR = 'Creature Generator';
-    public const AI_PROMPT_NAME_STEP7_SYSTEMS_GENERATOR = 'System Generator';
-    public const AI_PROMPT_NAME_STEP8_TIMELINE_GENERATOR = 'Timeline Generator';
-    public const AI_PROMPT_NAME_STEP9_STORY_STRUCTURE_GENERATOR = 'Story Structure Generator';
-    public const AI_PROMPT_NAME_STEP10_TWISTS_AND_FORESHADOWING_GENERATOR = 'Twists and Foreshadowing Generator';
-    public const AI_PROMPT_NAME_STEP11_SCENE_PLANS_GENERATOR = 'Scene Plans Generator';
-    public const AI_PROMPT_NAME_STEP12_DIALOGUE_PLANS_GENERATOR = 'Dialogue Plans Generator';
-    public const AI_PROMPT_NAME_STEP13_CHAPTER_PLAN_GENERATOR = 'Chapter Plan Generator';
-    public const AI_PROMPT_NAME_STEP14_PAGE_PLAN_GENERATOR = 'Page Plan Generator';
-    public const AI_PROMPT_NAME_STEP15_1_CHAPTER_SUMMARY_GENERATOR = 'Chapter Summary Generator';
-    public const AI_PROMPT_NAME_STEP15_2_CHAPTER_CONTENT_GENERATOR = 'Chapter Content Generator';
+    public const AI_PROMPT_NAME_STEP1 = 'Foundation Generator';
+    public const AI_PROMPT_NAME_STEP2 = 'CHARACTER Generator';
+    public const AI_PROMPT_NAME_STEP3 = 'World Bible Generator';
+    public const AI_PROMPT_NAME_STEP4 = 'Location Generator';
+    public const AI_PROMPT_NAME_STEP5 = 'Faction Generator';
+    public const AI_PROMPT_NAME_STEP6 = 'Creature Generator';
+    public const AI_PROMPT_NAME_STEP7 = 'System Generator';
+    public const AI_PROMPT_NAME_STEP8 = 'Timeline Generator';
+    public const AI_PROMPT_NAME_STEP9 = 'Story Structure Generator';
+    public const AI_PROMPT_NAME_STEP10 = 'Twists and Foreshadowing Generator';
+    public const AI_PROMPT_NAME_STEP11 = 'Scene Plans Generator';
+    public const AI_PROMPT_NAME_STEP12 = 'Dialogue Plans Generator';
+    public const AI_PROMPT_NAME_STEP13 = 'Chapter Plan Generator';
+    public const AI_PROMPT_NAME_STEP14 = 'Page Plan Generator';
+    public const AI_PROMPT_NAME_STEP15_1 = 'Chapter Summary Generator';
+    public const AI_PROMPT_NAME_STEP15_2 = 'Chapter Content Generator';
 
-    public static function step1FoundationGenerator(): string
+    public static function step1Prompt(): string
     {
         $prompt = "
             You are a professional novel development AI.
@@ -327,7 +327,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step2CharactersGenerator(): string
+    public static function step2Prompt(): string
     {
         $prompt = "
             You are a professional novel character development AI.
@@ -573,7 +573,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step3WorldBibleGenerator(): string
+    public static function step3Prompt(): string
     {
         $prompt = "
             You are a professional novel world-building AI.
@@ -875,7 +875,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step4LocationsGenerator(): string
+    public static function step4Prompt(): string
     {
         $prompt = "
             You are a professional novel location development AI.
@@ -1155,7 +1155,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step5FactionsGenerator(): string
+    public static function step5Prompt(): string
     {
         $prompt = "
             You are a professional novel faction and organization development AI.
@@ -1466,7 +1466,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step6CreaturesGenerator(): string
+    public static function step6Prompt(): string
     {
         $prompt = "
             You are a professional novel creature and being development AI.
@@ -1780,7 +1780,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step7SystemsGenerator(): string
+    public static function step7Prompt(): string
     {
         $prompt = "
             You are a professional novel world system development AI.
@@ -2071,7 +2071,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step8TimelineGenerator(): string
+    public static function step8Prompt(): string
     {
         $prompt = "
             You are a professional novel timeline and world history development AI.
@@ -2392,7 +2392,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step9StoryStructureGenerator(): string
+    public static function step9Prompt(): string
     {
         $prompt = "
             You are a professional novel story structure development AI.
@@ -2779,7 +2779,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step10TwistsAndForeshadowingGenerator(): string
+    public static function step10Prompt(): string
     {
         $prompt = "
             You are a professional novel twist and foreshadowing development AI.
@@ -3145,7 +3145,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step11ScenePlansGenerator(): string
+    public static function step11Prompt(): string
     {
         $prompt = "
             You are a professional novel scene planning AI.
@@ -3452,7 +3452,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step12DialoguePlansGenerator(): string
+    public static function step12Prompt(): string
     {
         $prompt = "
             You are a professional novel dialogue planning AI.
@@ -3607,7 +3607,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step13ChapterPlanGenerator(): string
+    public static function step13Prompt(): string
     {
         $prompt = "
             You are a professional novel chapter planning AI.
@@ -3750,7 +3750,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step14PagePlanGenerator(): string
+    public static function step14Prompt(): string
     {
         $prompt = "
             You are a professional novel page planning AI.
@@ -3888,7 +3888,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step15_1ChapterSummaryGenerator(): string
+    public static function step15_1Prompt(): string
     {
         $prompt = "
             You are a professional novel chapter development AI.
@@ -4145,7 +4145,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step15_2ChapterContentGenerator(): string
+    public static function step15_2Prompt(): string
     {
         $prompt = "
             You are a professional long-form novelist and story writer.

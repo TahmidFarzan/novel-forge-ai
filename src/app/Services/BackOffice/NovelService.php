@@ -130,7 +130,7 @@ class NovelService
         $statusEvent = $isNew ? "save" : "update";
 
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1_FOUNDATION_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -196,7 +196,7 @@ class NovelService
     public function generateStep2Characters(NovelCharactersRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2_CHARACTERS_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -234,9 +234,9 @@ class NovelService
     public function generateStep3WorldBible(NovelWorldBibleRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3_WORLD_BIBLE_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3;
 
-            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3_WORLD_BIBLE_GENERATOR));
+            $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
             $inputs = [
@@ -273,7 +273,7 @@ class NovelService
     public function generateStep4Locations(NovelLocationsRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4_LOCATIONS_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -312,7 +312,7 @@ class NovelService
     public function generateStep5Factions(NovelFactionsRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5_FACTIONS_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -351,7 +351,7 @@ class NovelService
     public function generateStep6Creatures(NovelCreaturesRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6_CREATURES_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -391,7 +391,7 @@ class NovelService
     public function generateStep7Systems(NovelSystemsRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP7_SYSTEMS_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP7;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -431,7 +431,7 @@ class NovelService
     public function generateStep8Timeline(NovelTimelineRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8_TIMELINE_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -471,7 +471,7 @@ class NovelService
     public function generateStep9StoryStructure(NovelStoryStructureRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9_STORY_STRUCTURE_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -512,7 +512,7 @@ class NovelService
     public function generateStep10TwistsAndForeshadowing(NovelTwistsAndForeshadowingRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10_TWISTS_AND_FORESHADOWING_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -552,7 +552,7 @@ class NovelService
     public function generateStep11ScenePlans(NovelScenePlannerRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11_SCENE_PLANS_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -592,7 +592,7 @@ class NovelService
     public function generateStep12DialoguePlans(NovelDialoguePlannerRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12_DIALOGUE_PLANS_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -631,7 +631,7 @@ class NovelService
     public function generateStep13ChapterPlan(NovelChapterPlannerRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13_CHAPTER_PLAN_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -670,7 +670,7 @@ class NovelService
     public function generateStep14PagePlan(NovelPagePlannerRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14_PAGE_PLAN_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -709,7 +709,7 @@ class NovelService
     public function generateStep15_1ChapterSummaries(NovelChapterSummaryRequest $request, Novel $novel): array
     {
         try {
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_1_CHAPTER_SUMMARY_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_1;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
@@ -757,7 +757,7 @@ class NovelService
                 throw new Exception('Novel chapter ' . $chapterNo . ' not found.');
             }
 
-            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_2_CHAPTER_CONTENT_GENERATOR;
+            $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_2;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));

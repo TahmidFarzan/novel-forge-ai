@@ -1,6 +1,7 @@
 <?php
 namespace App\Services\BackOffice;
 
+use App\Helpers\AiPromptGeneratorHelper;
 use App\Models\AiBrain;
 use App\Models\Novel;
 use App\Models\NovelChapter;
@@ -93,7 +94,7 @@ class NovelChapterService
             "additional_information"   => $additionalInformation,
         ];
 
-        $stepData = $this->huggingFaceApiService->generateStepData(HuggingFaceApiService::STEP15_1_CHAPTER_SUMMARY_GENERATOR, $prompt, $inputs, $aiBrain);
+        $stepData = $this->huggingFaceApiService->generateStepData(AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_1, $prompt, $inputs, $aiBrain);
 
         $this->saveSummaryByNovel($novel, $chapterPlanEntry, $stepData['chapter_summary']);
     }
@@ -128,7 +129,7 @@ class NovelChapterService
             "additional_information"   => $additionalInformation,
         ];
 
-        $stepData = $this->huggingFaceApiService->generateStepData(HuggingFaceApiService::STEP15_2_CHAPTER_CONTENT_GENERATOR, $prompt, $inputs, $aiBrain);
+        $stepData = $this->huggingFaceApiService->generateStepData(AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_2, $prompt, $inputs, $aiBrain);
 
         $this->saveContentByNovel($novelChapter, $stepData['chapter_content']);
     }
