@@ -17,8 +17,8 @@ class AiPromptGeneratorHelper
     public const AI_PROMPT_NAME_STEP12 = 'Dialogue Plans Generator';
     public const AI_PROMPT_NAME_STEP13 = 'Chapter Plan Generator';
     public const AI_PROMPT_NAME_STEP14 = 'Page Plan Generator';
-    public const AI_PROMPT_NAME_STEP15_1 = 'Chapter Summary Generator';
-    public const AI_PROMPT_NAME_STEP15_2 = 'Chapter Content Generator';
+    public const AI_PROMPT_NAME_STEP15 = 'Chapter Summary Generator';
+    public const AI_PROMPT_NAME_STEP16 = 'Chapter Content Generator';
 
     public static function step1Prompt(): string
     {
@@ -3888,7 +3888,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step15_1Prompt(): string
+    public static function step15Prompt(): string
     {
         $prompt = "
             You are a professional novel chapter development AI.
@@ -4145,7 +4145,7 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
-    public static function step15_2Prompt(): string
+    public static function step16Prompt(): string
     {
         $prompt = "
             You are a professional long-form novelist and story writer.

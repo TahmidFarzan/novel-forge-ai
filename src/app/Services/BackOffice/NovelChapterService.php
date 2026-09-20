@@ -80,7 +80,7 @@ class NovelChapterService
             ->appends($request->all());
     }
 
-    public function generateStep15_1ChapterSummary(Novel $novel, array $context, array $chapterPlanEntry, string $prompt, AiBrain $aiBrain, string $additionalInformation): void
+    public function generateStep15(Novel $novel, array $context, array $chapterPlanEntry, string $prompt, AiBrain $aiBrain, string $additionalInformation): void
     {
         $scenePlans = $this->chapterScenePlans($novel, $chapterPlanEntry);
 
@@ -94,12 +94,12 @@ class NovelChapterService
             "additional_information"   => $additionalInformation,
         ];
 
-        $stepData = $this->huggingFaceApiService->generateStepData(AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_1, $prompt, $inputs, $aiBrain);
+        $stepData = $this->huggingFaceApiService->generateStepData(AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15, $prompt, $inputs, $aiBrain);
 
         $this->saveSummaryByNovel($novel, $chapterPlanEntry, $stepData['chapter_summary']);
     }
 
-    public function generateStep15_2ChapterContent(Novel $novel, NovelChapter $novelChapter, array $context, string $prompt, AiBrain $aiBrain, string $additionalInformation): void
+    public function generateStep16(Novel $novel, NovelChapter $novelChapter, array $context, string $prompt, AiBrain $aiBrain, string $additionalInformation): void
     {
         if (is_string($novelChapter->content) && trim($novelChapter->content) !== '') {
             return;
@@ -129,7 +129,7 @@ class NovelChapterService
             "additional_information"   => $additionalInformation,
         ];
 
-        $stepData = $this->huggingFaceApiService->generateStepData(AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_2, $prompt, $inputs, $aiBrain);
+        $stepData = $this->huggingFaceApiService->generateStepData(AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16, $prompt, $inputs, $aiBrain);
 
         $this->saveContentByNovel($novelChapter, $stepData['chapter_content']);
     }

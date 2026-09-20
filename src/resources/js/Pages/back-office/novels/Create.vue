@@ -1,21 +1,21 @@
 <script setup>
 import Layout from "@/pages/layouts/AuthLayout.vue";
 
-import NovelStep1FoundationForm from "@/components/back-office/novel/NovelStep1FoundationForm.vue";
-import NovelStep2CharactersForm from "@/components/back-office/novel/NovelStep2CharactersForm.vue";
-import NovelStep3WorldBibleForm from "@/components/back-office/novel/NovelStep3WorldBibleForm.vue";
-import NovelStep4LocationsForm from "@/components/back-office/novel/NovelStep4LocationsForm.vue";
-import NovelStep5FactionsForm from "@/components/back-office/novel/NovelStep5FactionsForm.vue";
-import NovelStep6CreatureForm from "@/components/back-office/novel/NovelStep6CreatureForm.vue";
-import NovelStep7SystemForm from "@/components/back-office/novel/NovelStep7SystemForm.vue";
-import NovelStep8TimelineForm from "@/components/back-office/novel/NovelStep8TimelineForm.vue";
-import NovelStep9StoryStructureForm from "@/components/back-office/novel/NovelStep9StoryStructureForm.vue";
-import NovelStep10TwistsAndForeshadowingForm from "@/components/back-office/novel/NovelStep10TwistsAndForeshadowingForm.vue";
-import NovelStep11ScenePlannerForm from "@/components/back-office/novel/NovelStep11ScenePlannerForm.vue";
-import NovelStep12DialoguePlannerForm from "@/components/back-office/novel/NovelStep12DialoguePlannerForm.vue";
-import NovelStep13ChapterPlannerForm from "@/components/back-office/novel/NovelStep13ChapterPlannerForm.vue";
-import NovelStep14PagePlannerForm from "@/components/back-office/novel/NovelStep14PagePlannerForm.vue";
-import NovelStep15CompleteNovelForm from "@/components/back-office/novel/NovelStep15CompleteNovelForm.vue";
+import NovelStep1Form from "@/components/back-office/novel/NovelStep1Form.vue";
+import NovelStep2Form from "@/components/back-office/novel/NovelStep2Form.vue";
+import NovelStep3Form from "@/components/back-office/novel/NovelStep3Form.vue";
+import NovelStep4Form from "@/components/back-office/novel/NovelStep4Form.vue";
+import NovelStep5Form from "@/components/back-office/novel/NovelStep5Form.vue";
+import NovelStep6Form from "@/components/back-office/novel/NovelStep6Form.vue";
+import NovelStep7Form from "@/components/back-office/novel/NovelStep7Form.vue";
+import NovelStep8Form from "@/components/back-office/novel/NovelStep8Form.vue";
+import NovelStep9Form from "@/components/back-office/novel/NovelStep9Form.vue";
+import NovelStep10Form from "@/components/back-office/novel/NovelStep10Form.vue";
+import NovelStep11Form from "@/components/back-office/novel/NovelStep11Form.vue";
+import NovelStep12Form from "@/components/back-office/novel/NovelStep12Form.vue";
+import NovelStep13Form from "@/components/back-office/novel/NovelStep13Form.vue";
+import NovelStep14Form from "@/components/back-office/novel/NovelStep14Form.vue";
+import NovelStep15Form from "@/components/back-office/novel/NovelStep15Form.vue";
 
 import { ref, computed, onMounted, nextTick } from "vue";
 import { Head } from "@inertiajs/vue3";
@@ -296,7 +296,7 @@ const submitActiveStep = () => {
                 </div>
 
                 <div class="px-0 py-6">
-                    <NovelStep1FoundationForm
+                    <NovelStep1Form
                         v-if="activeStep === 1"
                         ref="activeStepComponentRef"
                         :novel="novel"
@@ -305,98 +305,98 @@ const submitActiveStep = () => {
                         @finished="handleFinished"
                     />
 
-                    <NovelStep2CharactersForm
+                    <NovelStep2Form
                         v-else-if="activeStep === 2"
                         ref="activeStepComponentRef"
                         :novel="novel"
                         @completed="handleStepCompleted(2)"
                     />
 
-                    <NovelStep3WorldBibleForm
+                    <NovelStep3Form
                         v-else-if="activeStep === 3"
                         ref="activeStepComponentRef"
                         :novel="novel"
                         @completed="handleStepCompleted(3)"
                     />
 
-                    <NovelStep4LocationsForm
+                    <NovelStep4Form
                         v-else-if="activeStep === 4"
                         ref="activeStepComponentRef"
                         :novel="novel"
                         @completed="handleStepCompleted(4)"
                     />
 
-                    <NovelStep5FactionsForm
+                    <NovelStep5Form
                         v-else-if="activeStep === 5"
                         ref="activeStepComponentRef"
                         :novel="novel"
                         @completed="handleStepCompleted(5)"
                     />
 
-                    <NovelStep6CreatureForm
+                    <NovelStep6Form
                         v-else-if="activeStep === 6"
                         ref="activeStepComponentRef"
                         :novel="novel"
                         @completed="handleStepCompleted(6)"
                     />
 
-                    <NovelStep7SystemForm
+                    <NovelStep7Form
                         v-else-if="activeStep === 7"
                         ref="activeStepComponentRef"
                         :novel="novel"
                         @completed="handleStepCompleted(7)"
                     />
 
-                    <NovelStep8TimelineForm
+                    <NovelStep8Form
                         v-else-if="activeStep === 8"
                         ref="activeStepComponentRef"
                         :novel="novel"
                         @completed="handleStepCompleted(8)"
                     />
 
-                    <NovelStep9StoryStructureForm
+                    <NovelStep9Form
                         v-else-if="activeStep === 9"
                         ref="activeStepComponentRef"
                         :novel="novel"
                         @completed="handleStepCompleted(9)"
                     />
 
-                    <NovelStep10TwistsAndForeshadowingForm
+                    <NovelStep10Form
                         v-else-if="activeStep === 10"
                         ref="activeStepComponentRef"
                         :novel="novel"
                         @completed="handleStepCompleted(10)"
                     />
 
-                    <NovelStep11ScenePlannerForm
+                    <NovelStep11Form
                         v-else-if="activeStep === 11"
                         ref="activeStepComponentRef"
                         :novel="novel"
                         @completed="handleStepCompleted(11)"
                     />
 
-                    <NovelStep12DialoguePlannerForm
+                    <NovelStep12Form
                         v-else-if="activeStep === 12"
                         ref="activeStepComponentRef"
                         :novel="novel"
                         @completed="handleStepCompleted(12)"
                     />
 
-                    <NovelStep13ChapterPlannerForm
+                    <NovelStep13Form
                         v-else-if="activeStep === 13"
                         ref="activeStepComponentRef"
                         :novel="novel"
                         @completed="handleStepCompleted(13)"
                     />
 
-                    <NovelStep14PagePlannerForm
+                    <NovelStep14Form
                         v-else-if="activeStep === 14"
                         ref="activeStepComponentRef"
                         :novel="novel"
                         @completed="handleStepCompleted(14)"
                     />
 
-                    <NovelStep15CompleteNovelForm
+                    <NovelStep15Form
                         v-else-if="activeStep === 15"
                         ref="activeStepComponentRef"
                         :novel="novel"

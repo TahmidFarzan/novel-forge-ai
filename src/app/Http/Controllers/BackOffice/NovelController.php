@@ -75,12 +75,12 @@ class NovelController extends Controller
     }
 
 
-    public function createStep1Foundation(NovelFoundationRequest $request): RedirectResponse
+    public function createStep1(NovelFoundationRequest $request): RedirectResponse
     {
         $novel = $this->novelService->new();
         Gate::authorize('create', $novel);
 
-        $result = $this->novelService->generateStep1Foundation($request, $novel);
+        $result = $this->novelService->generateStep1($request, $novel);
 
         if ($result['novel']?->slug) {
             return to_route('back-office.novels.edit', ["slug" => $result['novel']?->slug])->with('flash_message', [
@@ -94,12 +94,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep1Foundation(NovelFoundationRequest $request, string $slug): RedirectResponse
+    public function generateStep1(NovelFoundationRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep1Foundation($request, $novel);
+        $result = $this->novelService->generateStep1($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $slug])->with('flash_message', [
             'message' => $result['message'],
@@ -107,12 +107,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep2Characters(NovelCharactersRequest $request, string $slug): RedirectResponse
+    public function generateStep2(NovelCharactersRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep2Characters($request, $novel);
+        $result = $this->novelService->generateStep2($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -120,12 +120,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep3WorldBible(NovelWorldBibleRequest $request, string $slug): RedirectResponse
+    public function generateStep3(NovelWorldBibleRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep3WorldBible($request, $novel);
+        $result = $this->novelService->generateStep3($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -133,12 +133,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep4Locations(NovelLocationsRequest $request, string $slug): RedirectResponse
+    public function generateStep4(NovelLocationsRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep4Locations($request, $novel);
+        $result = $this->novelService->generateStep4($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -146,12 +146,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep5Factions(NovelFactionsRequest $request, string $slug): RedirectResponse
+    public function generateStep5(NovelFactionsRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep5Factions($request, $novel);
+        $result = $this->novelService->generateStep5($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -159,12 +159,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep6Creatures(NovelCreaturesRequest $request, string $slug): RedirectResponse
+    public function generateStep6(NovelCreaturesRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep6Creatures($request, $novel);
+        $result = $this->novelService->generateStep6($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -172,12 +172,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep7Systems(NovelSystemsRequest $request, string $slug): RedirectResponse
+    public function generateStep7(NovelSystemsRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep7Systems($request, $novel);
+        $result = $this->novelService->generateStep7($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -185,12 +185,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep8Timeline(NovelTimelineRequest $request, string $slug): RedirectResponse
+    public function generateStep8(NovelTimelineRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep8Timeline($request, $novel);
+        $result = $this->novelService->generateStep8($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -198,12 +198,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep9StoryStructure(NovelStoryStructureRequest $request, string $slug): RedirectResponse
+    public function generateStep9(NovelStoryStructureRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep9StoryStructure($request, $novel);
+        $result = $this->novelService->generateStep9($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -211,12 +211,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep10TwistsAndForeshadowing(NovelTwistsAndForeshadowingRequest $request, string $slug): RedirectResponse
+    public function generateStep10(NovelTwistsAndForeshadowingRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep10TwistsAndForeshadowing($request, $novel);
+        $result = $this->novelService->generateStep10($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -224,12 +224,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep11ScenePlans(NovelScenePlannerRequest $request, string $slug): RedirectResponse
+    public function generateStep11(NovelScenePlannerRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep11ScenePlans($request, $novel);
+        $result = $this->novelService->generateStep11($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -237,12 +237,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep12DialoguePlans(NovelDialoguePlannerRequest $request, string $slug): RedirectResponse
+    public function generateStep12(NovelDialoguePlannerRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep12DialoguePlans($request, $novel);
+        $result = $this->novelService->generateStep12($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -250,12 +250,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep13ChapterPlan(NovelChapterPlannerRequest $request, string $slug): RedirectResponse
+    public function generateStep13(NovelChapterPlannerRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep13ChapterPlan($request, $novel);
+        $result = $this->novelService->generateStep13($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -263,12 +263,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep14PagePlan(NovelPagePlannerRequest $request, string $slug): RedirectResponse
+    public function generateStep14(NovelPagePlannerRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep14PagePlan($request, $novel);
+        $result = $this->novelService->generateStep14($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -276,12 +276,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep15_1ChapterSummaries(NovelChapterSummaryRequest $request, string $slug): RedirectResponse
+    public function generateStep15(NovelChapterSummaryRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep15_1ChapterSummaries($request, $novel);
+        $result = $this->novelService->generateStep15($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],
@@ -289,12 +289,12 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep15_2ChapterContent(NovelChapterContentRequest $request, string $slug): RedirectResponse
+    public function generateStep16(NovelChapterContentRequest $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
 
-        $result = $this->novelService->generateStep15_2ChapterContent($request, $novel);
+        $result = $this->novelService->generateStep16($request, $novel);
 
         return to_route('back-office.novels.edit', ["slug" => $novel?->slug])->with('flash_message', [
             'message' => $result['message'],

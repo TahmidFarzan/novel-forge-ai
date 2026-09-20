@@ -1,6 +1,6 @@
 <script setup>
-import NovelStep15ChapterSummaryForm from "@/components/back-office/novel/NovelStep15ChapterSummaryForm.vue";
-import NovelStep15ChapterContentForm from "@/components/back-office/novel/NovelStep15ChapterContentForm.vue";
+import NovelStep15SummaryForm from "@/components/back-office/novel/NovelStep15SummaryForm.vue";
+import NovelStep16ContentForm from "@/components/back-office/novel/NovelStep16ContentForm.vue";
 
 import { ref, computed } from "vue";
 
@@ -128,14 +128,14 @@ defineExpose({ submit });
             </p>
         </div>
 
-        <NovelStep15ChapterSummaryForm
+        <NovelStep15SummaryForm
             v-if="currentTab === 'summaries'"
             ref="tabRef"
             :novel="novel"
             @completed="handleSummariesCompleted"
         />
 
-        <NovelStep15ChapterContentForm
+        <NovelStep16ContentForm
             v-else
             ref="tabRef"
             :novel="novel"

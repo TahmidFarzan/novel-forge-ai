@@ -463,19 +463,19 @@ class SeederHelper
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_1,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15,
                 'code'                 => "ChapterSummaryGenerator",
                 'step_number'          => 15,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::step15_1Prompt(),
+                'prompt'               => AiPromptGeneratorHelper::step15Prompt(),
             ],
 
             (object) [
-                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_2,
+                'name'                 => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16,
                 'code'                 => "ChapterContentGenerator",
                 'step_number'          => 15,
                 'depend_on_prompt_ids' => null,
-                'prompt'               => AiPromptGeneratorHelper::step15_2Prompt(),
+                'prompt'               => AiPromptGeneratorHelper::step16Prompt(),
             ],
 
         ]);

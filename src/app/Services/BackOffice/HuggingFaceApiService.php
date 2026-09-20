@@ -48,8 +48,8 @@ class HuggingFaceApiService
             AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12    => $this->step12DialoguePlansRequestInputsFormatter($inputs),
             AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13    => $this->step13ChapterPlanRequestInputsFormatter($inputs),
             AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14    => $this->step14PagePlanRequestInputsFormatter($inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_1  => $this->step15_1ChapterSummaryRequestInputsFormatter($inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_2  => $this->step15_2ChapterContentRequestInputsFormatter($inputs),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15    => $this->step15ChapterSummaryRequestInputsFormatter($inputs),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16    => $this->step16ChapterContentRequestInputsFormatter($inputs),
             default                                                                           => throw new Exception("Unknown AI step name [{$stepName}]."),
         };
     }
@@ -71,8 +71,8 @@ class HuggingFaceApiService
             AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12    => $this->formatStep12DialoguePlansResponse($this->extractStep12DialoguePlansFromResponse($apiResponse)),
             AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13    => $this->formatStep13ChapterPlanResponse($this->extractStep13ChapterPlanFromResponse($apiResponse)),
             AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14    => $this->formatStep14PagePlanResponse($this->extractStep14PagePlanFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_1  => $this->formatStep15_1ChapterSummaryResponse($this->extractStep15_1ChapterSummaryFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15_2  => $this->formatStep15_2ChapterContentResponse($this->extractStep15_2ChapterContentFromResponse($apiResponse)),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15    => $this->formatStep15ChapterSummaryResponse($this->extractStep15ChapterSummaryFromResponse($apiResponse)),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16    => $this->formatStep16ChapterContentResponse($this->extractStep16ChapterContentFromResponse($apiResponse)),
             default                                                                           => throw new Exception("Unknown AI step name [{$stepName}]."),
         };
     }
@@ -335,7 +335,7 @@ class HuggingFaceApiService
         ];
     }
 
-    private function step15_1ChapterSummaryRequestInputsFormatter(array $inputs): array
+    private function step15ChapterSummaryRequestInputsFormatter(array $inputs): array
     {
         return [
             "foundation"               => $inputs['foundation'] ?? '',
@@ -348,7 +348,7 @@ class HuggingFaceApiService
         ];
     }
 
-    private function step15_2ChapterContentRequestInputsFormatter(array $inputs): array
+    private function step16ChapterContentRequestInputsFormatter(array $inputs): array
     {
         return [
             "language"                 => $inputs['language'] ?? '',
@@ -537,7 +537,7 @@ class HuggingFaceApiService
         ];
     }
 
-    private function extractStep15_1ChapterSummaryFromResponse(array $apiResponse): array
+    private function extractStep15ChapterSummaryFromResponse(array $apiResponse): array
     {
         $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
 
@@ -546,7 +546,7 @@ class HuggingFaceApiService
         ];
     }
 
-    private function extractStep15_2ChapterContentFromResponse(array $apiResponse): array
+    private function extractStep16ChapterContentFromResponse(array $apiResponse): array
     {
         $content = data_get(
             $apiResponse,
@@ -694,14 +694,14 @@ class HuggingFaceApiService
         ];
     }
 
-    private function formatStep15_1ChapterSummaryResponse(array $extracted): array
+    private function formatStep15ChapterSummaryResponse(array $extracted): array
     {
         return [
             'chapter_summary' => json_encode($extracted['chapter_summary'] ?? [], JSON_UNESCAPED_UNICODE),
         ];
     }
 
-    private function formatStep15_2ChapterContentResponse(array $extracted): array
+    private function formatStep16ChapterContentResponse(array $extracted): array
     {
         return [
             'chapter_content' => (string) ($extracted['chapter_content'] ?? ''),
