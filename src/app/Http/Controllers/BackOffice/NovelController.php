@@ -4,22 +4,22 @@ namespace App\Http\Controllers\BackOffice;
 
 use App\Http\Controllers\Controller;
 use App\Helpers\NovelHelper;
-use App\Http\Requests\NovelChapterContentRequest;
-use App\Http\Requests\NovelChapterPlannerRequest;
-use App\Http\Requests\NovelChapterSummaryRequest;
-use App\Http\Requests\NovelCreaturesRequest;
-use App\Http\Requests\NovelDialoguePlannerRequest;
-use App\Http\Requests\NovelFactionsRequest;
-use App\Http\Requests\NovelFoundationRequest;
-use App\Http\Requests\NovelLocationsRequest;
-use App\Http\Requests\NovelPagePlannerRequest;
-use App\Http\Requests\NovelScenePlannerRequest;
-use App\Http\Requests\NovelStoryStructureRequest;
-use App\Http\Requests\NovelSystemsRequest;
-use App\Http\Requests\NovelTimelineRequest;
-use App\Http\Requests\NovelCharactersRequest;
-use App\Http\Requests\NovelTwistsAndForeshadowingRequest;
-use App\Http\Requests\NovelWorldBibleRequest;
+use App\Http\Requests\StoryBookStep1;
+use App\Http\Requests\StoryBookStep10;
+use App\Http\Requests\StoryBookStep11;
+use App\Http\Requests\StoryBookStep12;
+use App\Http\Requests\StoryBookStep13;
+use App\Http\Requests\StoryBookStep14;
+use App\Http\Requests\StoryBookStep15;
+use App\Http\Requests\StoryBookStep16;
+use App\Http\Requests\StoryBookStep2;
+use App\Http\Requests\StoryBookStep3;
+use App\Http\Requests\StoryBookStep4;
+use App\Http\Requests\StoryBookStep5;
+use App\Http\Requests\StoryBookStep6;
+use App\Http\Requests\StoryBookStep7;
+use App\Http\Requests\StoryBookStep8;
+use App\Http\Requests\StoryBookStep9;
 use App\Services\BackOffice\NovelService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -75,7 +75,7 @@ class NovelController extends Controller
     }
 
 
-    public function createStep1(NovelFoundationRequest $request): RedirectResponse
+    public function createStep1(StoryBookStep1 $request): RedirectResponse
     {
         $novel = $this->novelService->new();
         Gate::authorize('create', $novel);
@@ -94,7 +94,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep1(NovelFoundationRequest $request, string $slug): RedirectResponse
+    public function generateStep1(StoryBookStep1 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -107,7 +107,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep2(NovelCharactersRequest $request, string $slug): RedirectResponse
+    public function generateStep2(StoryBookStep2 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -120,7 +120,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep3(NovelWorldBibleRequest $request, string $slug): RedirectResponse
+    public function generateStep3(StoryBookStep3 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -133,7 +133,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep4(NovelLocationsRequest $request, string $slug): RedirectResponse
+    public function generateStep4(StoryBookStep4 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -146,7 +146,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep5(NovelFactionsRequest $request, string $slug): RedirectResponse
+    public function generateStep5(StoryBookStep5 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -159,7 +159,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep6(NovelCreaturesRequest $request, string $slug): RedirectResponse
+    public function generateStep6(StoryBookStep6 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -172,7 +172,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep7(NovelSystemsRequest $request, string $slug): RedirectResponse
+    public function generateStep7(StoryBookStep7 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -185,7 +185,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep8(NovelTimelineRequest $request, string $slug): RedirectResponse
+    public function generateStep8(StoryBookStep8 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -198,7 +198,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep9(NovelStoryStructureRequest $request, string $slug): RedirectResponse
+    public function generateStep9(StoryBookStep9 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -211,7 +211,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep10(NovelTwistsAndForeshadowingRequest $request, string $slug): RedirectResponse
+    public function generateStep10(StoryBookStep10 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -224,7 +224,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep11(NovelScenePlannerRequest $request, string $slug): RedirectResponse
+    public function generateStep11(StoryBookStep11 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -237,7 +237,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep12(NovelDialoguePlannerRequest $request, string $slug): RedirectResponse
+    public function generateStep12(StoryBookStep12 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -250,7 +250,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep13(NovelChapterPlannerRequest $request, string $slug): RedirectResponse
+    public function generateStep13(StoryBookStep13 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -263,7 +263,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep14(NovelPagePlannerRequest $request, string $slug): RedirectResponse
+    public function generateStep14(StoryBookStep14 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -276,7 +276,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep15(NovelChapterSummaryRequest $request, string $slug): RedirectResponse
+    public function generateStep15(StoryBookStep15 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -289,7 +289,7 @@ class NovelController extends Controller
         ]);
     }
 
-    public function generateStep16(NovelChapterContentRequest $request, string $slug): RedirectResponse
+    public function generateStep16(StoryBookStep16 $request, string $slug): RedirectResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);

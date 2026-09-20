@@ -3,22 +3,22 @@ namespace App\Services\BackOffice;
 
 use App\Helpers\AiPromptGeneratorHelper;
 use App\Helpers\NovelHelper;
-use App\Http\Requests\NovelChapterContentRequest;
-use App\Http\Requests\NovelChapterPlannerRequest;
-use App\Http\Requests\NovelChapterSummaryRequest;
-use App\Http\Requests\NovelCharactersRequest;
-use App\Http\Requests\NovelCreaturesRequest;
-use App\Http\Requests\NovelDialoguePlannerRequest;
-use App\Http\Requests\NovelFactionsRequest;
-use App\Http\Requests\NovelFoundationRequest;
-use App\Http\Requests\NovelLocationsRequest;
-use App\Http\Requests\NovelPagePlannerRequest;
-use App\Http\Requests\NovelScenePlannerRequest;
-use App\Http\Requests\NovelStoryStructureRequest;
-use App\Http\Requests\NovelSystemsRequest;
-use App\Http\Requests\NovelTimelineRequest;
-use App\Http\Requests\NovelTwistsAndForeshadowingRequest;
-use App\Http\Requests\NovelWorldBibleRequest;
+use App\Http\Requests\StoryBookStep1;
+use App\Http\Requests\StoryBookStep10;
+use App\Http\Requests\StoryBookStep11;
+use App\Http\Requests\StoryBookStep12;
+use App\Http\Requests\StoryBookStep13;
+use App\Http\Requests\StoryBookStep14;
+use App\Http\Requests\StoryBookStep15;
+use App\Http\Requests\StoryBookStep16;
+use App\Http\Requests\StoryBookStep2;
+use App\Http\Requests\StoryBookStep3;
+use App\Http\Requests\StoryBookStep4;
+use App\Http\Requests\StoryBookStep5;
+use App\Http\Requests\StoryBookStep6;
+use App\Http\Requests\StoryBookStep7;
+use App\Http\Requests\StoryBookStep8;
+use App\Http\Requests\StoryBookStep9;
 use App\Models\Novel;
 use App\Services\BackOffice\AiBrainService;
 use App\Services\BackOffice\AiPromptService;
@@ -124,7 +124,7 @@ class NovelService
             ->appends($request->all());
     }
 
-    public function generateStep1(NovelFoundationRequest $request, Novel $novel): array
+    public function generateStep1(StoryBookStep1 $request, Novel $novel): array
     {
         $isNew       = empty($novel->id);
         $statusEvent = $isNew ? "save" : "update";
@@ -143,7 +143,7 @@ class NovelService
                 "additional_information" => $request->input("additional_information", "Auto"),
             ];
 
-            $formatedInput = $this->huggingFaceApiService->step1FoundationRequestInputsFormatter($inputs);
+            $formatedInput = $this->huggingFaceApiService->step1InputsFormatter($inputs);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -195,7 +195,7 @@ class NovelService
         }
     }
 
-    public function generateStep2(NovelCharactersRequest $request, Novel $novel): array
+    public function generateStep2(StoryBookStep2 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2;
@@ -207,7 +207,7 @@ class NovelService
                 "foundation" => $novel->foundation ?? [],
             ];
 
-            $formatedInput = $this->huggingFaceApiService->step2CharactersRequestInputsFormatter($novel);
+            $formatedInput = $this->huggingFaceApiService->step2InputsFormatter($novel);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -234,7 +234,7 @@ class NovelService
         }
     }
 
-    public function generateStep3(NovelWorldBibleRequest $request, Novel $novel): array
+    public function generateStep3(StoryBookStep3 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3;
@@ -244,7 +244,7 @@ class NovelService
 
             $inputs = [];
 
-            $formatedInput = $this->huggingFaceApiService->step3WorldBibleRequestInputsFormatter($novel);
+            $formatedInput = $this->huggingFaceApiService->step3InputsFormatter($novel);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -271,7 +271,7 @@ class NovelService
         }
     }
 
-    public function generateStep4(NovelLocationsRequest $request, Novel $novel): array
+    public function generateStep4(StoryBookStep4 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4;
@@ -281,7 +281,7 @@ class NovelService
 
             $inputs = [];
 
-            $formatedInput = $this->huggingFaceApiService->step4LocationsRequestInputsFormatter($novel);
+            $formatedInput = $this->huggingFaceApiService->step4InputsFormatter($novel);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -309,7 +309,7 @@ class NovelService
         }
     }
 
-    public function generateStep5(NovelFactionsRequest $request, Novel $novel): array
+    public function generateStep5(StoryBookStep5 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5;
@@ -319,7 +319,7 @@ class NovelService
 
             $inputs = [];
 
-            $formatedInput = $this->huggingFaceApiService->step5FactionsRequestInputsFormatter($novel);
+            $formatedInput = $this->huggingFaceApiService->step5InputsFormatter($novel);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -346,7 +346,7 @@ class NovelService
         }
     }
 
-    public function generateStep6(NovelCreaturesRequest $request, Novel $novel): array
+    public function generateStep6(StoryBookStep6 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6;
@@ -356,7 +356,7 @@ class NovelService
 
             $inputs = [];
 
-            $formatedInput = $this->huggingFaceApiService->step6CreaturesRequestInputsFormatter($novel);
+            $formatedInput = $this->huggingFaceApiService->step6InputsFormatter($novel);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -383,7 +383,7 @@ class NovelService
         }
     }
 
-    public function generateStep7(NovelSystemsRequest $request, Novel $novel): array
+    public function generateStep7(StoryBookStep7 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP7;
@@ -393,7 +393,7 @@ class NovelService
 
             $inputs = [];
 
-            $formatedInput = $this->huggingFaceApiService->step7SystemsRequestInputsFormatter($novel);
+            $formatedInput = $this->huggingFaceApiService->step7InputsFormatter($novel);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -420,7 +420,7 @@ class NovelService
         }
     }
 
-    public function generateStep8(NovelTimelineRequest $request, Novel $novel): array
+    public function generateStep8(StoryBookStep8 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8;
@@ -430,7 +430,7 @@ class NovelService
 
             $inputs = [];
 
-            $formatedInput = $this->huggingFaceApiService->step8TimelineRequestInputsFormatter($novel);
+            $formatedInput = $this->huggingFaceApiService->step8InputsFormatter($novel);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -457,7 +457,7 @@ class NovelService
         }
     }
 
-    public function generateStep9(NovelStoryStructureRequest $request, Novel $novel): array
+    public function generateStep9(StoryBookStep9 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9;
@@ -467,7 +467,7 @@ class NovelService
 
             $inputs = [];
 
-            $formatedInput = $this->huggingFaceApiService->step9StoryStructureRequestInputsFormatter($novel);
+            $formatedInput = $this->huggingFaceApiService->step9InputsFormatter($novel);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -495,7 +495,7 @@ class NovelService
         }
     }
 
-    public function generateStep10(NovelTwistsAndForeshadowingRequest $request, Novel $novel): array
+    public function generateStep10(StoryBookStep10 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10;
@@ -505,7 +505,7 @@ class NovelService
 
             $inputs = [];
 
-            $formatedInput = $this->huggingFaceApiService->step10TwistsAndForeshadowingRequestInputsFormatter($novel);
+            $formatedInput = $this->huggingFaceApiService->step10InputsFormatter($novel);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -533,7 +533,7 @@ class NovelService
         }
     }
 
-    public function generateStep11(NovelScenePlannerRequest $request, Novel $novel): array
+    public function generateStep11(StoryBookStep11 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11;
@@ -543,7 +543,7 @@ class NovelService
 
             $inputs = [];
 
-            $formatedInput = $this->huggingFaceApiService->step11ScenePlansRequestInputsFormatter($novel);
+            $formatedInput = $this->huggingFaceApiService->step11InputsFormatter($novel);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -570,7 +570,7 @@ class NovelService
         }
     }
 
-    public function generateStep12(NovelDialoguePlannerRequest $request, Novel $novel): array
+    public function generateStep12(StoryBookStep12 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12;
@@ -580,7 +580,7 @@ class NovelService
 
             $inputs = [];
 
-            $formatedInput = $this->huggingFaceApiService->step12DialoguePlansRequestInputsFormatter($novel);
+            $formatedInput = $this->huggingFaceApiService->step12InputsFormatter($novel);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -608,7 +608,7 @@ class NovelService
         }
     }
 
-    public function generateStep13(NovelChapterPlannerRequest $request, Novel $novel): array
+    public function generateStep13(StoryBookStep13 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13;
@@ -618,7 +618,7 @@ class NovelService
 
             $inputs = [];
 
-            $formatedInput = $this->huggingFaceApiService->step13ChapterPlanRequestInputsFormatter($novel);
+            $formatedInput = $this->huggingFaceApiService->step13InputsFormatter($novel);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -645,7 +645,7 @@ class NovelService
         }
     }
 
-    public function generateStep14(NovelPagePlannerRequest $request, Novel $novel): array
+    public function generateStep14(StoryBookStep14 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14;
@@ -655,7 +655,7 @@ class NovelService
 
             $inputs = [];
 
-            $formatedInput = $this->huggingFaceApiService->step14PagePlanRequestInputsFormatter($novel);
+            $formatedInput = $this->huggingFaceApiService->step14InputsFormatter($novel);
             $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
             $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -683,7 +683,7 @@ class NovelService
         }
     }
 
-    public function generateStep15(NovelChapterSummaryRequest $request, Novel $novel): array
+    public function generateStep15(StoryBookStep15 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15;
@@ -710,7 +710,7 @@ class NovelService
         }
     }
 
-    public function generateStep16(NovelChapterContentRequest $request, Novel $novel): array
+    public function generateStep16(StoryBookStep16 $request, Novel $novel): array
     {
         try {
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16;

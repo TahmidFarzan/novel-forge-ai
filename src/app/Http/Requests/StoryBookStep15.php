@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class NovelChapterPlannerRequest extends FormRequest
+class StoryBookStep15 extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,11 +23,7 @@ class NovelChapterPlannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'scene_plans' => [
-                'required',
-            ],
-
-            'story_structure' => [
+            'chapter_plan' => [
                 'required',
             ],
         ];
@@ -36,8 +32,7 @@ class NovelChapterPlannerRequest extends FormRequest
     public function messages()
     {
         return [
-            'scene_plans.required'              => 'Scene Plans are required.',
-            'story_structure.required'          => 'Story Structure is required.',
+            'chapter_plan.required'             => 'Chapter Plan is required.',
         ];
     }
 }

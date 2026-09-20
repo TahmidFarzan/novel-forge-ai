@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class NovelTwistsAndForeshadowingRequest extends FormRequest
+class StoryBookStep9 extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,7 @@ class NovelTwistsAndForeshadowingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'story_structure' => [
+            'foundation' => [
                 'required',
             ],
 
@@ -34,15 +34,20 @@ class NovelTwistsAndForeshadowingRequest extends FormRequest
             'world_bible' => [
                 'required',
             ],
+
+            'timeline' => [
+                'required',
+            ],
         ];
     }
 
     public function messages()
     {
         return [
-            'story_structure.required'          => 'Story Structure is required.',
+            'foundation.required'               => 'Foundation is required.',
             'characters.required'               => 'Characters are required.',
             'world_bible.required'              => 'World Bible is required.',
+            'timeline.required'                 => 'Timeline is required.',
         ];
     }
 }

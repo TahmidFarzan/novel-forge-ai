@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class NovelTimelineRequest extends FormRequest
+class StoryBookStep7 extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,11 +27,11 @@ class NovelTimelineRequest extends FormRequest
                 'required',
             ],
 
-            'factions' => [
+            'creatures' => [
                 'required',
             ],
 
-            'foundation' => [
+            'factions' => [
                 'required',
             ],
         ];
@@ -41,8 +41,8 @@ class NovelTimelineRequest extends FormRequest
     {
         return [
             'world_bible.required'           => 'World Bible is required.',
+            'creatures.required'             => 'Creatures are required.',
             'factions.required'              => 'Factions are required.',
-            'foundation.required'            => 'Foundation is required.',
         ];
     }
 }

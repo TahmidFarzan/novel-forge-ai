@@ -112,7 +112,7 @@ class NovelChapterService
 
     private function generateSummary(Novel $novel, string $step, array $chapterPlanEntry, AiPrompt $aiPrompt, AiBrain $aiBrain): void
     {
-        $formatedInput = $this->huggingFaceApiService->step15ChapterSummaryRequestInputsFormatter($novel, $chapterPlanEntry);
+        $formatedInput = $this->huggingFaceApiService->step15InputsFormatter($novel, $chapterPlanEntry);
         $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
         $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
@@ -122,7 +122,7 @@ class NovelChapterService
     public function generateStep16(Novel $novel, NovelChapter $novelChapter,  string $step,AiPrompt $aiPrompt, AiBrain $aiBrain): void
     {
 
-        $formatedInput = $this->huggingFaceApiService->step16ChapterContentRequestInputsFormatter($novel,$novelChapter);
+        $formatedInput = $this->huggingFaceApiService->step16InputsFormatter($novel,$novelChapter);
         $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
         $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
