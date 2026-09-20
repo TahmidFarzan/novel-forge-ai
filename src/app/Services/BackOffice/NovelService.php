@@ -143,7 +143,9 @@ class NovelService
                 "additional_information" => $request->input("additional_information", "Auto"),
             ];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             $novel = DB::transaction(function () use ($request, $stepData, $novel, $isNew) {
                 $novel->title      = $stepData['title'];
@@ -202,11 +204,12 @@ class NovelService
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
             $inputs = [
-                "foundation"             => $novel->foundation ?? [],
-                "additional_information" => $request->input("additional_information", "Auto"),
+                "foundation" => $novel->foundation ?? [],
             ];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($stepData, $novel) {
                 $novel->characters = $stepData['characters'];
@@ -239,13 +242,11 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $inputs = [
-                "foundation"             => $novel->foundation ?? [],
-                "characters"             => $novel->characters ?? [],
-                "additional_information" => $request->input("additional_information", "Auto"),
-            ];
+            $inputs = [];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($stepData, $novel) {
                 $novel->world_bible = $stepData['world_bible'];
@@ -278,13 +279,12 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $inputs = [
-                "world_bible"            => $novel->world_bible ?? [],
-                "characters"             => $novel->characters ?? [],
-                "additional_information" => $request->input("additional_information", "Auto"),
-            ];
+            $inputs = [];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+
 
             DB::transaction(function () use ($stepData, $novel) {
                 $novel->locations = $stepData['locations'];
@@ -317,13 +317,11 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $inputs = [
-                "world_bible"            => $novel->world_bible ?? [],
-                "locations"              => $novel->locations ?? [],
-                "additional_information" => $request->input("additional_information", "Auto"),
-            ];
+            $inputs = [];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($stepData, $novel) {
                 $novel->factions = $stepData['factions'];
@@ -356,14 +354,11 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $inputs = [
-                "world_bible"            => $novel->world_bible ?? [],
-                "locations"              => $novel->locations ?? [],
-                "factions"               => $novel->factions ?? [],
-                "additional_information" => $request->input("additional_information", "Auto"),
-            ];
+            $inputs = [];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($stepData, $novel) {
                 $novel->creatures = $stepData['creatures'];
@@ -396,14 +391,11 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $inputs = [
-                "world_bible"            => $novel->world_bible ?? [],
-                "creatures"              => $novel->creatures ?? [],
-                "factions"               => $novel->factions ?? [],
-                "additional_information" => $request->input("additional_information", "Auto"),
-            ];
+            $inputs = [];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($stepData, $novel) {
                 $novel->systems = $stepData['systems'];
@@ -436,14 +428,11 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $inputs = [
-                "world_bible"            => $novel->world_bible ?? [],
-                "factions"               => $novel->factions ?? [],
-                "foundation"             => $novel->foundation ?? [],
-                "additional_information" => $request->input("additional_information", "Auto"),
-            ];
+            $inputs = [];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($stepData, $novel) {
                 $novel->timeline = $stepData['timeline'];
@@ -476,15 +465,12 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $inputs = [
-                "foundation"             => $novel->foundation ?? [],
-                "characters"             => $novel->characters ?? [],
-                "world_bible"            => $novel->world_bible ?? [],
-                "timeline"               => $novel->timeline ?? [],
-                "additional_information" => $request->input("additional_information", "Auto"),
-            ];
+            $inputs = [];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+
 
             DB::transaction(function () use ($stepData, $novel) {
                 $novel->story_structure = $stepData['story_structure'];
@@ -517,14 +503,12 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $inputs = [
-                "story_structure"        => $novel->story_structure ?? [],
-                "characters"             => $novel->characters ?? [],
-                "world_bible"            => $novel->world_bible ?? [],
-                "additional_information" => $request->input("additional_information", "Auto"),
-            ];
+            $inputs = [];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+
 
             DB::transaction(function () use ($stepData, $novel) {
                 $novel->twists_and_foreshadowing = $stepData['twists_and_foreshadowing'];
@@ -557,14 +541,11 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $inputs = [
-                "story_structure"          => $novel->story_structure ?? [],
-                "twists_and_foreshadowing" => $novel->twists_and_foreshadowing ?? [],
-                "locations"                => $novel->locations ?? [],
-                "additional_information"   => $request->input("additional_information", "Auto"),
-            ];
+            $inputs = [];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($stepData, $novel) {
                 $novel->scene_plans = $stepData['scene_plans'];
@@ -597,13 +578,12 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $inputs = [
-                "characters"             => $novel->characters ?? [],
-                "scene_plans"            => $novel->scene_plans ?? [],
-                "additional_information" => $request->input("additional_information", "Auto"),
-            ];
+            $inputs = [];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+
 
             DB::transaction(function () use ($stepData, $novel) {
                 $novel->dialogue_plans = $stepData['dialogue_plans'];
@@ -636,13 +616,11 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $inputs = [
-                "scene_plans"            => $novel->scene_plans ?? [],
-                "story_structure"        => $novel->story_structure ?? [],
-                "additional_information" => $request->input("additional_information", "Auto"),
-            ];
+            $inputs = [];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
             DB::transaction(function () use ($stepData, $novel) {
                 $novel->chapter_plan = $stepData['chapter_plan'];
@@ -675,13 +653,12 @@ class NovelService
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $inputs = [
-                "chapter_plan"           => $novel->chapter_plan ?? [],
-                "scene_plans"            => $novel->scene_plans ?? [],
-                "additional_information" => $request->input("additional_information", "Auto"),
-            ];
+            $inputs = [];
 
-            $stepData = $this->huggingFaceApiService->generateStepData($step, $aiPrompt->prompt, $inputs, $aiBrain);
+            $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+            $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
+            $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+
 
             DB::transaction(function () use ($stepData, $novel) {
                 $novel->page_plan = $stepData['page_plan'];
@@ -720,11 +697,8 @@ class NovelService
                 throw new Exception('Chapter plan is empty.');
             }
 
-            $context               = $this->chapterSummaryContextFormatter($novel);
-            $additionalInformation = $request->input("additional_information", "Auto");
-
             foreach ($chapterPlan as $chapterPlanEntry) {
-                $this->novelChapterService->generateStep15($novel, $context, (array) $chapterPlanEntry, $aiPrompt->prompt, $aiBrain, $additionalInformation);
+                $this->novelChapterService->generateStep15($novel, (array) $chapterPlanEntry, $aiPrompt->prompt, $aiBrain);
             }
 
             return [
@@ -749,23 +723,14 @@ class NovelService
         try {
             $chapterNo = $request->input("chapter_no");
 
-            $novelChapter = $novel->novelChapters()
-                ->where('no', (string) $chapterNo)
-                ->first();
-
-            if (! $novelChapter) {
-                throw new Exception('Novel chapter ' . $chapterNo . ' not found.');
-            }
+            $novelChapter = $this->novelChapterService->findByNo($novel, $chapterNo);
 
             $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16;
 
             $aiPrompt = $this->aiPromptService->findByCode(Str::studly($step));
             $aiBrain  = $this->aiBrainService->findById($request->input("ai_brain_id"));
 
-            $context               = $this->chapterContentContextFormatter($novel);
-            $additionalInformation = $request->input("additional_information", "Auto");
-
-            $this->novelChapterService->generateStep16($novel, $novelChapter, $context, $aiPrompt->prompt, $aiBrain, $additionalInformation);
+            $this->novelChapterService->generateStep16($novel, $novelChapter, $aiPrompt->prompt, $aiBrain);
 
             return [
                 'status'  => 'success',
@@ -904,28 +869,6 @@ class NovelService
                 'message' => 'Failed to delete novel. Please try again.',
             ];
         }
-    }
-
-    private function chapterSummaryContextFormatter(Novel $novel): array
-    {
-        return [
-            "foundation"               => json_encode($novel->foundation, JSON_PRETTY_PRINT),
-            "characters"               => json_encode($novel->characters, JSON_PRETTY_PRINT),
-            "story_structure"          => json_encode($novel->story_structure, JSON_PRETTY_PRINT),
-            "twists_and_foreshadowing" => json_encode($novel->twists_and_foreshadowing, JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function chapterContentContextFormatter(Novel $novel): array
-    {
-        return [
-            "language"                 => $novel->language?->name,
-            "foundation"               => json_encode($novel->foundation, JSON_PRETTY_PRINT),
-            "characters"               => json_encode($novel->characters, JSON_PRETTY_PRINT),
-            "world_bible"              => json_encode($novel->world_bible, JSON_PRETTY_PRINT),
-            "story_structure"          => json_encode($novel->story_structure, JSON_PRETTY_PRINT),
-            "twists_and_foreshadowing" => json_encode($novel->twists_and_foreshadowing, JSON_PRETTY_PRINT),
-        ];
     }
 
     private function reviewFindingsMessage(bool $orderingInvalid, $missingChapters, $missingSummaries, $missingContents, $duplicateChapters, $extraChapters): string

@@ -23,11 +23,6 @@ class NovelTwistsAndForeshadowingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'additional_information' => [
-                'nullable',
-                'string',
-            ],
-
             'story_structure' => [
                 'required',
             ],
@@ -48,7 +43,6 @@ class NovelTwistsAndForeshadowingRequest extends FormRequest
             'story_structure.required'          => 'Story Structure is required.',
             'characters.required'               => 'Characters are required.',
             'world_bible.required'              => 'World Bible is required.',
-            'additional_information.string'     => 'Additional Information must be a string.',
         ];
     }
 }

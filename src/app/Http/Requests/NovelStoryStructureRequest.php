@@ -23,11 +23,6 @@ class NovelStoryStructureRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'additional_information' => [
-                'nullable',
-                'string',
-            ],
-
             'foundation' => [
                 'required',
             ],
@@ -53,7 +48,6 @@ class NovelStoryStructureRequest extends FormRequest
             'characters.required'               => 'Characters are required.',
             'world_bible.required'              => 'World Bible is required.',
             'timeline.required'                 => 'Timeline is required.',
-            'additional_information.string'     => 'Additional Information must be a string.',
         ];
     }
 }

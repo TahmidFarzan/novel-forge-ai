@@ -23,11 +23,6 @@ class NovelDialoguePlannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'additional_information' => [
-                'nullable',
-                'string',
-            ],
-
             'characters' => [
                 'required',
             ],
@@ -43,7 +38,6 @@ class NovelDialoguePlannerRequest extends FormRequest
         return [
             'characters.required'               => 'Characters are required.',
             'scene_plans.required'              => 'Scene Plans are required.',
-            'additional_information.string'     => 'Additional Information must be a string.',
         ];
     }
 }

@@ -23,11 +23,6 @@ class NovelCharactersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'additional_information' => [
-                'nullable',
-                'string',
-            ],
-
             'foundation' => [
                 'required',
             ],
@@ -38,7 +33,6 @@ class NovelCharactersRequest extends FormRequest
     {
         return [
             'foundation.required'  => 'Foundation is required.',
-            'additional_information.string'  => 'Additional Iinformation must be a string.',
         ];
     }
 }

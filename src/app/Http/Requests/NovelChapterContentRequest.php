@@ -32,11 +32,6 @@ class NovelChapterContentRequest extends FormRequest
                 'required',
                 'integer',
             ],
-
-            'additional_information' => [
-                'nullable',
-                'string',
-            ],
         ];
     }
 
@@ -45,7 +40,6 @@ class NovelChapterContentRequest extends FormRequest
         return [
             'chapter_no.required'             => 'Chapter Number is required.',
             'ai_brain_id.required'            => 'AI Brain is required.',
-            'additional_information.string'   => 'Additional Information must be a string.',
         ];
     }
 }

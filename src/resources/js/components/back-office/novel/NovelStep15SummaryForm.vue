@@ -66,7 +66,6 @@ const serializeField = (name) => {
 
 const chapterSummaryForm = useForm({
     chapter_plan: serializeField("chapter_plan"),
-    additional_information: null,
     ai_brain_id: null,
 });
 
@@ -169,20 +168,6 @@ defineExpose({ submit });
 
                 <p v-if="summariesComplete" class="text-xs text-emerald-600">
                     All chapter summaries have been generated. You can now proceed to Chapter Content Generation.
-                </p>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium mb-1">
-                    Chapter Summary Additional Information
-                </label>
-
-                <textarea v-model="chapterSummaryForm.additional_information" rows="3"
-                    placeholder="Any additional context or instructions for the AI..."
-                    class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none border-gray-300"></textarea>
-
-                <p v-if="chapterSummaryForm.errors.additional_information">
-                    {{ chapterSummaryForm.errors.additional_information }}
                 </p>
             </div>
 

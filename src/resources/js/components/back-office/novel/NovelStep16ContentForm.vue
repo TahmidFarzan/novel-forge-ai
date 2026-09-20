@@ -35,7 +35,6 @@ const isUpdate = computed(() => !!novel?.id);
 const AUTO_NEXT_SECONDS = 50;
 
 const chapterContentForm = useForm({
-    additional_information: null,
     ai_brain_id: null,
 });
 
@@ -133,7 +132,7 @@ const validate = () => {
 
     if (chaptersWithSummary.value.length === 0) {
         chapterContentForm.setError(
-            "additional_information",
+            "chapter_content",
             "Generate chapter summaries before generating chapter contents.",
         );
         valid = false;
@@ -141,7 +140,7 @@ const validate = () => {
 
     if (!currentChapter.value) {
         chapterContentForm.setError(
-            "additional_information",
+            "chapter_content",
             "All chapter contents have already been generated.",
         );
         valid = false;
@@ -320,6 +319,10 @@ defineExpose({ submit });
                 <FontAwesomeIcon icon="xmark" />
                 Chapter {{ failedChapterNo }} content generation failed. Review the details and retry.
             </div>
+
+            <p v-if="chapterContentForm.errors.chapter_content" class="text-red-500 text-sm">
+                {{ chapterContentForm.errors.chapter_content }}
+            </p>
         </div>
 
         <div class="bg-white border rounded-xl p-5 shadow-sm space-y-4">
@@ -388,20 +391,6 @@ defineExpose({ submit });
             <p v-if="chapterContentForm.errors.ai_brain_id" class="text-red-500 text-sm">
                 {{ chapterContentForm.errors.ai_brain_id }}
             </p>
-
-            <div>
-                <label class="block text-sm font-medium mb-1">
-                    Chapter Content Additional Information
-                </label>
-
-                <textarea v-model="chapterContentForm.additional_information" rows="3"
-                    placeholder="Any additional context or instructions for the AI..."
-                    class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none border-gray-300"></textarea>
-
-                <p v-if="chapterContentForm.errors.additional_information">
-                    {{ chapterContentForm.errors.additional_information }}
-                </p>
-            </div>
         </div>
 
         <div class="bg-white border rounded-xl p-5 shadow-sm" v-if="allContentsComplete">

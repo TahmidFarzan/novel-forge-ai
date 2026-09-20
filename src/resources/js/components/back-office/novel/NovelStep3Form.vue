@@ -38,7 +38,6 @@ const worldBibleForm = useForm({
             ? novel.characters
             : JSON.stringify(novel.characters)
         : null,
-    additional_information: null,
     ai_brain_id: null,
 });
 
@@ -116,20 +115,6 @@ defineExpose({ submit });
             <p class="text-sm text-gray-500">
                 Build the world bible and setting rules
             </p>
-
-            <div>
-                <label class="block text-sm font-medium mb-1">
-                    World Bible Additional Information
-                </label>
-
-                <textarea v-model="worldBibleForm.additional_information" rows="3"
-                    placeholder="Any additional context or instructions for the AI..."
-                    class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none border-gray-300"></textarea>
-
-                <p v-if="worldBibleForm.errors.additional_information">
-                    {{ worldBibleForm.errors.additional_information }}
-                </p>
-            </div>
 
             <p v-if="worldBibleForm.errors.foundation" class="text-red-500 text-sm">
                 {{ worldBibleForm.errors.foundation }}

@@ -38,7 +38,6 @@ const chapterPlanForm = useForm({
             ? novel.story_structure
             : JSON.stringify(novel.story_structure)
         : null,
-    additional_information: null,
     ai_brain_id: null,
 });
 
@@ -116,20 +115,6 @@ defineExpose({ submit });
             <p class="text-sm text-gray-500">
                 Plan the novel's chapters
             </p>
-
-            <div>
-                <label class="block text-sm font-medium mb-1">
-                    Chapter Plan Additional Information
-                </label>
-
-                <textarea v-model="chapterPlanForm.additional_information" rows="3"
-                    placeholder="Any additional context or instructions for the AI..."
-                    class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none border-gray-300"></textarea>
-
-                <p v-if="chapterPlanForm.errors.additional_information">
-                    {{ chapterPlanForm.errors.additional_information }}
-                </p>
-            </div>
 
             <p v-if="chapterPlanForm.errors.scene_plans" class="text-red-500 text-sm">
                 {{ chapterPlanForm.errors.scene_plans }}

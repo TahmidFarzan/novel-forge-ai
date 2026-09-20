@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\BackOffice;
 
 use App\Helpers\AiPromptGeneratorHelper;
@@ -20,7 +21,7 @@ class NovelChapterService
         $this->huggingFaceApiService = $huggingFaceApiService;
     }
 
-    public function new (): NovelChapter
+    public function new(): NovelChapter
     {
         return new NovelChapter();
     }
@@ -38,6 +39,21 @@ class NovelChapterService
             'latestActivityLog',
             'latestActivityLog.causer',
         ])->where('novel_id', $novel->id)->where('slug', $slug)->firstOrFail();
+    }
+
+    public function findByNo(Novel $novel, string|int $no): NovelChapter
+    {
+        return NovelChapter::with([
+            'novel',
+
+            'createdBy',
+
+            'activityLogs' => fn($query) => $query->latest()->limit(10),
+            'activityLogs.causer',
+
+            'latestActivityLog',
+            'latestActivityLog.causer',
+        ])->where('novel_id', $novel->id)->where('no', $no)->firstOrFail();
     }
 
     public function search(Novel $novel, Request $request)
@@ -80,27 +96,31 @@ class NovelChapterService
             ->appends($request->all());
     }
 
-    public function generateStep15(Novel $novel, array $context, array $chapterPlanEntry, string $prompt, AiBrain $aiBrain, string $additionalInformation): void
+    public function generateStep15(Novel $novel, array $chapterPlanEntry, string $prompt, AiBrain $aiBrain): void
     {
         $scenePlans = $this->chapterScenePlans($novel, $chapterPlanEntry);
 
+        $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15;
         $inputs = [
-            "foundation"               => $context['foundation'],
-            "characters"               => $context['characters'],
-            "story_structure"          => $context['story_structure'],
-            "twists_and_foreshadowing" => $context['twists_and_foreshadowing'],
+            "foundation"               => $novel->foundation,
+            "characters"               =>  $novel->characters,
+            "story_structure"          =>  $novel->story_structure,
+            "twists_and_foreshadowing" =>  $novel->twists_and_foreshadowing,
             "chapter_plan_entry"       => $chapterPlanEntry,
             "scene_plans"              => $scenePlans,
-            "additional_information"   => $additionalInformation,
         ];
 
-        $stepData = $this->huggingFaceApiService->generateStepData(AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15, $prompt, $inputs, $aiBrain);
+        $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+        $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($prompt, $formatedInput);
+        $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+
 
         $this->saveSummaryByNovel($novel, $chapterPlanEntry, $stepData['chapter_summary']);
     }
 
-    public function generateStep16(Novel $novel, NovelChapter $novelChapter, array $context, string $prompt, AiBrain $aiBrain, string $additionalInformation): void
+    public function generateStep16(Novel $novel, NovelChapter $novelChapter, string $prompt, AiBrain $aiBrain): void
     {
+        $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16;
         if (is_string($novelChapter->content) && trim($novelChapter->content) !== '') {
             return;
         }
@@ -116,20 +136,21 @@ class NovelChapterService
         $dialoguePlans    = $this->chapterDialoguePlans($novel, $scenePlans);
 
         $inputs = [
-            "language"                 => $context['language'],
-            "foundation"               => $context['foundation'],
-            "characters"               => $context['characters'],
-            "world_bible"              => $context['world_bible'],
-            "story_structure"          => $context['story_structure'],
-            "twists_and_foreshadowing" => $context['twists_and_foreshadowing'],
+            "language"                 =>  $novel->language?->name,
+            "foundation"               => $novel->foundation,
+            "characters"               =>  $novel->characters,
+            "world_bible"              =>  $novel->world_bible,
+            "story_structure"          =>  $novel->story_structure,
+            "twists_and_foreshadowing" =>  $novel->twists_and_foreshadowing,
             "chapter_summary"          => $summery,
             "chapter_plan_entry"       => $chapterPlanEntry,
             "scene_plans"              => $scenePlans,
             "dialogue_plans"           => $dialoguePlans,
-            "additional_information"   => $additionalInformation,
         ];
 
-        $stepData = $this->huggingFaceApiService->generateStepData(AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16, $prompt, $inputs, $aiBrain);
+        $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
+        $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($prompt, $formatedInput);
+        $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
         $this->saveContentByNovel($novelChapter, $stepData['chapter_content']);
     }
@@ -225,7 +246,7 @@ class NovelChapterService
             'summary'        => $novelChapter->summery,
             'scenes'         => [],
             'chapter_goals'  => [],
-            'pacing_and_flow'=> '',
+            'pacing_and_flow' => '',
         ];
     }
 
@@ -273,5 +294,4 @@ class NovelChapterService
             ? count(array_filter($words))
             : 0;
     }
-
 }

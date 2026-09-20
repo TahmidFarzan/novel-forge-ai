@@ -23,11 +23,6 @@ class NovelChapterPlannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'additional_information' => [
-                'nullable',
-                'string',
-            ],
-
             'scene_plans' => [
                 'required',
             ],
@@ -43,7 +38,6 @@ class NovelChapterPlannerRequest extends FormRequest
         return [
             'scene_plans.required'              => 'Scene Plans are required.',
             'story_structure.required'          => 'Story Structure is required.',
-            'additional_information.string'     => 'Additional Information must be a string.',
         ];
     }
 }

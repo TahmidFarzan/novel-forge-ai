@@ -23,11 +23,6 @@ class NovelWorldBibleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'additional_information' => [
-                'nullable',
-                'string',
-            ],
-
             'foundation' => [
                 'required',
             ],
@@ -43,7 +38,6 @@ class NovelWorldBibleRequest extends FormRequest
         return [
             'foundation.required'            => 'Foundation is required.',
             'characters.required'            => 'Characters are required.',
-            'additional_information.string'  => 'Additional Information must be a string.',
         ];
     }
 }

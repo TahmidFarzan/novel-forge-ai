@@ -377,29 +377,6 @@ class AiPromptGeneratorHelper
             The existing novel foundation is the source of truth.
 
             ==================================================
-            ADDITIONAL IINFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            This field is optional.
-
-            If additional iinformation is provided:
-
-                - Use it as creative guidance.
-                - Integrate it naturally with the existing novel foundation.
-                - Maintain consistency with the established story direction.
-                - Do not allow it to conflict with the existing foundation.
-
-            If this field is empty, null, missing, or contains \"Auto\":
-
-                - Automatically determine the required characters.
-                - Use professional storytelling judgment.
-                - Create characters that best support the foundation, conflict, themes, and emotional journey.
-
-            Do not create unnecessary characters.
-
-            ==================================================
             CHARACTER CREATION REQUIREMENTS
             ==================================================
 
@@ -643,27 +620,6 @@ class AiPromptGeneratorHelper
             Do not change, rewrite, or expand the characters.
 
             The existing characters are the source of truth.
-
-            ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            This field is optional.
-
-            If additional information is provided:
-
-                - Use it as creative guidance.
-                - Integrate it naturally with the existing foundation and characters.
-                - Maintain consistency with the established story direction.
-                - Do not allow it to conflict with the existing foundation.
-
-            If this field is empty, null, missing, or contains \"Auto\":
-
-                - Automatically determine the required world details.
-                - Use professional storytelling judgment.
-                - Create a world that best supports the foundation, characters, conflict, themes, and emotional journey.
 
             ==================================================
             WORLD OVERVIEW REQUIREMENTS
@@ -940,27 +896,6 @@ class AiPromptGeneratorHelper
             The existing characters are the source of truth.
 
             ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            This field is optional.
-
-            If additional information is provided:
-
-                - Use it as creative guidance.
-                - Integrate it naturally with the existing world bible and characters.
-                - Maintain consistency with the established story direction.
-                - Do not allow it to conflict with the existing world bible.
-
-            If this field is empty, null, missing, or contains \"Auto\":
-
-                - Automatically determine the required locations.
-                - Use professional storytelling judgment.
-                - Create locations that best support the world, characters, conflict, themes, and emotional journey.
-
-            ==================================================
             MAJOR LOCATIONS REQUIREMENTS
             ==================================================
 
@@ -1220,27 +1155,6 @@ class AiPromptGeneratorHelper
             Do not change, rewrite, or expand the locations.
 
             The existing locations are the source of truth.
-
-            ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            This field is optional.
-
-            If additional information is provided:
-
-                - Use it as creative guidance.
-                - Integrate it naturally with the existing world bible and locations.
-                - Maintain consistency with the established story direction.
-                - Do not allow it to conflict with the existing world bible.
-
-            If this field is empty, null, missing, or contains \"Auto\":
-
-                - Automatically determine the required factions.
-                - Use professional storytelling judgment.
-                - Create factions that best support the world, characters, conflict, themes, and emotional journey.
 
             ==================================================
             FACTIONS REQUIREMENTS
@@ -1554,27 +1468,6 @@ class AiPromptGeneratorHelper
             The existing factions are the source of truth.
 
             ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            This field is optional.
-
-            If additional information is provided:
-
-                - Use it as creative guidance.
-                - Integrate it naturally with the existing world bible, locations, and factions.
-                - Maintain consistency with the established story direction.
-                - Do not allow it to conflict with the existing world bible.
-
-            If this field is empty, null, missing, or contains \"Auto\":
-
-                - Automatically determine the required creatures.
-                - Use professional storytelling judgment.
-                - Create creatures that best support the world, characters, conflict, themes, and emotional journey.
-
-            ==================================================
             CREATURE / SPECIES LIST REQUIREMENTS
             ==================================================
 
@@ -1867,35 +1760,6 @@ class AiPromptGeneratorHelper
             The existing factions are the source of truth.
 
             ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            This field is optional.
-
-            If additional information is provided:
-
-                - Use it as creative guidance.
-                - Integrate it naturally with the existing world bible, creatures, and factions.
-                - Maintain consistency with the established story direction.
-                - Do not allow it to conflict with the existing world bible.
-
-            If this field is empty, null, missing, or contains \"Auto\":
-
-                - Automatically determine the required systems.
-                - Use professional storytelling judgment.
-                - Create systems that best support the world, characters, conflict, themes, and emotional journey.
-
-            Consider system types such as:
-
-                - Magic systems
-                - Power systems
-                - Technology systems
-                - Economy systems
-                - Social systems
-
-            ==================================================
             SYSTEM TYPES AND RULES REQUIREMENTS
             ==================================================
 
@@ -2163,27 +2027,6 @@ class AiPromptGeneratorHelper
             Do not change, rewrite, or expand the foundation.
 
             The existing foundation is the source of truth.
-
-            ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            This field is optional.
-
-            If additional information is provided:
-
-                - Use it as creative guidance.
-                - Integrate it naturally with the existing world bible, factions, and foundation.
-                - Maintain consistency with the established story direction.
-                - Do not allow it to conflict with the existing world bible.
-
-            If this field is empty, null, missing, or contains \"Auto\":
-
-                - Automatically determine the required timeline events.
-                - Use professional storytelling judgment.
-                - Create a timeline that best supports the world, characters, conflict, themes, and emotional journey.
 
             ==================================================
             MAJOR HISTORICAL EVENTS REQUIREMENTS
@@ -2510,27 +2353,6 @@ class AiPromptGeneratorHelper
             Do not change, rewrite, or expand the timeline.
 
             The existing timeline is the source of truth.
-
-            ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            This field is optional.
-
-            If additional information is provided:
-
-                - Use it as creative guidance.
-                - Integrate it naturally with the existing foundation, characters, world bible, and timeline.
-                - Maintain consistency with the established story direction.
-                - Do not allow it to conflict with the existing foundation.
-
-            If this field is empty, null, missing, or contains \"Auto\":
-
-                - Automatically determine the most suitable story structure.
-                - Use professional storytelling judgment.
-                - Select the structure that best supports the foundation, characters, conflict, themes, and emotional journey.
 
             ==================================================
             STRUCTURE TYPE SELECTION
@@ -2874,27 +2696,6 @@ class AiPromptGeneratorHelper
             Do not change, rewrite, or expand the world bible.
 
             The existing world bible is the source of truth.
-
-            ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            This field is optional.
-
-            If additional information is provided:
-
-                - Use it as creative guidance.
-                - Integrate it naturally with the existing story structure, characters, and world bible.
-                - Maintain consistency with the established story direction.
-                - Do not allow it to conflict with the existing story structure.
-
-            If this field is empty, null, missing, or contains \"Auto\":
-
-                - Automatically determine the required twists and foreshadowing.
-                - Use professional storytelling judgment.
-                - Create hidden elements that best support the structure, conflict, themes, and emotional journey.
 
             ==================================================
             MAJOR TWISTS REQUIREMENTS
@@ -3243,27 +3044,6 @@ class AiPromptGeneratorHelper
             The existing locations are the source of truth.
 
             ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            This field is optional.
-
-            If additional information is provided:
-
-                - Use it as creative guidance.
-                - Integrate it naturally with the existing story structure, twists and foreshadowing, and locations.
-                - Maintain consistency with the established story direction.
-                - Do not allow it to conflict with the existing story structure.
-
-            If this field is empty, null, missing, or contains \"Auto\":
-
-                - Automatically determine the required scenes.
-                - Use professional storytelling judgment.
-                - Create scenes that best support the structure, conflict, themes, and emotional journey.
-
-            ==================================================
             SCENE LIST REQUIREMENTS
             ==================================================
 
@@ -3527,14 +3307,6 @@ class AiPromptGeneratorHelper
             The existing scene plans are the source of truth.
 
             ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            Use any additional information provided to tailor the dialogue plans.
-
-            ==================================================
             DIALOGUE PLANNING REQUIREMENTS
             ==================================================
 
@@ -3681,14 +3453,6 @@ class AiPromptGeneratorHelper
             The existing story structure is the source of truth.
 
             ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            Use any additional information provided to tailor the chapter plan.
-
-            ==================================================
             CHAPTER PLANNING REQUIREMENTS
             ==================================================
 
@@ -3818,14 +3582,6 @@ class AiPromptGeneratorHelper
             Do not change, rewrite, or expand the scene plans.
 
             The existing scene plans are the source of truth.
-
-            ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            Use any additional information provided to tailor the page plan.
 
             ==================================================
             PAGE PLANNING REQUIREMENTS
@@ -4060,14 +3816,6 @@ class AiPromptGeneratorHelper
             Do not change, rewrite, or expand the scene plans.
 
             The existing scene plans are the source of truth.
-
-            ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            Use any additional information provided to tailor the chapter summary.
 
             ==================================================
             CHAPTER SUMMARY REQUIREMENTS
@@ -4334,16 +4082,6 @@ class AiPromptGeneratorHelper
             Use them to support the chapter's dialogue.
 
             Match the planned character voice and tone.
-
-            ==================================================
-            ADDITIONAL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            Use any additional information provided to tailor the chapter content.
-
-            If this field is empty, null, missing, or contains \"Auto\", use professional writing judgment.
 
             ==================================================
             WRITING REQUIREMENTS
