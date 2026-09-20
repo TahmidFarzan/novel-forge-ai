@@ -4,6 +4,7 @@ namespace App\Services\BackOffice;
 
 use App\Helpers\AiPromptGeneratorHelper;
 use App\Models\AiBrain;
+use App\Models\AiPrompt;
 use App\Models\Novel;
 use App\Models\NovelChapter;
 use Exception;
@@ -96,60 +97,33 @@ class NovelChapterService
             ->appends($request->all());
     }
 
-    public function generateStep15(Novel $novel, array $chapterPlanEntry, string $prompt, AiBrain $aiBrain): void
+    public function generateSummaries(Novel $novel, string $step, AiPrompt $aiPrompt, AiBrain $aiBrain): void
     {
-        $scenePlans = $this->chapterScenePlans($novel, $chapterPlanEntry);
+        $chapterPlan = $novel->chapter_plan ?? [];
 
-        $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15;
-        $inputs = [
-            "foundation"               => $novel->foundation,
-            "characters"               =>  $novel->characters,
-            "story_structure"          =>  $novel->story_structure,
-            "twists_and_foreshadowing" =>  $novel->twists_and_foreshadowing,
-            "chapter_plan_entry"       => $chapterPlanEntry,
-            "scene_plans"              => $scenePlans,
-        ];
+        if (! is_array($chapterPlan) || empty($chapterPlan)) {
+            throw new Exception('Chapter plan is empty.');
+        }
 
-        $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
-        $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($prompt, $formatedInput);
+        foreach ($chapterPlan as $chapterPlanEntry) {
+            $this->generateSummary($novel, $step, (array) $chapterPlanEntry, $aiPrompt, $aiBrain);
+        }
+    }
+
+    private function generateSummary(Novel $novel, string $step, array $chapterPlanEntry, AiPrompt $aiPrompt, AiBrain $aiBrain): void
+    {
+        $formatedInput = $this->huggingFaceApiService->step15ChapterSummaryRequestInputsFormatter($novel, $chapterPlanEntry);
+        $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
         $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
-
 
         $this->saveSummaryByNovel($novel, $chapterPlanEntry, $stepData['chapter_summary']);
     }
 
-    public function generateStep16(Novel $novel, NovelChapter $novelChapter, string $prompt, AiBrain $aiBrain): void
+    public function generateStep16(Novel $novel, NovelChapter $novelChapter,  string $step,AiPrompt $aiPrompt, AiBrain $aiBrain): void
     {
-        $step = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16;
-        if (is_string($novelChapter->content) && trim($novelChapter->content) !== '') {
-            return;
-        }
 
-        $summery = $novelChapter->summery;
-
-        if (! is_string($summery) || trim($summery) === '') {
-            throw new Exception('Chapter ' . $novelChapter->no . ' does not have a summary. Generate chapter summaries first.');
-        }
-
-        $chapterPlanEntry = $this->findChapterPlanEntry($novel, $novelChapter);
-        $scenePlans       = $this->chapterScenePlans($novel, $chapterPlanEntry);
-        $dialoguePlans    = $this->chapterDialoguePlans($novel, $scenePlans);
-
-        $inputs = [
-            "language"                 =>  $novel->language?->name,
-            "foundation"               => $novel->foundation,
-            "characters"               =>  $novel->characters,
-            "world_bible"              =>  $novel->world_bible,
-            "story_structure"          =>  $novel->story_structure,
-            "twists_and_foreshadowing" =>  $novel->twists_and_foreshadowing,
-            "chapter_summary"          => $summery,
-            "chapter_plan_entry"       => $chapterPlanEntry,
-            "scene_plans"              => $scenePlans,
-            "dialogue_plans"           => $dialoguePlans,
-        ];
-
-        $formatedInput = $this->huggingFaceApiService->formatRequestInputs($novel, $step, $inputs);
-        $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($prompt, $formatedInput);
+        $formatedInput = $this->huggingFaceApiService->step16ChapterContentRequestInputsFormatter($novel,$novelChapter);
+        $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
         $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
 
         $this->saveContentByNovel($novelChapter, $stepData['chapter_content']);
@@ -226,64 +200,6 @@ class NovelChapterService
                 'message' => 'Failed to delete novel chapter. Please try again.',
             ];
         }
-    }
-
-    private function findChapterPlanEntry(Novel $novel, NovelChapter $novelChapter): array
-    {
-        $chapterPlan = $novel->chapter_plan ?? [];
-
-        if (is_array($chapterPlan)) {
-            foreach ($chapterPlan as $entry) {
-                if ((string) ($entry['chapter_number'] ?? '') === (string) $novelChapter->no) {
-                    return (array) $entry;
-                }
-            }
-        }
-
-        return [
-            'chapter_number' => $novelChapter->no,
-            'title'          => $novelChapter->title,
-            'summary'        => $novelChapter->summery,
-            'scenes'         => [],
-            'chapter_goals'  => [],
-            'pacing_and_flow' => '',
-        ];
-    }
-
-    private function chapterDialoguePlans(Novel $novel, array $scenePlans): array
-    {
-        $dialoguePlans = $novel->dialogue_plans ?? [];
-
-        if (! is_array($dialoguePlans) || empty($dialoguePlans)) {
-            return [];
-        }
-
-        $sceneNumbers = array_values(array_filter(array_map(function ($scene) {
-            return (string) ($scene['scene_number'] ?? '');
-        }, $scenePlans)));
-
-        if (empty($sceneNumbers)) {
-            return [];
-        }
-
-        return array_values(array_filter($dialoguePlans, function ($dialogue) use ($sceneNumbers) {
-            return isset($dialogue['scene_reference']) && in_array((string) $dialogue['scene_reference'], $sceneNumbers, true);
-        }));
-    }
-
-    private function chapterScenePlans(Novel $novel, array $chapterPlanEntry): array
-    {
-        $scenePlans = $novel->scene_plans ?? [];
-
-        if (! is_array($scenePlans) || empty($scenePlans)) {
-            return [];
-        }
-
-        $chapterNumber = (string) ($chapterPlanEntry['chapter_number'] ?? '');
-
-        return array_values(array_filter($scenePlans, function ($scene) use ($chapterNumber) {
-            return isset($scene['chapter']) && (string) $scene['chapter'] === $chapterNumber;
-        }));
     }
 
     private function wordCount(string $content): int

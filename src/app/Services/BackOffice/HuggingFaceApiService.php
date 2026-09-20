@@ -5,6 +5,7 @@ namespace App\Services\BackOffice;
 use App\Helpers\AiPromptGeneratorHelper;
 use Exception;
 use App\Models\Novel;
+use App\Models\NovelChapter;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -67,28 +68,6 @@ class HuggingFaceApiService
         return $response->json();
     }
 
-    public function formatRequestInputs(Novel $novel, string $stepName, array $inputs = []): array
-    {
-        return match ($stepName) {
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1     => $this->step1FoundationRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2     => $this->step2CharactersRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3     => $this->step3WorldBibleRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4     => $this->step4LocationsRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5     => $this->step5FactionsRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6     => $this->step6CreaturesRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP7     => $this->step7SystemsRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8     => $this->step8TimelineRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9     => $this->step9StoryStructureRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10    => $this->step10TwistsAndForeshadowingRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11    => $this->step11ScenePlansRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12    => $this->step12DialoguePlansRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13    => $this->step13ChapterPlanRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14    => $this->step14PagePlanRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15    => $this->step15ChapterSummaryRequestInputsFormatter($novel, $inputs),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16    => $this->step16ChapterContentRequestInputsFormatter($novel, $inputs),
-            default                                                                           => throw new Exception("Unknown AI step name [{$stepName}]."),
-        };
-    }
 
     public function aiResponseFormats(string $stepName, array $apiResponse): array
     {
@@ -111,6 +90,230 @@ class HuggingFaceApiService
             AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16    => $this->formatStep16ChapterContentResponse($this->extractStep16ChapterContentFromResponse($apiResponse)),
             default                                                                           => throw new Exception("Unknown AI step name [{$stepName}]."),
         };
+    }
+
+    public function step1FoundationRequestInputsFormatter(array $inputs): array
+    {
+        $language               = $inputs['language'] ?? null;
+        $audience               = $inputs['audience'] ?? null;
+        $novelType              = $inputs['novel_type'] ?? null;
+        $genres                 = collect($inputs['genres'] ?? []);
+        $genrePromptInstruction = '';
+
+        foreach ($genres as $genre) {
+
+            $gInstruction = trim($genre->prompt_instruction ?? '');
+
+            if ($gInstruction === '') {
+                continue;
+            }
+
+            if (! str_ends_with($gInstruction, '.')) {
+                $gInstruction .= '.';
+            }
+
+            if ($genrePromptInstruction !== '') {
+                $genrePromptInstruction .= ' ';
+            }
+
+            $genrePromptInstruction .= $gInstruction;
+        }
+
+        return [
+            "language"                 => $language?->name,
+            "additional_information"   => $inputs['additional_information'] ?? 'Auto',
+            "genre_prompt_instruction" => $genrePromptInstruction,
+            "audience_instruction"     => $audience?->prompt_instruction,
+            "novel_type_instruction"   => $novelType?->prompt_instruction,
+        ];
+    }
+
+    public function step2CharactersRequestInputsFormatter(Novel $novel): array
+    {
+        return [
+            "foundation"             => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step3WorldBibleRequestInputsFormatter(Novel $novel): array
+    {
+        return [
+            "foundation"             => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
+            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step4LocationsRequestInputsFormatter(Novel $novel): array
+    {
+        return [
+            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
+            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step5FactionsRequestInputsFormatter(Novel $novel): array
+    {
+        return [
+            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
+            "locations"              => json_encode($novel->locations ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step6CreaturesRequestInputsFormatter(Novel $novel): array
+    {
+        return [
+            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
+            "locations"              => json_encode($novel->locations ?? [], JSON_PRETTY_PRINT),
+            "factions"               => json_encode($novel->factions ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step7SystemsRequestInputsFormatter(Novel $novel): array
+    {
+        return [
+            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
+            "creatures"              => json_encode($novel->creatures ?? [], JSON_PRETTY_PRINT),
+            "factions"               => json_encode($novel->factions ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step8TimelineRequestInputsFormatter(Novel $novel): array
+    {
+        return [
+            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
+            "factions"               => json_encode($novel->factions ?? [], JSON_PRETTY_PRINT),
+            "foundation"             => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step9StoryStructureRequestInputsFormatter(Novel $novel): array
+    {
+        return [
+            "foundation"             => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
+            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
+            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
+            "timeline"               => json_encode($novel->timeline ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step10TwistsAndForeshadowingRequestInputsFormatter(Novel $novel): array
+    {
+        return [
+            "story_structure"        => json_encode($novel->story_structure ?? [], JSON_PRETTY_PRINT),
+            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
+            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step11ScenePlansRequestInputsFormatter(Novel $novel): array
+    {
+        return [
+            "story_structure"          => json_encode($novel->story_structure ?? [], JSON_PRETTY_PRINT),
+            "twists_and_foreshadowing" => json_encode($novel->twists_and_foreshadowing ?? [], JSON_PRETTY_PRINT),
+            "locations"                => json_encode($novel->locations ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step12DialoguePlansRequestInputsFormatter(Novel $novel): array
+    {
+        return [
+            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
+            "scene_plans"            => json_encode($novel->scene_plans ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step13ChapterPlanRequestInputsFormatter(Novel $novel): array
+    {
+        return [
+            "scene_plans"            => json_encode($novel->scene_plans ?? [], JSON_PRETTY_PRINT),
+            "story_structure"        => json_encode($novel->story_structure ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step14PagePlanRequestInputsFormatter(Novel $novel): array
+    {
+        return [
+            "chapter_plan"           => json_encode($novel->chapter_plan ?? [], JSON_PRETTY_PRINT),
+            "scene_plans"            => json_encode($novel->scene_plans ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step15ChapterSummaryRequestInputsFormatter(Novel $novel, $chapterPlanEntry): array
+    {
+        $scenePlans = $this->chapterScenePlans($novel, $chapterPlanEntry);
+
+        return [
+            "foundation"               => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
+            "characters"               => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
+            "story_structure"          => json_encode($novel->story_structure ?? [], JSON_PRETTY_PRINT),
+            "twists_and_foreshadowing" => json_encode($novel->twists_and_foreshadowing ?? [], JSON_PRETTY_PRINT),
+            "chapter_plan_entry"       => json_encode($chapterPlanEntry ?? [], JSON_PRETTY_PRINT),
+            "scene_plans"              => json_encode($scenePlans ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    public function step16ChapterContentRequestInputsFormatter(Novel $novel, NovelChapter $novelChapter): array
+    {
+
+        $chapterPlanEntry = $this->findChapterPlanEntry($novel, $novelChapter);
+        $scenePlans       = $this->chapterScenePlans($novel, $chapterPlanEntry);
+        $dialoguePlans    = $this->chapterDialoguePlans($novel, $scenePlans);
+
+        return [
+            "language"                 => $novel->language?->name ?? '',
+            "foundation"               => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
+            "characters"               => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
+            "world_bible"              => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
+            "story_structure"          => json_encode($novel->story_structure ?? [], JSON_PRETTY_PRINT),
+            "twists_and_foreshadowing" => json_encode($novel->twists_and_foreshadowing ?? [], JSON_PRETTY_PRINT),
+            "chapter_summary"          => $novel->chapter_summary ?? '',
+            "chapter_plan_entry"       => json_encode($chapterPlanEntry ?? [], JSON_PRETTY_PRINT),
+            "scene_plans"              => json_encode($scenePlans ?? [], JSON_PRETTY_PRINT),
+            "dialogue_plans"           => json_encode($dialoguePlans ?? [], JSON_PRETTY_PRINT),
+        ];
+    }
+
+    private function extractStepContentFromResponse(array $apiResponse): string
+    {
+        $content = data_get(
+            $apiResponse,
+            'choices.0.message.content'
+        );
+
+        if (! is_string($content) || trim($content) === '') {
+            throw new Exception('Invalid AI response structure.');
+        }
+
+        $content = trim($content);
+
+        $content = preg_replace(
+            '/^```(?:json)?\s*|\s*```$/i',
+            '',
+            $content
+        );
+
+        $content = trim($content);
+
+        return $content;
+    }
+
+    private function decodeStepContent(string $content): array
+    {
+        $decoded = json_decode(
+            $content,
+            true
+        );
+
+        if (
+            json_last_error() !== JSON_ERROR_NONE ||
+            ! is_array($decoded)
+        ) {
+            throw new Exception(
+                'AI response is not valid JSON: ' . json_last_error_msg()
+            );
+        }
+
+        return $decoded;
     }
 
     private function buildPayload(string $model, mixed $data = null, ?int $maxOutputTokens = null): array
@@ -156,223 +359,6 @@ class HuggingFaceApiService
         }
 
         return (string) $data;
-    }
-
-    private function step1FoundationRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        $language               = $inputs['language'] ?? null;
-        $audience               = $inputs['audience'] ?? null;
-        $novelType              = $inputs['novel_type'] ?? null;
-        $genres                 = collect($inputs['genres'] ?? []);
-        $genrePromptInstruction = '';
-
-        foreach ($genres as $genre) {
-
-            $gInstruction = trim($genre->prompt_instruction ?? '');
-
-            if ($gInstruction === '') {
-                continue;
-            }
-
-            if (! str_ends_with($gInstruction, '.')) {
-                $gInstruction .= '.';
-            }
-
-            if ($genrePromptInstruction !== '') {
-                $genrePromptInstruction .= ' ';
-            }
-
-            $genrePromptInstruction .= $gInstruction;
-        }
-
-        return [
-            "language"                 => $language?->name,
-            "additional_information"   => $inputs['additional_information'] ?? 'Auto',
-            "genre_prompt_instruction" => $genrePromptInstruction,
-            "audience_instruction"     => $audience?->prompt_instruction,
-            "novel_type_instruction"   => $novelType?->prompt_instruction,
-        ];
-    }
-
-    private function step2CharactersRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "foundation"             => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step3WorldBibleRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "foundation"             => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
-            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step4LocationsRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step5FactionsRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-            "locations"              => json_encode($novel->locations ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step6CreaturesRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-            "locations"              => json_encode($novel->locations ?? [], JSON_PRETTY_PRINT),
-            "factions"               => json_encode($novel->factions ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step7SystemsRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-            "creatures"              => json_encode($novel->creatures ?? [], JSON_PRETTY_PRINT),
-            "factions"               => json_encode($novel->factions ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step8TimelineRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-            "factions"               => json_encode($novel->factions ?? [], JSON_PRETTY_PRINT),
-            "foundation"             => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step9StoryStructureRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "foundation"             => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
-            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-            "timeline"               => json_encode($novel->timeline ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step10TwistsAndForeshadowingRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "story_structure"        => json_encode($novel->story_structure ?? [], JSON_PRETTY_PRINT),
-            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step11ScenePlansRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "story_structure"          => json_encode($novel->story_structure ?? [], JSON_PRETTY_PRINT),
-            "twists_and_foreshadowing" => json_encode($novel->twists_and_foreshadowing ?? [], JSON_PRETTY_PRINT),
-            "locations"                => json_encode($novel->locations ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step12DialoguePlansRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
-            "scene_plans"            => json_encode($novel->scene_plans ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step13ChapterPlanRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "scene_plans"            => json_encode($novel->scene_plans ?? [], JSON_PRETTY_PRINT),
-            "story_structure"        => json_encode($novel->story_structure ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step14PagePlanRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "chapter_plan"           => json_encode($novel->chapter_plan ?? [], JSON_PRETTY_PRINT),
-            "scene_plans"            => json_encode($novel->scene_plans ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step15ChapterSummaryRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "foundation"               => $inputs['foundation'] ?? '',
-            "characters"               => $inputs['characters'] ?? '',
-            "story_structure"          => $inputs['story_structure'] ?? '',
-            "twists_and_foreshadowing" => $inputs['twists_and_foreshadowing'] ?? '',
-            "chapter_plan_entry"       => json_encode($inputs['chapter_plan_entry'] ?? [], JSON_PRETTY_PRINT),
-            "scene_plans"              => json_encode($inputs['scene_plans'] ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function step16ChapterContentRequestInputsFormatter(Novel $novel, array $inputs): array
-    {
-        return [
-            "language"                 => $inputs['language'] ?? '',
-            "foundation"               => $inputs['foundation'] ?? '',
-            "characters"               => $inputs['characters'] ?? '',
-            "world_bible"              => $inputs['world_bible'] ?? '',
-            "story_structure"          => $inputs['story_structure'] ?? '',
-            "twists_and_foreshadowing" => $inputs['twists_and_foreshadowing'] ?? '',
-            "chapter_summary"          => $inputs['chapter_summary'] ?? '',
-            "chapter_plan_entry"       => json_encode($inputs['chapter_plan_entry'] ?? [], JSON_PRETTY_PRINT),
-            "scene_plans"              => json_encode($inputs['scene_plans'] ?? [], JSON_PRETTY_PRINT),
-            "dialogue_plans"           => json_encode($inputs['dialogue_plans'] ?? [], JSON_PRETTY_PRINT),
-        ];
-    }
-
-    private function extractStepContentFromResponse(array $apiResponse): string
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        return $content;
-    }
-
-    private function decodeStepContent(string $content): array
-    {
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
-            );
-        }
-
-        return $decoded;
     }
 
     private function extractStep1FoundationFromResponse(array $apiResponse): array
@@ -678,5 +664,63 @@ class HuggingFaceApiService
     private function formatAsArrayField(mixed $value): array
     {
         return is_array($value) ? $value : (array) $value;
+    }
+
+    private function findChapterPlanEntry(Novel $novel, NovelChapter $novelChapter): array
+    {
+        $chapterPlan = $novel->chapter_plan ?? [];
+
+        if (is_array($chapterPlan)) {
+            foreach ($chapterPlan as $entry) {
+                if ((string) ($entry['chapter_number'] ?? '') === (string) $novelChapter->no) {
+                    return (array) $entry;
+                }
+            }
+        }
+
+        return [
+            'chapter_number' => $novelChapter->no,
+            'title'          => $novelChapter->title,
+            'summary'        => $novelChapter->summery,
+            'scenes'         => [],
+            'chapter_goals'  => [],
+            'pacing_and_flow' => '',
+        ];
+    }
+
+    private function chapterDialoguePlans(Novel $novel, array $scenePlans): array
+    {
+        $dialoguePlans = $novel->dialogue_plans ?? [];
+
+        if (! is_array($dialoguePlans) || empty($dialoguePlans)) {
+            return [];
+        }
+
+        $sceneNumbers = array_values(array_filter(array_map(function ($scene) {
+            return (string) ($scene['scene_number'] ?? '');
+        }, $scenePlans)));
+
+        if (empty($sceneNumbers)) {
+            return [];
+        }
+
+        return array_values(array_filter($dialoguePlans, function ($dialogue) use ($sceneNumbers) {
+            return isset($dialogue['scene_reference']) && in_array((string) $dialogue['scene_reference'], $sceneNumbers, true);
+        }));
+    }
+
+    private function chapterScenePlans(Novel $novel, array $chapterPlanEntry): array
+    {
+        $scenePlans = $novel->scene_plans ?? [];
+
+        if (! is_array($scenePlans) || empty($scenePlans)) {
+            return [];
+        }
+
+        $chapterNumber = (string) ($chapterPlanEntry['chapter_number'] ?? '');
+
+        return array_values(array_filter($scenePlans, function ($scene) use ($chapterNumber) {
+            return isset($scene['chapter']) && (string) $scene['chapter'] === $chapterNumber;
+        }));
     }
 }
