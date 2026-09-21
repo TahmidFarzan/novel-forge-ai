@@ -52,6 +52,7 @@ import {
     canAccessDocumentStyle,
     canAccessAiPrompt,
     canAccessAiBrainOutputType,
+    canAccessNovelGeneratorStep,
 } from "@/composables/useUserPermissions";
 
 const { authUser } = defineProps({
@@ -75,7 +76,7 @@ const subMenus = ref({
 
 const routeMap = {
     UserManagement: ["/back-office/users/*"],
-    AiAttributes: ["/back-office/ai-brains/*", "/back-office/ai-brain-output-types/*"],
+    AiAttributes: ["/back-office/ai-brains/*", "/back-office/ai-brain-output-types/*", "/back-office/novel-generator-steps/*"],
     NovelAttributes: ["/back-office/genres/*", "/back-office/audiences/*", "/back-office/novel-types/*", "/back-office/languages/*", "/back-office/kdp-layouts/*"],
     Configuration: ["/back-office/document-styles/*"],
     Reports: ["/reports/*"],
@@ -119,6 +120,10 @@ const canAccessAiPromptComputed = computed(() => {
 
 const canAccessAiBrainOutputTypeComputed = computed(() => {
     return canAccessAiBrainOutputType(authUser);
+});
+
+const canAccessNovelGeneratorStepComputed = computed(() => {
+    return canAccessNovelGeneratorStep(authUser);
 });
 
 const toggleShowSubMenu = (key) => {
@@ -324,6 +329,16 @@ const isSubMenuVisible = (key) => {
                 >
                     <FontAwesomeIcon icon="shapes" class="w-4" />
                     Ai Brain Output Type
+                </a>
+
+                <a
+                    v-if="canAccessNovelGeneratorStepComputed"
+                    :href="route('back-office.novel-generator-steps.index')"
+                    class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[var(--ink-soft)] transition-colors duration-150 hover:bg-[var(--primary-soft)] hover:text-[var(--primary-strong)]"
+                    :class="isCurrentPage('/back-office/novel-generator-steps/*') ? 'bg-[var(--primary-soft)] font-semibold text-[var(--primary-strong)]' : ''"
+                >
+                    <FontAwesomeIcon icon="book-open" class="w-4" />
+                    Novel Generator Step
                 </a>
             </div>
         </Transition>

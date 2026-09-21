@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call(KdpLayoutSeeder::class);
         $this->call(DocumentStyleSeeder::class);
         $this->call(AiPromptSeeder::class);
+        $this->call(NovelGeneratorStepSeeder::class);
         $this->call(AiBrainOutputTypeSeeder::class);
         $this->call(AiBrainAiBrainOutputTypeSeeder::class);
     }

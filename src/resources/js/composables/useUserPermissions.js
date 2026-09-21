@@ -15,6 +15,7 @@ export const groups = {
     DocumentStyle: 'Document Style',
     AiPrompt: 'Ai Prompt',
     AiBrainOutputType: 'Ai Brain Output Type',
+    NovelGeneratorStep: 'Novel Generator Step',
     Novel: 'Novel',
 }
 
@@ -163,6 +164,9 @@ export const canUpdateAiPrompt = async (authUser, aiPrompt) => hasPermission(aut
 
 export const canAccessAiBrainOutputType = async (authUser) => hasPermission(authUser, groups.AiBrainOutputType, access.View)
 export const canViewAiBrainOutputType = async (authUser, aiBrainOutputType) => hasPermission(authUser, groups.AiBrainOutputType, access.ViewAny)
+
+export const canAccessNovelGeneratorStep = async (authUser) => hasPermission(authUser, groups.NovelGeneratorStep, access.View)
+export const canViewNovelGeneratorStep = async (authUser, novelGeneratorStep) => hasPermission(authUser, groups.NovelGeneratorStep, access.ViewAny)
 
 export const canAccessActivityLog = async (authUser) => true
 export const canDeleteActivityLog = async (authUser) => authUser?.is_super_admin

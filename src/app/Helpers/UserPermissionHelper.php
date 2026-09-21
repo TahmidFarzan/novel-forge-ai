@@ -23,6 +23,7 @@ class UserPermissionHelper
     public const MODULE_DOCUMENT_STYLE = 'Document Style';
     public const MODULE_AI_PROMPT = 'Ai Prompt';
     public const MODULE_AI_BRAIN_OUTPUT_TYPE = 'Ai Brain Output Type';
+    public const MODULE_NOVEL_GENERATOR_STEP = 'Novel Generator Step';
     public const MODULE_AUDIENCE = 'Audience';
     public const MODULE_NOVEL_TYPE = 'Novel Type';
     public const MODULE_NOVEL = 'Novel';
@@ -40,6 +41,7 @@ class UserPermissionHelper
             self::MODULE_DOCUMENT_STYLE,
             self::MODULE_AI_PROMPT,
             self::MODULE_AI_BRAIN_OUTPUT_TYPE,
+            self::MODULE_NOVEL_GENERATOR_STEP,
             self::MODULE_NOVEL,
         ]);
     }
@@ -85,6 +87,13 @@ class UserPermissionHelper
         }
 
         if ($moduleName == self::MODULE_AI_BRAIN_OUTPUT_TYPE) {
+            return SystemHelper::toOptions([
+                self::ACCESS_VIEW_ANY,
+                self::ACCESS_VIEW,
+            ]);
+        }
+
+        if ($moduleName == self::MODULE_NOVEL_GENERATOR_STEP) {
             return SystemHelper::toOptions([
                 self::ACCESS_VIEW_ANY,
                 self::ACCESS_VIEW,

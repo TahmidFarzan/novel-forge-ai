@@ -12,6 +12,7 @@ use App\Http\Controllers\BackOffice\KdpLayoutController;
 use App\Http\Controllers\BackOffice\LanguageController;
 use App\Http\Controllers\BackOffice\MediaController;
 use App\Http\Controllers\BackOffice\NovelController;
+use App\Http\Controllers\BackOffice\NovelGeneratorStepController;
 use App\Http\Controllers\BackOffice\NovelTypeController;
 use App\Http\Controllers\BackOffice\UserController;
 use App\Http\Controllers\PageController;
@@ -200,6 +201,11 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
     Route::prefix('ai-brain-output-types')->name('ai-brain-output-types.')->group(function () {
         Route::get('/', [AiBrainOutputTypeController::class, 'index'])->name('index');
         Route::get('{slug}/details', [AiBrainOutputTypeController::class, 'details'])->name('details');
+    });
+
+    Route::prefix('novel-generator-steps')->name('novel-generator-steps.')->group(function () {
+        Route::get('/', [NovelGeneratorStepController::class, 'index'])->name('index');
+        Route::get('{slug}/details', [NovelGeneratorStepController::class, 'details'])->name('details');
     });
 
     Route::prefix('document-styles')->name('document-styles.')->group(function () {
