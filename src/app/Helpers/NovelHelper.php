@@ -11,12 +11,6 @@ class NovelHelper
     public const STATUS_PENDING    = 'Pending';
     public const STATUS_COMPLETE    = 'Complete';
 
-    public const STEP_STATUS_DRAFT    = 'Draft';
-    public const STEP_STATUS_ONGOING    = 'Ongoing';
-    public const STEP_STATUS_PENDING    = 'Pending';
-    public const STEP_STATUS_COMPLETE    = 'Complete';
-    public const STEP_STATUS_FAILED    = 'Failed';
-    public const STEP_STATUS_CANCELLED    = 'Cancelled';
 
     public static function statuses(): Collection
     {
@@ -28,15 +22,4 @@ class NovelHelper
         ]);
     }
 
-    public static function stepStatuses(): Collection
-    {
-        return SystemHelper::toOptions([
-            self::STEP_STATUS_DRAFT,
-            self::STEP_STATUS_ONGOING,
-            self::STEP_STATUS_PENDING,
-            self::STEP_STATUS_FAILED,
-            self::STEP_STATUS_CANCELLED,
-            self::STEP_STATUS_COMPLETE,
-        ]);
-    }
 }
