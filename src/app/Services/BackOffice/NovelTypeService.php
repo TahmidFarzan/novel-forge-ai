@@ -31,7 +31,7 @@ class NovelTypeService
 
     public function findById(string | int $id): NovelType
     {
-        return NovelType::whereIn('id', $id)->firstOrFail();
+        return NovelType::where('id', $id)->firstOrFail();
     }
 
     public function search(Request $request)
