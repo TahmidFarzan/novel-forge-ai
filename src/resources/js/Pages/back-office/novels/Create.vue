@@ -2,57 +2,252 @@
 import Layout from "@/pages/layouts/AuthLayout.vue";
 
 import NovelStep1Form from "@/components/back-office/novel/NovelStep1Form.vue";
-import NovelStep2Form from "@/components/back-office/novel/NovelStep2Form.vue";
-import NovelStep3Form from "@/components/back-office/novel/NovelStep3Form.vue";
-import NovelStep4Form from "@/components/back-office/novel/NovelStep4Form.vue";
-import NovelStep5Form from "@/components/back-office/novel/NovelStep5Form.vue";
-import NovelStep6Form from "@/components/back-office/novel/NovelStep6Form.vue";
-import NovelStep7Form from "@/components/back-office/novel/NovelStep7Form.vue";
-import NovelStep8Form from "@/components/back-office/novel/NovelStep8Form.vue";
-import NovelStep9Form from "@/components/back-office/novel/NovelStep9Form.vue";
-import NovelStep10Form from "@/components/back-office/novel/NovelStep10Form.vue";
-import NovelStep11Form from "@/components/back-office/novel/NovelStep11Form.vue";
-import NovelStep12Form from "@/components/back-office/novel/NovelStep12Form.vue";
-import NovelStep13Form from "@/components/back-office/novel/NovelStep13Form.vue";
-import NovelStep14Form from "@/components/back-office/novel/NovelStep14Form.vue";
-import NovelStep15Form from "@/components/back-office/novel/NovelStep15Form.vue";
 
-import { ref, computed, onMounted, nextTick } from "vue";
-import { Head } from "@inertiajs/vue3";
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from "vue";
+import { Head, router } from "@inertiajs/vue3";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library as FontAwesomeLibrary } from "@fortawesome/fontawesome-svg-core";
 import {
     faSpinner,
-    faCheck,
-    faLock,
+    faCircleCheck,
+    faCircleXmark,
+    faHourglassHalf,
+    faStop,
+    faRotateRight,
     faArrowLeft,
     faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 
+import { statuses, stepStatuses } from "@/composables/useNovel";
+
 FontAwesomeLibrary.add(
     faSpinner,
-    faCheck,
-    faLock,
+    faCircleCheck,
+    faCircleXmark,
+    faHourglassHalf,
+    faStop,
+    faRotateRight,
     faArrowLeft,
     faWandMagicSparkles,
 );
 
 defineOptions({ layout: Layout });
 
-const createPageTitle = "Create Novel";
+const createPageTitle = "Novel Generation";
 
-const { novel } = defineProps({
+const props = defineProps({
     novel: {
         type: Object,
         default: null,
     },
+    generationSteps: {
+        type: Array,
+        default: () => [],
+    },
 });
 
-const isUpdate = computed(() => !!novel?.slug);
+const isEdit = computed(() => !!props.novel?.slug);
 
 const pageTitle = computed(() => {
-    return isUpdate.value ? `Edit ${novel?.name}` : "New Novel";
+    return isEdit.value ? `Edit ${props.novel?.name}` : "New Novel";
+});
+
+const steps = computed(() => props.generationSteps ?? []);
+
+const progressMap = computed(() => props.novel?.generation_steps ?? {});
+
+const totalSteps = computed(() => steps.value.length);
+
+const completedSteps = computed(() => {
+    return steps.value.filter(
+        (step) =>
+            progressMap.value[step.id]?.status === stepStatuses.completed,
+    ).length;
+});
+
+const progressPercent = computed(() => {
+    if (totalSteps.value === 0) {
+        return 0;
+    }
+
+    return Math.round((completedSteps.value / totalSteps.value) * 100);
+});
+
+const stepState = (stepId) => {
+    return progressMap.value[stepId]?.status ?? stepStatuses.pending;
+};
+
+const currentStep = computed(() => {
+    return (
+        steps.value.find(
+            (step) => stepState(step.id) === stepStatuses.inProgress,
+        ) ??
+        steps.value.find((step) => stepState(step.id) === stepStatuses.pending) ??
+        null
+    );
+});
+
+const generationStatus = computed(() => props.novel?.status);
+
+const isOngoing = computed(() => {
+    return generationStatus.value === statuses.Ongoing;
+});
+
+const isRestartable = computed(() => {
+    return [statuses.Failed, statuses.Stopped].includes(generationStatus.value);
+});
+
+const hasAutoFlag = () => {
+    return new URL(window.location.href).searchParams.get("auto") === "1";
+};
+
+const AUTO_CONTINUE_DELAY = 3;
+
+const creating = ref(false);
+const isGenerating = ref(false);
+const autoContinueRemaining = ref(null);
+let autoContinueTimer = null;
+
+const stopCountdown = () => {
+    if (autoContinueTimer !== null) {
+        clearInterval(autoContinueTimer);
+        autoContinueTimer = null;
+    }
+
+    autoContinueRemaining.value = null;
+};
+
+const startAutoContinue = () => {
+    stopCountdown();
+
+    if (!isEdit.value || !isOngoing.value || !hasAutoFlag()) {
+        return;
+    }
+
+    autoContinueRemaining.value = AUTO_CONTINUE_DELAY;
+
+    autoContinueTimer = setInterval(() => {
+        autoContinueRemaining.value -= 1;
+
+        if (autoContinueRemaining.value <= 0) {
+            stopCountdown();
+            continueGeneration();
+        }
+    }, 1000);
+};
+
+const continueGeneration = () => {
+    isGenerating.value = true;
+
+    router.patch(
+        route("back-office.novels.generate", { slug: props.novel?.slug }),
+        {},
+        {
+            preserveScroll: true,
+            preserveState: true,
+            onFinish: () => {
+                isGenerating.value = false;
+                stopCountdown();
+            },
+        },
+    );
+};
+
+const stopGeneration = () => {
+    isGenerating.value = true;
+
+    router.patch(
+        route("back-office.novels.stop", { slug: props.novel?.slug }),
+        {},
+        {
+            preserveScroll: true,
+            preserveState: true,
+            onFinish: () => {
+                isGenerating.value = false;
+                stopCountdown();
+            },
+        },
+    );
+};
+
+const startGeneration = () => {
+    creating.value = true;
+    activeStepComponentRef.value?.submit();
+};
+
+const handleCreated = () => {
+    creating.value = false;
+};
+
+const handleFinished = () => {
+    creating.value = false;
+};
+
+const activeStepComponentRef = ref(null);
+
+const statusBadgeClass = computed(() => {
+    switch (generationStatus.value) {
+        case statuses.Ongoing:
+            return "bg-blue-100 text-blue-700";
+        case statuses.Pending:
+            return "bg-amber-100 text-amber-700";
+        case statuses.Failed:
+            return "bg-red-100 text-red-700";
+        case statuses.Stopped:
+            return "bg-slate-200 text-slate-700";
+        case statuses.Complete:
+            return "bg-green-100 text-green-700";
+        default:
+            return "bg-gray-100 text-gray-700";
+    }
+});
+
+const getStepClass = (stepId) => {
+    switch (stepState(stepId)) {
+        case stepStatuses.inProgress:
+            return "border-blue-500 bg-blue-50";
+        case stepStatuses.completed:
+            return "border-green-500 bg-green-50";
+        case stepStatuses.failed:
+            return "border-red-500 bg-red-50";
+        default:
+            return "border-gray-200 bg-white";
+    }
+};
+
+const getStepIconClass = (stepId) => {
+    switch (stepState(stepId)) {
+        case stepStatuses.inProgress:
+            return "text-blue-600";
+        case stepStatuses.completed:
+            return "text-green-600";
+        case stepStatuses.failed:
+            return "text-red-600";
+        default:
+            return "text-gray-400";
+    }
+};
+
+const getStepLabel = (stepId) => {
+    switch (stepState(stepId)) {
+        case stepStatuses.inProgress:
+            return "Generating...";
+        case stepStatuses.completed:
+            return "Completed";
+        case stepStatuses.failed:
+            return "Failed";
+        default:
+            return "Pending";
+    }
+};
+
+const failedStep = computed(() => {
+    return (
+        steps.value.find(
+            (step) => stepState(step.id) === stepStatuses.failed,
+        ) ?? null
+    );
 });
 
 onMounted(async () => {
@@ -72,90 +267,11 @@ onMounted(async () => {
             ],
         }),
     );
+
+    startAutoContinue();
 });
 
-const STEP_DEFINITIONS = [
-    { id: 1, name: "Foundation Generator" },
-    { id: 2, name: "Character Development" },
-    { id: 3, name: "World Bible Generator" },
-    { id: 4, name: "Location Generator" },
-    { id: 5, name: "Faction Generator" },
-    { id: 6, name: "Creature / Being Generator" },
-    { id: 7, name: "Dynamic System Generator" },
-    { id: 8, name: "Timeline Generator" },
-    { id: 9, name: "Story Structure Generator" },
-    { id: 10, name: "Twist & Foreshadowing Generator" },
-    { id: 11, name: "Scene Planner" },
-    { id: 12, name: "Dialogue Planner" },
-    { id: 13, name: "Chapter Planner" },
-    { id: 14, name: "Page Planner" },
-    { id: 15, name: "Complete Novel" },
-];
-
-const activeStep = ref(1);
-const completedSteps = ref(new Set());
-const submittingStep = ref(null);
-const activeStepComponentRef = ref(null);
-
-const isStepAccessible = (stepId) => {
-    if (stepId === 1) {
-        return true;
-    }
-
-    return completedSteps.value.has(stepId - 1);
-};
-
-const isStepCompleted = (stepId) => {
-    return completedSteps.value.has(stepId);
-};
-
-const getStepState = (stepId) => {
-    if (isStepCompleted(stepId)) {
-        return "completed";
-    }
-
-    if (stepId === activeStep.value) {
-        return "active";
-    }
-
-    if (isStepAccessible(stepId)) {
-        return "accessible";
-    }
-
-    return "locked";
-};
-
-const goToStep = (stepId) => {
-    if (isStepAccessible(stepId) || isStepCompleted(stepId)) {
-        activeStep.value = stepId;
-    }
-};
-
-const goPrev = () => {
-    if (activeStep.value > 1) {
-        activeStep.value--;
-    }
-};
-
-const handleStepCompleted = (stepId) => {
-    completedSteps.value.add(stepId);
-
-    if (stepId < STEP_DEFINITIONS.length) {
-        activeStep.value = stepId + 1;
-    }
-};
-
-const handleSubmitting = (stepId) => {
-    submittingStep.value = stepId;
-};
-
-const handleFinished = () => {
-    submittingStep.value = null;
-};
-
-const submitActiveStep = () => {
-    activeStepComponentRef.value?.submit();
-};
+onBeforeUnmount(stopCountdown);
 </script>
 
 <template>
@@ -165,312 +281,232 @@ const submitActiveStep = () => {
         <div
             class="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 md:p-6"
         >
-            <div class="flex flex-col">
-                <div
-                    class="flex items-center px-0 py-4 border-b border-gray-200"
+            <div
+                class="flex items-center justify-between px-0 py-4 border-b border-gray-200"
+            >
+                <h2 class="text-lg font-semibold flex items-center gap-2">
+                    <FontAwesomeIcon
+                        icon="wand-magic-sparkles"
+                        class="text-purple-600"
+                    />
+                    {{ pageTitle }}
+                </h2>
+
+                <span
+                    v-if="isEdit"
+                    class="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold rounded-full"
+                    :class="statusBadgeClass"
                 >
-                    <h2 class="text-lg font-semibold flex items-center gap-2">
-                        <FontAwesomeIcon
-                            icon="wand-magic-sparkles"
-                            class="text-purple-600"
-                        />
-                        {{ pageTitle }}
-                    </h2>
-                </div>
-
-                <div class="px-0 pt-4 border-b border-gray-200">
-                    <nav
-                        class="hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-x-2 pb-px"
-                    >
-                        <button
-                            v-for="step in STEP_DEFINITIONS"
-                            :key="step.id"
-                            type="button"
-                            @click="goToStep(step.id)"
-                            :disabled="
-                                !isStepAccessible(step.id) &&
-                                !isStepCompleted(step.id)
-                            "
-                            class="flex items-center justify-center gap-2 px-3 py-3 text-sm font-medium text-center border-b-2 transition disabled:opacity-40 disabled:cursor-not-allowed"
-                            :class="{
-                                'border-blue-600 text-blue-600':
-                                    getStepState(step.id) === 'active',
-                                'border-green-500 text-green-600':
-                                    getStepState(step.id) === 'completed',
-                                'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300':
-                                    getStepState(step.id) === 'accessible',
-                                'border-transparent text-gray-300':
-                                    getStepState(step.id) === 'locked',
-                            }"
-                        >
-                            <span
-                                class="flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold"
-                                :class="{
-                                    'bg-blue-600 text-white':
-                                        getStepState(step.id) === 'active',
-                                    'bg-green-500 text-white':
-                                        getStepState(step.id) === 'completed',
-                                    'bg-gray-200 text-gray-600':
-                                        getStepState(step.id) === 'accessible',
-                                    'bg-gray-100 text-gray-400':
-                                        getStepState(step.id) === 'locked',
-                                }"
-                            >
-                                <FontAwesomeIcon
-                                    v-if="isStepCompleted(step.id)"
-                                    icon="check"
-                                    class="text-xs"
-                                />
-                                <span v-else>{{ step.id }}</span>
-                            </span>
-
-                            <span>{{ step.name }}</span>
-
-                            <FontAwesomeIcon
-                                v-if="
-                                    !isStepAccessible(step.id) &&
-                                    !isStepCompleted(step.id)
-                                "
-                                icon="lock"
-                                class="text-xs text-gray-300"
-                            />
-                        </button>
-                    </nav>
-
-                    <nav class="md:hidden -mx-2 px-2">
-                        <button
-                            v-for="step in STEP_DEFINITIONS"
-                            :key="step.id"
-                            type="button"
-                            @click="goToStep(step.id)"
-                            :disabled="
-                                !isStepAccessible(step.id) &&
-                                !isStepCompleted(step.id)
-                            "
-                            class="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed text-left"
-                            :class="{
-                                'bg-blue-50 text-blue-700':
-                                    getStepState(step.id) === 'active' ||
-                                    getStepState(step.id) === 'completed',
-                                'text-gray-600 hover:bg-gray-50':
-                                    getStepState(step.id) === 'accessible',
-                                'text-gray-300':
-                                    getStepState(step.id) === 'locked',
-                            }"
-                        >
-                            <span
-                                class="flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold flex-shrink-0"
-                                :class="{
-                                    'bg-blue-600 text-white':
-                                        getStepState(step.id) === 'active',
-                                    'bg-green-500 text-white':
-                                        getStepState(step.id) === 'completed',
-                                    'bg-gray-200 text-gray-600':
-                                        getStepState(step.id) === 'accessible',
-                                    'bg-gray-100 text-gray-400':
-                                        getStepState(step.id) === 'locked',
-                                }"
-                            >
-                                <FontAwesomeIcon
-                                    v-if="isStepCompleted(step.id)"
-                                    icon="check"
-                                    class="text-xs"
-                                />
-                                <span v-else>{{ step.id }}</span>
-                            </span>
-
-                            <span class="flex-1">
-                                {{ step.name }}
-                            </span>
-
-                            <FontAwesomeIcon
-                                v-if="
-                                    !isStepAccessible(step.id) &&
-                                    !isStepCompleted(step.id)
-                                "
-                                icon="lock"
-                                class="text-xs text-gray-300 flex-shrink-0"
-                            />
-                        </button>
-                    </nav>
-                </div>
-
-                <div class="px-0 py-6">
-                    <NovelStep1Form
-                        v-if="activeStep === 1"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @submitting="handleSubmitting(1)"
-                        @completed="handleStepCompleted(1)"
-                        @finished="handleFinished"
+                    <FontAwesomeIcon
+                        v-if="isGenerating"
+                        icon="spinner"
+                        spin
                     />
+                    {{ generationStatus }}
+                </span>
+            </div>
 
-                    <NovelStep2Form
-                        v-else-if="activeStep === 2"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(2)"
-                    />
-
-                    <NovelStep3Form
-                        v-else-if="activeStep === 3"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(3)"
-                    />
-
-                    <NovelStep4Form
-                        v-else-if="activeStep === 4"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(4)"
-                    />
-
-                    <NovelStep5Form
-                        v-else-if="activeStep === 5"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(5)"
-                    />
-
-                    <NovelStep6Form
-                        v-else-if="activeStep === 6"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(6)"
-                    />
-
-                    <NovelStep7Form
-                        v-else-if="activeStep === 7"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(7)"
-                    />
-
-                    <NovelStep8Form
-                        v-else-if="activeStep === 8"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(8)"
-                    />
-
-                    <NovelStep9Form
-                        v-else-if="activeStep === 9"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(9)"
-                    />
-
-                    <NovelStep10Form
-                        v-else-if="activeStep === 10"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(10)"
-                    />
-
-                    <NovelStep11Form
-                        v-else-if="activeStep === 11"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(11)"
-                    />
-
-                    <NovelStep12Form
-                        v-else-if="activeStep === 12"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(12)"
-                    />
-
-                    <NovelStep13Form
-                        v-else-if="activeStep === 13"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(13)"
-                    />
-
-                    <NovelStep14Form
-                        v-else-if="activeStep === 14"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(14)"
-                    />
-
-                    <NovelStep15Form
-                        v-else-if="activeStep === 15"
-                        ref="activeStepComponentRef"
-                        :novel="novel"
-                        @completed="handleStepCompleted(15)"
-                    />
-                </div>
+            <div v-if="!isEdit" class="px-0 py-6">
+                <NovelStep1Form
+                    ref="activeStepComponentRef"
+                    :novel="novel"
+                    @submitting="creating = true"
+                    @completed="handleCreated"
+                    @finished="handleFinished"
+                />
 
                 <div
-                    class="px-0 py-4 border-t border-gray-200 flex justify-between items-center"
+                    class="px-0 pt-4 border-t border-gray-200 flex justify-end items-center gap-2"
                 >
                     <button
                         type="button"
-                        @click="goPrev"
-                        :disabled="activeStep === 1"
-                        class="px-4 py-2 text-sm rounded-md border border-gray-300 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                        @click="startGeneration"
+                        :disabled="creating"
+                        class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                        <FontAwesomeIcon icon="arrow-left" />
-                        Previous
+                        <FontAwesomeIcon
+                            v-if="creating"
+                            icon="spinner"
+                            spin
+                        />
+                        <FontAwesomeIcon
+                            v-else
+                            icon="wand-magic-sparkles"
+                        />
+
+                        {{ creating ? "Generating Foundation..." : "Generate Novel" }}
                     </button>
+                </div>
+            </div>
 
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-400">
-                            Step {{ activeStep }} of
-                            {{ STEP_DEFINITIONS.length }}
-                        </span>
-                    </div>
+            <div v-else class="px-0 pt-6 space-y-6">
+                <div
+                    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-gray-50 border border-gray-200 rounded-xl p-4"
+                >
+                    <div class="space-y-1 flex-1">
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-gray-600">
+                                Progress
+                            </span>
+                            <span class="text-sm font-semibold">
+                                {{ completedSteps }} / {{ totalSteps }} steps
+                            </span>
+                            <span class="text-sm font-semibold text-blue-700">
+                                {{ progressPercent }}%
+                            </span>
+                        </div>
 
-                    <div>
-                        <button
-                            v-if="activeStep === 1"
-                            type="button"
-                            @click="submitActiveStep"
-                            :disabled="submittingStep === 1"
-                            class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                        <div
+                            class="w-full h-2 bg-gray-200 rounded-full overflow-hidden"
+                        >
+                            <div
+                                class="h-full bg-blue-600 rounded-full transition-all"
+                                :style="{ width: `${progressPercent}%` }"
+                            ></div>
+                        </div>
+
+                        <p v-if="isGenerating" class="text-sm text-blue-700">
+                            <FontAwesomeIcon icon="spinner" spin class="mr-1" />
+                            Generating...
+                        </p>
+
+                        <p
+                            v-else-if="
+                                autoContinueRemaining !== null &&
+                                isOngoing
+                            "
+                            class="text-sm text-slate-500"
                         >
                             <FontAwesomeIcon
-                                v-if="submittingStep === 1"
+                                icon="hourglass-half"
+                                class="mr-1"
+                            />
+                            Auto-continuing in
+                            {{ autoContinueRemaining }}s...
+                        </p>
+
+                        <p
+                            v-else-if="currentStep"
+                            class="text-sm text-slate-500"
+                        >
+                            <FontAwesomeIcon
+                                icon="hourglass-half"
+                                class="mr-1 text-gray-400"
+                            />
+                            Upcoming:
+                            {{ currentStep.name }}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <template v-if="isRestartable">
+                            <button
+                                type="button"
+                                @click="continueGeneration"
+                                :disabled="isGenerating"
+                                class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                                <FontAwesomeIcon
+                                    v-if="isGenerating"
+                                    icon="spinner"
+                                    spin
+                                />
+                                <FontAwesomeIcon v-else icon="rotate-right" />
+                                Resume Generation
+                            </button>
+                        </template>
+
+                        <template v-else-if="isOngoing">
+                            <button
+                                type="button"
+                                @click="continueGeneration"
+                                :disabled="isGenerating"
+                                class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                                <FontAwesomeIcon
+                                    v-if="isGenerating"
+                                    icon="spinner"
+                                    spin
+                                />
+                                <FontAwesomeIcon v-else icon="rotate-right" />
+                                Continue
+                            </button>
+
+                            <button
+                                type="button"
+                                @click="stopGeneration"
+                                :disabled="isGenerating"
+                                class="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md flex items-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                                <FontAwesomeIcon icon="stop" />
+                                Stop
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <p
+                    v-if="failedStep"
+                    class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3"
+                >
+                    <FontAwesomeIcon icon="circle-xmark" class="mr-1" />
+                    Step "{{ failedStep.name }}" failed. You can resume
+                    generation to retry.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div
+                        v-for="step in steps"
+                        :key="step.id"
+                        class="border rounded-lg p-3 flex items-start gap-3 transition"
+                        :class="getStepClass(step.id)"
+                    >
+                        <span
+                            class="flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold flex-shrink-0"
+                            :class="getStepIconClass(step.id)"
+                        >
+                            <FontAwesomeIcon
+                                v-if="stepState(step.id) === stepStatuses.completed"
+                                icon="circle-check"
+                            />
+                            <FontAwesomeIcon
+                                v-else-if="
+                                    stepState(step.id) === stepStatuses.failed
+                                "
+                                icon="circle-xmark"
+                            />
+                            <FontAwesomeIcon
+                                v-else-if="
+                                    stepState(step.id) ===
+                                    stepStatuses.inProgress
+                                "
                                 icon="spinner"
                                 spin
                             />
                             <FontAwesomeIcon
                                 v-else
-                                icon="wand-magic-sparkles"
+                                icon="hourglass-half"
                             />
+                        </span>
 
-                            {{
-                                submittingStep === 1
-                                    ? "Generating..."
-                                    : "Generate Foundation"
-                            }}
-                        </button>
-
-                        <button
-                            v-else
-                            type="button"
-                            @click="submitActiveStep"
-                            :disabled="submittingStep === activeStep"
-                            class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                            <FontAwesomeIcon
-                                v-if="submittingStep === activeStep"
-                                icon="spinner"
-                                spin
-                            />
-                            <FontAwesomeIcon v-else icon="check" />
-
-                            {{
-                                submittingStep === activeStep
-                                    ? "Saving..."
-                                    : activeStep === STEP_DEFINITIONS.length
-                                      ? "Complete"
-                                      : "Continue"
-                            }}
-                        </button>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-800">
+                                {{ step.name }}
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                {{ getStepLabel(step.id) }}
+                            </p>
+                            <p
+                                v-if="
+                                    stepState(step.id) ===
+                                        stepStatuses.failed &&
+                                    progressMap[step.id]?.error
+                                "
+                                class="text-xs text-red-600 mt-1 break-words"
+                            >
+                                {{ progressMap[step.id].error }}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -123,6 +123,7 @@ const getStatusColor = (status) => {
         'Pending': 'bg-yellow-50 text-yellow-700 border-yellow-300',
         'Complete': 'bg-green-50 text-green-700 border-green-300',
         'Failed': 'bg-red-50 text-red-700 border-red-300',
+        'Stopped': 'bg-slate-100 text-slate-700 border-slate-300',
     }
     return colors[status] || 'bg-gray-100 text-gray-600 border-gray-300'
 }

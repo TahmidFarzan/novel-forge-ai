@@ -472,7 +472,7 @@ class SeederHelper
             (object) [
                 'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16,
                 'code' => 'ChapterContentGenerator',
-                'step_number' => 15,
+                'step_number' => 16,
                 'depend_on_prompt_ids' => null,
                 'prompt' => AiPromptGeneratorHelper::step16Prompt(),
             ],

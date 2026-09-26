@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'ai_generation' => [
+
+        'max_attempts' => env('AI_GENERATION_MAX_ATTEMPTS', 3),
+
+        'retry_delay_ms' => env('AI_GENERATION_RETRY_DELAY_MS', 750),
+
+        'json_response_format' => env('AI_GENERATION_JSON_RESPONSE_FORMAT', false),
+
+    ],
+
 ];

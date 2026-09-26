@@ -31,7 +31,10 @@ use Spatie\Sluggable\SlugOptions;
     'audience_id',
     'novel_type_id',
     'language_id',
+    'ai_brain_id',
     'ai_prompt',
+
+    'generation_steps',
 
     'foundation',
     'characters',
@@ -77,6 +80,8 @@ class Novel extends Model
             'page_plan' => 'array',
             'chapter_plan' => 'array',
             'complete_novel' => 'array',
+
+            'generation_steps' => 'array',
 
             'datetime' => 'datetime',
             'created_at' => 'datetime',
@@ -147,6 +152,11 @@ class Novel extends Model
     public function audience(): BelongsTo
     {
         return $this->belongsTo(Audience::class);
+    }
+
+    public function aiBrain(): BelongsTo
+    {
+        return $this->belongsTo(AiBrain::class);
     }
 
     public function createdBy(): BelongsTo

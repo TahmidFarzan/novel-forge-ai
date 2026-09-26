@@ -2,15 +2,140 @@
 
 namespace App\Services\BackOffice;
 
+use App\Models\Novel;
 use App\Models\NovelGeneratorStep;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 class NovelGeneratorStepService
 {
+    public const STATUS_PENDING    = 'pending';
+    public const STATUS_IN_PROGRESS = 'in_progress';
+    public const STATUS_COMPLETED  = 'completed';
+    public const STATUS_FAILED     = 'failed';
+
     public function new(): NovelGeneratorStep
     {
         return new NovelGeneratorStep;
+    }
+
+    public function orderedSteps(): Collection
+    {
+        return NovelGeneratorStep::query()
+            ->with('aiPrompt')
+            ->orderBy('id')
+            ->get();
+    }
+
+    public function initializeProgress(): array
+    {
+        $progress = [];
+
+        foreach ($this->orderedSteps() as $step) {
+            $progress[$step->id] = $this->emptyProgressState();
+        }
+
+        return $progress;
+    }
+
+    public function progress(Novel $novel): array
+    {
+        $progress = $novel->generation_steps;
+
+        return is_array($progress) ? $progress : [];
+    }
+
+    public function stepProgress(Novel $novel, NovelGeneratorStep $step): array
+    {
+        $progress = $this->progress($novel);
+
+        return $progress[$step->id] ?? $this->emptyProgressState();
+    }
+
+    public function nextPendingStep(Novel $novel): ?NovelGeneratorStep
+    {
+        foreach ($this->orderedSteps() as $step) {
+            $state = $this->stepProgress($novel, $step);
+
+            if (($state['status'] ?? self::STATUS_PENDING) !== self::STATUS_COMPLETED) {
+                return $step;
+            }
+        }
+
+        return null;
+    }
+
+    public function markStarted(Novel $novel, NovelGeneratorStep $step): void
+    {
+        $this->updateStepProgress($novel, $step, [
+            'status' => self::STATUS_IN_PROGRESS,
+            'error' => null,
+        ]);
+    }
+
+    public function markCompleted(Novel $novel, NovelGeneratorStep $step): void
+    {
+        $this->updateStepProgress($novel, $step, [
+            'status' => self::STATUS_COMPLETED,
+            'finished_at' => now()->toISOString(),
+            'error' => null,
+        ]);
+    }
+
+    public function markFailed(Novel $novel, NovelGeneratorStep $step, string $error): void
+    {
+        $this->updateStepProgress($novel, $step, [
+            'status' => self::STATUS_FAILED,
+            'finished_at' => now()->toISOString(),
+            'error' => $error,
+        ]);
+    }
+
+    public function completedStepCount(Novel $novel): int
+    {
+        return collect($this->progress($novel))
+            ->filter(fn (array $state) => ($state['status'] ?? null) === self::STATUS_COMPLETED)
+            ->count();
+    }
+
+    public function allStepsCompleted(Novel $novel): bool
+    {
+        $totalSteps = $this->orderedSteps()->count();
+
+        if ($totalSteps === 0) {
+            return false;
+        }
+
+        return $this->completedStepCount($novel) >= $totalSteps;
+    }
+
+    private function updateStepProgress(Novel $novel, NovelGeneratorStep $step, array $changes): void
+    {
+        $progress = $this->progress($novel);
+        $current = $progress[$step->id] ?? $this->emptyProgressState();
+
+        if (($changes['status'] ?? null) === self::STATUS_IN_PROGRESS && ($current['started_at'] ?? null) !== null) {
+            unset($changes['started_at']);
+        }
+
+        if (($changes['status'] ?? null) !== self::STATUS_IN_PROGRESS && ($current['started_at'] ?? null) === null) {
+            $changes['started_at'] = now()->toISOString();
+        }
+
+        $progress[$step->id] = array_merge($this->emptyProgressState(), $current, $changes);
+
+        $novel->generation_steps = $progress;
+        $novel->save();
+    }
+
+    private function emptyProgressState(): array
+    {
+        return [
+            'status' => self::STATUS_PENDING,
+            'started_at' => null,
+            'finished_at' => null,
+            'error' => null,
+        ];
     }
 
     public function find(string $slug): NovelGeneratorStep

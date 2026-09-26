@@ -2,10 +2,13 @@
 
 namespace App\Services\BackOffice;
 
+use App\Exceptions\AiResponseException;
 use App\Helpers\AiPromptGeneratorHelper;
 use Exception;
 use App\Models\Novel;
 use App\Models\NovelChapter;
+use App\Support\PromptContextEncoder;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -13,38 +16,53 @@ class HuggingFaceApiService
 {
     protected int $defaultTimeout = 120;
 
+    protected AiResponseService $aiResponseService;
+
+    public function __construct(AiResponseService $aiResponseService)
+    {
+        $this->aiResponseService = $aiResponseService;
+    }
+
     public function sendPostRequest(string $stepName, string $url, string $apiKey, string $model, mixed $data = null, ?int $maxOutputTokens = null, ?int $timeout = null): array
     {
         $requestTimeout = $timeout ?? $this->defaultTimeout;
+        $maxAttempts    = max(1, (int) config('services.ai_generation.max_attempts', 3));
+        $retryDelayMs   = max(0, (int) config('services.ai_generation.retry_delay_ms', 750));
 
-        set_time_limit($requestTimeout);
+        set_time_limit(($requestTimeout * $maxAttempts) + 5);
 
-        $payload = $this->buildPayload(
-            $model,
-            $data,
-            $maxOutputTokens
-        );
-
+        $payload  = $this->buildPayload($model, $data, $maxOutputTokens);
         $endpoint = rtrim($url, '/');
 
-        $response = Http::timeout(
-            $requestTimeout
-        )
-            ->withToken($apiKey)
-            ->acceptJson()
-            ->post(
-                $endpoint,
-                $payload
-            );
+        $attempt = 0;
 
-        if (! $response->successful()) {
-            throw new Exception(
-                $response->body()
-            );
+        while (true) {
+            $attempt++;
+
+            try {
+                $response = $this->post($stepName, $endpoint, $apiKey, $payload, $requestTimeout);
+
+                return $this->aiResponseFormats($stepName, $response);
+            } catch (AiResponseException $exception) {
+                if (! $exception->isRetryable() || $attempt >= $maxAttempts) {
+                    throw $exception->withContext([
+                        'attempts'     => $attempt,
+                        'max_attempts' => $maxAttempts,
+                    ]);
+                }
+
+                Log::warning('Retrying AI generation step after an unusable AI response.', [
+                    'step'         => $stepName,
+                    'attempt'      => $attempt,
+                    'max_attempts' => $maxAttempts,
+                    'reason'       => $exception->context()['reason'] ?? null,
+                ]);
+
+                if ($retryDelayMs > 0) {
+                    usleep($retryDelayMs * 1000 * $attempt);
+                }
+            }
         }
-
-
-        return $this->aiResponseFormats($stepName,  $response->json());
     }
 
     public function sendGetRequest(string $url, string $apiKey, array $params = [], ?int $timeout = null): array
@@ -69,26 +87,33 @@ class HuggingFaceApiService
     }
 
 
-    public function aiResponseFormats(string $stepName, array $apiResponse): array
+    public function aiResponseFormats(string $stepName, mixed $apiResponse): array
     {
+        $content = $this->aiResponseService->contentFromApiResponse($stepName, $apiResponse);
+
+        if ($stepName === AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16) {
+            return $this->apiStep16ResponseFormat($this->extractStep16ChapterContentFromResponse($stepName, $content));
+        }
+
+        $decoded = $this->aiResponseService->decodeAndValidate($content, $stepName);
+
         return match ($stepName) {
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1     => $this->apiStep1ResponseFormat($this->extractStep1FoundationFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2     => $this->apiStep2ResponseFormat($this->extractStep2CharactersFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3     => $this->apiStep3ResponseFormat($this->extractStep3WorldBibleFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4     => $this->apiStep4ResponseFormat($this->extractStep4LocationsFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5     => $this->apiStep5ResponseFormat($this->extractStep5FactionsFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6     => $this->apiStep6ResponseFormat($this->extractStep6CreaturesFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP7     => $this->apiStep7ResponseFormat($this->extractStep7SystemsFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8     => $this->apiStep8ResponseFormat($this->extractStep8TimelineFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9     => $this->apiStep9ResponseFormat($this->extractStep9StoryStructureFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10    => $this->apiStep10ResponseFormat($this->extractStep10TwistsAndForeshadowingFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11    => $this->apiStep11ResponseFormat($this->extractStep11ScenePlansFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12    => $this->apiStep12ResponseFormat($this->extractStep12DialoguePlansFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13    => $this->apiStep13ResponseFormat($this->extractStep13ChapterPlanFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14    => $this->apiStep14ResponseFormat($this->extractStep14PagePlanFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15    => $this->apiStep15ResponseFormat($this->extractStep15ChapterSummaryFromResponse($apiResponse)),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16    => $this->apiStep16ResponseFormat($this->extractStep16ChapterContentFromResponse($apiResponse)),
-            default                                                                           => throw new Exception("Unknown AI step name [{$stepName}]."),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1     => $this->apiStep1ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2     => $this->apiStep2ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3     => $this->apiStep3ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4     => $this->apiStep4ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5     => $this->apiStep5ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6     => $this->apiStep6ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP7     => $this->apiStep7ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8     => $this->apiStep8ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9     => $this->apiStep9ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10    => $this->apiStep10ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11    => $this->apiStep11ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12    => $this->apiStep12ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13    => $this->apiStep13ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14    => $this->apiStep14ResponseFormat($decoded),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15    => $this->apiStep15ResponseFormat($decoded),
+            default                                                => throw new Exception("Unknown AI step name [{$stepName}]."),
         };
     }
 
@@ -131,110 +156,110 @@ class HuggingFaceApiService
     public function step2InputsFormatter(Novel $novel): array
     {
         return [
-            "foundation"             => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
+            "foundation"             => PromptContextEncoder::encode($novel->foundation ?? []),
         ];
     }
 
     public function step3InputsFormatter(Novel $novel): array
     {
         return [
-            "foundation"             => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
-            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
+            "foundation"             => PromptContextEncoder::encode($novel->foundation ?? []),
+            "characters"             => PromptContextEncoder::encode($novel->characters ?? []),
         ];
     }
 
     public function step4InputsFormatter(Novel $novel): array
     {
         return [
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
+            "world_bible"            => PromptContextEncoder::encode($novel->world_bible ?? []),
+            "characters"             => PromptContextEncoder::encode($novel->characters ?? []),
         ];
     }
 
     public function step5InputsFormatter(Novel $novel): array
     {
         return [
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-            "locations"              => json_encode($novel->locations ?? [], JSON_PRETTY_PRINT),
+            "world_bible"            => PromptContextEncoder::encode($novel->world_bible ?? []),
+            "locations"              => PromptContextEncoder::encode($novel->locations ?? []),
         ];
     }
 
     public function step6InputsFormatter(Novel $novel): array
     {
         return [
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-            "locations"              => json_encode($novel->locations ?? [], JSON_PRETTY_PRINT),
-            "factions"               => json_encode($novel->factions ?? [], JSON_PRETTY_PRINT),
+            "world_bible"            => PromptContextEncoder::encode($novel->world_bible ?? []),
+            "locations"              => PromptContextEncoder::encode($novel->locations ?? []),
+            "factions"               => PromptContextEncoder::encode($novel->factions ?? []),
         ];
     }
 
     public function step7InputsFormatter(Novel $novel): array
     {
         return [
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-            "creatures"              => json_encode($novel->creatures ?? [], JSON_PRETTY_PRINT),
-            "factions"               => json_encode($novel->factions ?? [], JSON_PRETTY_PRINT),
+            "world_bible"            => PromptContextEncoder::encode($novel->world_bible ?? []),
+            "creatures"              => PromptContextEncoder::encode($novel->creatures ?? []),
+            "factions"               => PromptContextEncoder::encode($novel->factions ?? []),
         ];
     }
 
     public function step8InputsFormatter(Novel $novel): array
     {
         return [
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-            "factions"               => json_encode($novel->factions ?? [], JSON_PRETTY_PRINT),
-            "foundation"             => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
+            "world_bible"            => PromptContextEncoder::encode($novel->world_bible ?? []),
+            "factions"               => PromptContextEncoder::encode($novel->factions ?? []),
+            "foundation"             => PromptContextEncoder::encode($novel->foundation ?? []),
         ];
     }
 
     public function step9InputsFormatter(Novel $novel): array
     {
         return [
-            "foundation"             => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
-            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-            "timeline"               => json_encode($novel->timeline ?? [], JSON_PRETTY_PRINT),
+            "foundation"             => PromptContextEncoder::encode($novel->foundation ?? []),
+            "characters"             => PromptContextEncoder::encode($novel->characters ?? []),
+            "world_bible"            => PromptContextEncoder::encode($novel->world_bible ?? []),
+            "timeline"               => PromptContextEncoder::encode($novel->timeline ?? []),
         ];
     }
 
     public function step10InputsFormatter(Novel $novel): array
     {
         return [
-            "story_structure"        => json_encode($novel->story_structure ?? [], JSON_PRETTY_PRINT),
-            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
-            "world_bible"            => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
+            "story_structure"        => PromptContextEncoder::encode($novel->story_structure ?? []),
+            "characters"             => PromptContextEncoder::encode($novel->characters ?? []),
+            "world_bible"            => PromptContextEncoder::encode($novel->world_bible ?? []),
         ];
     }
 
     public function step11InputsFormatter(Novel $novel): array
     {
         return [
-            "story_structure"          => json_encode($novel->story_structure ?? [], JSON_PRETTY_PRINT),
-            "twists_and_foreshadowing" => json_encode($novel->twists_and_foreshadowing ?? [], JSON_PRETTY_PRINT),
-            "locations"                => json_encode($novel->locations ?? [], JSON_PRETTY_PRINT),
+            "story_structure"          => PromptContextEncoder::encode($novel->story_structure ?? []),
+            "twists_and_foreshadowing" => PromptContextEncoder::encode($novel->twists_and_foreshadowing ?? []),
+            "locations"                => PromptContextEncoder::encode($novel->locations ?? []),
         ];
     }
 
     public function step12InputsFormatter(Novel $novel): array
     {
         return [
-            "characters"             => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
-            "scene_plans"            => json_encode($novel->scene_plans ?? [], JSON_PRETTY_PRINT),
+            "characters"             => PromptContextEncoder::encode($novel->characters ?? []),
+            "scene_plans"            => PromptContextEncoder::encode($novel->scene_plans ?? []),
         ];
     }
 
     public function step13InputsFormatter(Novel $novel): array
     {
         return [
-            "scene_plans"            => json_encode($novel->scene_plans ?? [], JSON_PRETTY_PRINT),
-            "story_structure"        => json_encode($novel->story_structure ?? [], JSON_PRETTY_PRINT),
+            "scene_plans"            => PromptContextEncoder::encode($novel->scene_plans ?? []),
+            "story_structure"        => PromptContextEncoder::encode($novel->story_structure ?? []),
         ];
     }
 
     public function step14InputsFormatter(Novel $novel): array
     {
         return [
-            "chapter_plan"           => json_encode($novel->chapter_plan ?? [], JSON_PRETTY_PRINT),
-            "scene_plans"            => json_encode($novel->scene_plans ?? [], JSON_PRETTY_PRINT),
+            "chapter_plan"           => PromptContextEncoder::encode($novel->chapter_plan ?? []),
+            "scene_plans"            => PromptContextEncoder::encode($novel->scene_plans ?? []),
         ];
     }
 
@@ -243,12 +268,12 @@ class HuggingFaceApiService
         $scenePlans = $this->chapterScenePlans($novel, $chapterPlanEntry);
 
         return [
-            "foundation"               => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
-            "characters"               => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
-            "story_structure"          => json_encode($novel->story_structure ?? [], JSON_PRETTY_PRINT),
-            "twists_and_foreshadowing" => json_encode($novel->twists_and_foreshadowing ?? [], JSON_PRETTY_PRINT),
-            "chapter_plan_entry"       => json_encode($chapterPlanEntry ?? [], JSON_PRETTY_PRINT),
-            "scene_plans"              => json_encode($scenePlans ?? [], JSON_PRETTY_PRINT),
+            "foundation"               => PromptContextEncoder::encode($novel->foundation ?? []),
+            "characters"               => PromptContextEncoder::encode($novel->characters ?? []),
+            "story_structure"          => PromptContextEncoder::encode($novel->story_structure ?? []),
+            "twists_and_foreshadowing" => PromptContextEncoder::encode($novel->twists_and_foreshadowing ?? []),
+            "chapter_plan_entry"       => PromptContextEncoder::encode($chapterPlanEntry ?? []),
+            "scene_plans"              => PromptContextEncoder::encode($scenePlans ?? []),
         ];
     }
 
@@ -261,59 +286,57 @@ class HuggingFaceApiService
 
         return [
             "language"                 => $novel->language?->name ?? '',
-            "foundation"               => json_encode($novel->foundation ?? [], JSON_PRETTY_PRINT),
-            "characters"               => json_encode($novel->characters ?? [], JSON_PRETTY_PRINT),
-            "world_bible"              => json_encode($novel->world_bible ?? [], JSON_PRETTY_PRINT),
-            "story_structure"          => json_encode($novel->story_structure ?? [], JSON_PRETTY_PRINT),
-            "twists_and_foreshadowing" => json_encode($novel->twists_and_foreshadowing ?? [], JSON_PRETTY_PRINT),
+            "foundation"               => PromptContextEncoder::encode($novel->foundation ?? []),
+            "characters"               => PromptContextEncoder::encode($novel->characters ?? []),
+            "world_bible"              => PromptContextEncoder::encode($novel->world_bible ?? []),
+            "story_structure"          => PromptContextEncoder::encode($novel->story_structure ?? []),
+            "twists_and_foreshadowing" => PromptContextEncoder::encode($novel->twists_and_foreshadowing ?? []),
             "chapter_summary"          => $novel->chapter_summary ?? '',
-            "chapter_plan_entry"       => json_encode($chapterPlanEntry ?? [], JSON_PRETTY_PRINT),
-            "scene_plans"              => json_encode($scenePlans ?? [], JSON_PRETTY_PRINT),
-            "dialogue_plans"           => json_encode($dialoguePlans ?? [], JSON_PRETTY_PRINT),
+            "chapter_plan_entry"       => PromptContextEncoder::encode($chapterPlanEntry ?? []),
+            "scene_plans"              => PromptContextEncoder::encode($scenePlans ?? []),
+            "dialogue_plans"           => PromptContextEncoder::encode($dialoguePlans ?? []),
         ];
     }
 
-    private function extractStepContentFromResponse(array $apiResponse): string
+    private function post(string $stepName, string $endpoint, string $apiKey, array $payload, int $timeout): mixed
     {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        return $content;
-    }
-
-    private function decodeStepContent(string $content): array
-    {
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (
-            json_last_error() !== JSON_ERROR_NONE ||
-            ! is_array($decoded)
-        ) {
-            throw new Exception(
-                'AI response is not valid JSON: ' . json_last_error_msg()
+        try {
+            $response = Http::timeout($timeout)
+                ->withToken($apiKey)
+                ->acceptJson()
+                ->post($endpoint, $payload);
+        } catch (\Throwable $exception) {
+            throw AiResponseException::transport(
+                $stepName,
+                $this->safeMessage($exception),
+                true,
+                ['exception' => $exception::class],
             );
         }
 
-        return $decoded;
+        if (! $response->successful()) {
+            throw AiResponseException::transport(
+                $stepName,
+                sprintf('the provider responded with HTTP %d.', $response->status()),
+                $this->isRetryableStatus($response->status()),
+                [
+                    'status'        => $response->status(),
+                    'body_excerpt'  => mb_substr((string) $response->body(), 0, 300),
+                ],
+            );
+        }
+
+        return $response->json();
+    }
+
+    private function isRetryableStatus(int $status): bool
+    {
+        return $status === 408 || $status === 429 || $status >= 500;
+    }
+
+    private function safeMessage(\Throwable $exception): string
+    {
+        return mb_substr(preg_replace('/\s+/', ' ', $exception->getMessage()) ?: 'connection error', 0, 200);
     }
 
     private function buildPayload(string $model, mixed $data = null, ?int $maxOutputTokens = null): array
@@ -332,6 +355,10 @@ class HuggingFaceApiService
 
         if ($maxOutputTokens !== null && $maxOutputTokens > 0) {
             $payload['max_tokens'] = $maxOutputTokens;
+        }
+
+        if (config('services.ai_generation.json_response_format')) {
+            $payload['response_format'] = ['type' => 'json_object'];
         }
 
         return $payload;
@@ -361,175 +388,21 @@ class HuggingFaceApiService
         return (string) $data;
     }
 
-    private function extractStep1FoundationFromResponse(array $apiResponse): array
+    private function extractStep16ChapterContentFromResponse(string $stepName, string $content): array
     {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
+        $normalized = $this->aiResponseService->normalize($content);
 
-        return [
-            'title'      => $decoded['novel_title'] ?? null,
-            'subtitle'   => $decoded['novel_subtitle'] ?? null,
-            'foundation' => $decoded['novel_foundation'] ?? null,
-        ];
-    }
+        $decoded = json_decode($normalized, true);
 
-    private function extractStep2CharactersFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'characters'            => $decoded['characters'] ?? [],
-            'relationship_dynamics' => $decoded['relationships'] ?? [],
-        ];
-    }
-
-    private function extractStep3WorldBibleFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'world_bible' => $decoded['world_bible'] ?? [],
-        ];
-    }
-
-    private function extractStep4LocationsFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'locations' => $decoded['locations'] ?? [],
-        ];
-    }
-
-    private function extractStep5FactionsFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'factions' => $decoded['factions'] ?? [],
-        ];
-    }
-
-    private function extractStep6CreaturesFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'creatures' => $decoded['creatures'] ?? [],
-        ];
-    }
-
-    private function extractStep7SystemsFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'systems' => $decoded['systems'] ?? [],
-        ];
-    }
-
-    private function extractStep8TimelineFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'timeline' => $decoded['timeline'] ?? [],
-        ];
-    }
-
-    private function extractStep9StoryStructureFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'story_structure' => $decoded['story_structure'] ?? [],
-        ];
-    }
-
-    private function extractStep10TwistsAndForeshadowingFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'twists_and_foreshadowing' => $decoded['twists_and_foreshadowing'] ?? [],
-        ];
-    }
-
-    private function extractStep11ScenePlansFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'scene_plans' => $decoded['scene_plans'] ?? [],
-        ];
-    }
-
-    private function extractStep12DialoguePlansFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'dialogue_plans' => $decoded['dialogue_plans'] ?? [],
-        ];
-    }
-
-    private function extractStep13ChapterPlanFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'chapter_plan' => $decoded['chapter_plan'] ?? [],
-        ];
-    }
-
-    private function extractStep14PagePlanFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'page_plan' => $decoded['page_plan'] ?? [],
-        ];
-    }
-
-    private function extractStep15ChapterSummaryFromResponse(array $apiResponse): array
-    {
-        $decoded = $this->decodeStepContent($this->extractStepContentFromResponse($apiResponse));
-
-        return [
-            'chapter_summary' => $decoded['chapter_summary'] ?? [],
-        ];
-    }
-
-    private function extractStep16ChapterContentFromResponse(array $apiResponse): array
-    {
-        $content = data_get(
-            $apiResponse,
-            'choices.0.message.content'
-        );
-
-        if (! is_string($content) || trim($content) === '') {
-            throw new Exception('Invalid AI response structure.');
-        }
-
-        $content = trim($content);
-
-        $content = preg_replace(
-            '/^```(?:json|markdown|md|txt)?\s*|\s*```$/i',
-            '',
-            $content
-        );
-
-        $content = trim($content);
-
-        $decoded = json_decode(
-            $content,
-            true
-        );
-
-        if (is_array($decoded)) {
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
             $candidate = $decoded['chapter_content'] ?? null;
 
             if (! is_string($candidate) || trim($candidate) === '') {
-                throw new Exception('AI response does not contain chapter content.');
+                throw AiResponseException::structureMismatch(
+                    $stepName,
+                    'a JSON object was returned but the "chapter_content" field was missing or empty.',
+                    $this->aiResponseService->diagnostics($normalized, $stepName),
+                );
             }
 
             return [
@@ -537,120 +410,140 @@ class HuggingFaceApiService
             ];
         }
 
-        if ($content === '') {
-            throw new Exception('AI response is empty.');
+        if (trim($normalized) === '') {
+            throw AiResponseException::transport($stepName, 'the provider returned empty chapter content.', false);
         }
 
         return [
-            'chapter_content' => $content,
+            'chapter_content' => trim($normalized),
         ];
     }
 
-    private function apiStep1ResponseFormat(array $extracted): array
+    private function apiStep1ResponseFormat(array $decoded): array
     {
         return [
-            'title'      => $extracted['title'],
-            'subtitle'   => $extracted['subtitle'],
-            'foundation' => $extracted['foundation'],
+            'title'      => $decoded['novel_title'],
+            'subtitle'   => $decoded['novel_subtitle'],
+            'foundation' => $decoded['novel_foundation'],
         ];
     }
 
-    private function apiStep2ResponseFormat(array $extracted): array
+    private function apiStep2ResponseFormat(array $decoded): array
     {
         return [
-            'characters'            => $this->formatAsArrayField($extracted['characters'] ?? []),
-            'relationship_dynamics' => $this->formatAsArrayField($extracted['relationship_dynamics'] ?? []),
+            'characters' => [
+                'characters'    => $this->formatAsList($decoded['characters'] ?? []),
+                'relationships' => $this->formatAsList($decoded['relationships'] ?? []),
+            ],
         ];
     }
 
-    private function apiStep3ResponseFormat(array $extracted): array
+    private function apiStep3ResponseFormat(array $decoded): array
     {
         return [
-            'world_bible' => $this->formatAsArrayField($extracted['world_bible'] ?? []),
+            'world_bible' => $this->formatAsObject($decoded['world_bible'] ?? []),
         ];
     }
 
-    private function apiStep4ResponseFormat(array $extracted): array
+    private function apiStep4ResponseFormat(array $decoded): array
     {
         return [
-            'locations' => $this->formatAsArrayField($extracted['locations'] ?? []),
+            'locations' => $this->formatAsObject($decoded['locations'] ?? []),
         ];
     }
 
-    private function apiStep5ResponseFormat(array $extracted): array
+    private function apiStep5ResponseFormat(array $decoded): array
     {
         return [
-            'factions' => $this->formatAsArrayField($extracted['factions'] ?? []),
+            'factions' => $this->formatAsObject($decoded['factions'] ?? []),
         ];
     }
 
-    private function apiStep6ResponseFormat(array $extracted): array
+    private function apiStep6ResponseFormat(array $decoded): array
     {
         return [
-            'creatures' => $this->formatAsArrayField($extracted['creatures'] ?? []),
+            'creatures' => $this->formatAsObject($decoded['creatures'] ?? []),
         ];
     }
 
-    private function apiStep7ResponseFormat(array $extracted): array
+    private function apiStep7ResponseFormat(array $decoded): array
     {
         return [
-            'systems' => $this->formatAsArrayField($extracted['systems'] ?? []),
+            'systems' => $this->formatAsObject($decoded['systems'] ?? []),
         ];
     }
 
-    private function apiStep8ResponseFormat(array $extracted): array
+    private function apiStep8ResponseFormat(array $decoded): array
     {
         return [
-            'timeline' => $this->formatAsArrayField($extracted['timeline'] ?? []),
+            'timeline' => $this->formatAsObject($decoded['timeline'] ?? []),
         ];
     }
 
-    private function apiStep9ResponseFormat(array $extracted): array
+    private function apiStep9ResponseFormat(array $decoded): array
     {
         return [
-            'story_structure' => $this->formatAsArrayField($extracted['story_structure'] ?? []),
+            'story_structure' => $this->formatAsObject($decoded['story_structure'] ?? []),
         ];
     }
 
-    private function apiStep10ResponseFormat(array $extracted): array
+    private function apiStep10ResponseFormat(array $decoded): array
     {
         return [
-            'twists_and_foreshadowing' => $this->formatAsArrayField($extracted['twists_and_foreshadowing'] ?? []),
+            'twists_and_foreshadowing' => $this->formatAsObject($decoded['twists_and_foreshadowing'] ?? []),
         ];
     }
 
-    private function apiStep11ResponseFormat(array $extracted): array
+    private function apiStep11ResponseFormat(array $decoded): array
     {
         return [
-            'scene_plans' => $this->formatAsArrayField($extracted['scene_plans'] ?? []),
+            'scene_plans' => $this->formatAsList($decoded['scene_plans'] ?? []),
         ];
     }
 
-    private function apiStep12ResponseFormat(array $extracted): array
+    private function apiStep12ResponseFormat(array $decoded): array
     {
         return [
-            'dialogue_plans' => $this->formatAsArrayField($extracted['dialogue_plans'] ?? []),
+            'dialogue_plans' => $this->formatAsList($decoded['dialogue_plans'] ?? []),
         ];
     }
 
-    private function apiStep13ResponseFormat(array $extracted): array
+    private function apiStep13ResponseFormat(array $decoded): array
     {
         return [
-            'chapter_plan' => $this->formatAsArrayField($extracted['chapter_plan'] ?? []),
+            'chapter_plan' => $this->formatAsList($decoded['chapter_plan'] ?? []),
         ];
     }
 
-    private function apiStep14ResponseFormat(array $extracted): array
+    private function apiStep14ResponseFormat(array $decoded): array
     {
         return [
-            'page_plan' => $this->formatAsArrayField($extracted['page_plan'] ?? []),
+            'page_plan' => $this->formatAsList($decoded['page_plan'] ?? []),
         ];
     }
 
-    private function apiStep15ResponseFormat(array $extracted): array
+    private function apiStep15ResponseFormat(array $decoded): array
     {
+        $chapterSummary = $decoded['chapter_summary'] ?? null;
+
+        if (! is_array($chapterSummary) || $chapterSummary === []) {
+            throw AiResponseException::structureMismatch(
+                AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15,
+                'the "chapter_summary" object was missing or empty.',
+            );
+        }
+
+        $encoded = json_encode($chapterSummary, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        if (! is_string($encoded)) {
+            throw AiResponseException::structureMismatch(
+                AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15,
+                'the "chapter_summary" object could not be re-encoded for storage.',
+            );
+        }
+
         return [
-            'chapter_summary' => json_encode($extracted['chapter_summary'] ?? [], JSON_UNESCAPED_UNICODE),
+            'chapter_summary' => $encoded,
         ];
     }
 
@@ -661,9 +554,18 @@ class HuggingFaceApiService
         ];
     }
 
-    private function formatAsArrayField(mixed $value): array
+    private function formatAsList(mixed $value): array
     {
-        return is_array($value) ? $value : (array) $value;
+        if (! is_array($value)) {
+            return [];
+        }
+
+        return array_is_list($value) ? $value : [$value];
+    }
+
+    private function formatAsObject(mixed $value): array
+    {
+        return is_array($value) ? $value : [];
     }
 
     private function findChapterPlanEntry(Novel $novel, NovelChapter $novelChapter): array

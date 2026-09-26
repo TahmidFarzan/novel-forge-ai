@@ -50,7 +50,7 @@ class AiPromptGeneratorHelper
             GENRE REQUIREMENT
             ==================================================
 
-            {{genre_instructions}}
+            {{genre_prompt_instruction}}
 
             Understand all selected genres and combine them into one unified and consistent story direction.
 
@@ -321,8 +321,7 @@ class AiPromptGeneratorHelper
                 - The response is valid JSON only.
                 - Do not return explanations, markdown, or additional text outside the JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -544,8 +543,7 @@ class AiPromptGeneratorHelper
                 - No explanation is added outside JSON.
 
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -825,8 +823,7 @@ class AiPromptGeneratorHelper
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -1084,8 +1081,7 @@ class AiPromptGeneratorHelper
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -1374,8 +1370,7 @@ class AiPromptGeneratorHelper
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -1667,8 +1662,7 @@ class AiPromptGeneratorHelper
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -1929,8 +1923,7 @@ class AiPromptGeneratorHelper
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -2229,8 +2222,7 @@ class AiPromptGeneratorHelper
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -2595,8 +2587,7 @@ class AiPromptGeneratorHelper
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -2940,8 +2931,7 @@ class AiPromptGeneratorHelper
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -3226,8 +3216,7 @@ class AiPromptGeneratorHelper
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -3373,8 +3362,7 @@ class AiPromptGeneratorHelper
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -3508,8 +3496,7 @@ class AiPromptGeneratorHelper
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -3638,8 +3625,7 @@ class AiPromptGeneratorHelper
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -3887,8 +3873,7 @@ class AiPromptGeneratorHelper
                 - Output contains only valid JSON.
                 - No explanation is added outside JSON.
 
-            Return only JSON.
-        ";
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -4121,7 +4106,6 @@ class AiPromptGeneratorHelper
                 - Generate a summary instead of prose.
                 - Output analysis of your own writing.
                 - Output instructions to a developer.
-                - Output JSON.
                 - Wrap the content in code fences.
 
             ==================================================
@@ -4135,6 +4119,10 @@ class AiPromptGeneratorHelper
             Do not include a chapter title heading, an introduction, or a conclusion outside the prose.
 
             Do not include any explanations before or after the content.
+
+            The chapter title is taken from the chapter plan, not from your response, so do not repeat the title in the prose.
+
+            If your model forces a structured response, the only accepted structure is a single JSON object with exactly one key, chapter_content, holding the full prose as a string. Do not use that structure unless you cannot return bare prose.
 
             ==================================================
             FINAL CHECK
@@ -4159,6 +4147,51 @@ class AiPromptGeneratorHelper
         return $prompt;
     }
 
+    public static function jsonOutputContract(): string
+    {
+        return "
+            ==================================================
+            OUTPUT CONTRACT
+            ==================================================
+
+            These rules are mandatory. The response is parsed by a strict JSON decoder and rejected if any rule is broken.
+
+            Return only the raw JSON object described above, starting with the first opening brace and ending with the final closing brace.
+
+            You must NOT:
+
+                - Wrap the JSON in a Markdown code fence.
+                - Use \`\`\`json or any other fence marker.
+                - Add any explanation, commentary, summary, or reasoning.
+                - Add text before the JSON, such as \"Here is the JSON:\".
+                - Add text after the JSON, such as \"Let me know if you need changes\".
+                - Use Markdown headings, bullet points, or tables.
+                - Add comments inside the JSON.
+                - Add trailing commas after the last value in an object or an array.
+                - Use single quotes for JSON keys or string values.
+                - Leave any key or value unquoted.
+                - Add fields that are not listed in the structure above.
+                - Rename, abbreviate, or nest any listed field.
+                - Omit any listed field. Every field shown above must be present.
+                - Return an empty string or null for a listed field unless the structure shows an empty array.
+
+            You must:
+
+                - Use double quotes for every JSON key and every string value.
+                - Use the exact key names and nesting shown above.
+                - Match the value type shown above: a quoted value is a string, and [ ] is an array.
+                - Populate every array with real content. An empty array [] is only acceptable where this contract or the structure above explicitly allows it.
+                - Escape every double quote inside a string value as \\\".
+                - Escape every backslash as \\\\.
+                - Escape every literal newline inside a string value as \\n and every literal tab as \\t. Do not place a raw line break inside a string value.
+                - Keep the JSON syntactically complete even when the generated prose contains quotation marks, apostrophes, colons, commas, brackets, braces, slashes, or non-Latin characters.
+
+            The entire response must be parseable by a standard JSON parser in a single pass.
+
+            Return the JSON now, and nothing else.
+        ";
+    }
+
     public static function generateFullPrompt(string $partialPrompt, array $receivedInputs): string
     {
         $search  = [];
@@ -4170,5 +4203,12 @@ class AiPromptGeneratorHelper
         }
 
         return str_replace($search, $replace, $partialPrompt);
+    }
+
+    public static function unresolvedPlaceholders(string $fullPrompt): array
+    {
+        preg_match_all('/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/', $fullPrompt, $matches);
+
+        return array_values(array_unique($matches[1] ?? []));
     }
 }

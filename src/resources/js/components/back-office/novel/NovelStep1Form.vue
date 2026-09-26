@@ -3,7 +3,7 @@ import InfiniteScrollApiSelect from "@/components/common/multi-select/InfiniteSc
 import { AiBrainOutputTypes } from "@/composables/useAiBrain";
 
 import { ref, computed, watch } from "vue";
-import { useForm, router as intertiaJsRoute } from "@inertiajs/vue3";
+import { useForm } from "@inertiajs/vue3";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library as FontAwesomeLibrary } from "@fortawesome/fontawesome-svg-core";
@@ -19,8 +19,6 @@ const { novel } = defineProps({
         default: null,
     },
 });
-
-const isUpdate = computed(() => !!novel?.slug);
 
 const foundationGeneratorForm = useForm({
     additional_information: novel?.additional_information ?? null,
@@ -138,20 +136,10 @@ function submit() {
         },
     };
 
-    if (isUpdate.value) {
-        intertiaJsRoute.post(
-            route("back-office.novels.generate.foundation", {
-                slug: novel?.slug,
-            }),
-            { ...foundationGeneratorForm.data(), _method: "patch" },
-            requestConfig,
-        );
-    } else {
-        foundationGeneratorForm.post(
-            route("back-office.novels.create.foundation"),
-            requestConfig,
-        );
-    }
+    foundationGeneratorForm.post(
+        route("back-office.novels.create.generate"),
+        requestConfig,
+    );
 }
 
 defineExpose({ submit });
