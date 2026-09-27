@@ -28,7 +28,7 @@ class AiBrainAiBrainOutputTypeSeeder extends Seeder
         }
 
         $mapping = [
-            'google-gemma-4-26b-a4b' => [
+            'google/gemma-4-26B-A4B-it' => [
                 'text',
             ],
             'Qwen/Qwen3-8B' => [
@@ -39,9 +39,9 @@ class AiBrainAiBrainOutputTypeSeeder extends Seeder
             ],
         ];
 
-        foreach ($mapping as $aiBrainSlug => $aiBrainOutputTypeSlugs) {
+        foreach ($mapping as $aiBrainModel => $aiBrainOutputTypeSlugs) {
 
-            $aiBrain = AiBrain::where('slug', $aiBrainSlug)->first();
+            $aiBrain = AiBrain::where('model', $aiBrainModel)->first();
 
             if (! $aiBrain) {
                 continue;
