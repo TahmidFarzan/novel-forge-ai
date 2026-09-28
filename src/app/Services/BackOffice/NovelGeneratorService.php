@@ -2,30 +2,28 @@
 
 namespace App\Services\BackOffice;
 
-use App\Exceptions\AiResponseException;
 use App\Helpers\AiPromptGeneratorHelper;
 use App\Helpers\NovelHelper;
-use App\Http\Requests\StoryBookStep1;
+use App\Http\Requests\NovelGenerationRequest;
 use App\Models\AiBrain;
 use App\Models\Novel;
 use App\Models\NovelChapter;
 use App\Models\NovelGeneratorStep;
-use App\Services\BackOffice\AiBrainService;
-use App\Services\BackOffice\AudienceService;
-use App\Services\BackOffice\GenreService;
-use App\Services\BackOffice\HuggingFaceApiService;
-use App\Services\BackOffice\LanguageService;
-use App\Services\BackOffice\NovelChapterService;
-use App\Services\BackOffice\NovelGeneratorStepService;
-use App\Services\BackOffice\NovelTypeService;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class NovelGeneratorService
 {
+    public const STATUS_SUCCESS = 'success';
+    public const STATUS_ERROR   = 'error';
+    public const STATUS_BUSY    = 'busy';
+
+    protected const GENERATION_LOCK_SECONDS = 900;
+
     protected AiBrainService $aiBrainService;
     protected AudienceService $audienceService;
     protected GenreService $genreService;
@@ -47,18 +45,23 @@ class NovelGeneratorService
         $this->novelGeneratorStepService = $novelGeneratorStepService;
     }
 
-    public function createNovelFromFoundation(StoryBookStep1 $request): array
+    public function createNovel(NovelGenerationRequest $request): array
     {
         try {
-            $step = $this->foundationStep();
-            $aiBrain = $this->aiBrainService->findById($request->input('ai_brain_id'));
-            $stepData = $this->runFoundationGeneration($request, $aiBrain);
+            $step        = $this->stepByName(AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION);
+            $aiBrain     = $this->aiBrainService->findById($request->input('ai_brain_id'));
+            $foundation  = $this->generateFoundation($step, $aiBrain, $this->foundationContext($request->only([
+                'language_id',
+                'audience_id',
+                'novel_type_id',
+                'genre_ids',
+                'additional_information',
+            ])));
 
-            $novel = DB::transaction(function () use ($request, $stepData, $step) {
+            $novel = DB::transaction(function () use ($request, $foundation, $step) {
                 $novel = new Novel();
-                $novel->title = $stepData['title'];
-                $novel->sub_title = $stepData['subtitle'];
-                $novel->foundation = $stepData['foundation'];
+
+                $this->applyFoundation($novel, $foundation);
 
                 $novel->audience_id = $request->input('audience_id');
                 $novel->novel_type_id = $request->input('novel_type_id');
@@ -80,35 +83,48 @@ class NovelGeneratorService
                 return $novel;
             });
 
-            return $this->result('success', 'Novel foundation generated successfully.', $novel);
+            return $this->result(self::STATUS_SUCCESS, 'Foundation generated successfully.', $novel);
         } catch (Exception $exception) {
-            Log::error('Failed to generate novel foundation.', array_merge(
-                [
-                    'step'      => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1,
-                    'exception' => $exception->getMessage(),
-                ],
-                $this->aiFailureContext($exception),
-            ));
+            Log::error('Failed to generate novel foundation.', [
+                'step'      => AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
+                'exception' => $exception::class,
+                'reason'    => $exception->getMessage(),
+            ]);
 
-            return $this->result('error', 'Failed to generate novel foundation. Please try again.', null);
+            return $this->result(self::STATUS_ERROR, 'Failed to generate novel foundation. Please try again.', null);
         }
     }
 
     public function continueGeneration(Novel $novel): array
     {
+        $lock = Cache::lock($this->generationLockKey($novel), self::GENERATION_LOCK_SECONDS);
+
+        if (! $lock->get()) {
+            return $this->result(self::STATUS_BUSY, 'Generation is already running for this novel.', $novel);
+        }
+
+        try {
+            return $this->runNextPendingStep($novel->refresh());
+        } finally {
+            $lock->release();
+        }
+    }
+
+    private function runNextPendingStep(Novel $novel): array
+    {
         $activeStep = null;
 
         try {
             if ($novel->status === NovelHelper::STATUS_COMPLETE) {
-                return $this->result('success', 'This novel is already completed.', $novel);
+                return $this->result(self::STATUS_SUCCESS, 'This novel is already completed.', $novel);
             }
 
-            if (! in_array($novel->status, [NovelHelper::STATUS_ONGOING, NovelHelper::STATUS_PENDING, NovelHelper::STATUS_FAILED, NovelHelper::STATUS_STOPPED], true)) {
-                return $this->result('error', 'This novel cannot be generated in its current state.', $novel);
+            if (! in_array($novel->status, [NovelHelper::STATUS_ONGOING, NovelHelper::STATUS_PENDING, NovelHelper::STATUS_FAILED, NovelHelper::STATUS_STOPPED, NovelHelper::STATUS_DRAFT], true)) {
+                return $this->result(self::STATUS_ERROR, 'This novel cannot be generated in its current state.', $novel);
             }
 
             if (! $novel->ai_brain_id) {
-                return $this->result('error', 'No AI Brain is configured for this novel. Generate the foundation first.', $novel);
+                return $this->result(self::STATUS_ERROR, 'No AI Brain is configured for this novel. Generate the foundation first.', $novel);
             }
 
             $activeStep = $this->novelGeneratorStepService->nextPendingStep($novel);
@@ -116,7 +132,7 @@ class NovelGeneratorService
             if (! $activeStep) {
                 $this->finalizeNovel($novel);
 
-                return $this->result('success', 'Novel completed successfully.', $novel);
+                return $this->result(self::STATUS_SUCCESS, 'Novel completed successfully.', $novel);
             }
 
             if (in_array($novel->status, [NovelHelper::STATUS_FAILED, NovelHelper::STATUS_STOPPED], true)) {
@@ -124,130 +140,176 @@ class NovelGeneratorService
                 $novel->save();
             }
 
-            if ($this->isChapterContentStep($activeStep)) {
-                $message = $this->continueChapterContents($novel, $activeStep);
-
-                return $this->result('success', $message, $novel);
-            }
-
             $this->novelGeneratorStepService->markStarted($novel, $activeStep);
 
-            $stepData = $this->generateStep($novel, $activeStep);
+            $message = $this->runStep($novel, $activeStep);
 
-            DB::transaction(function () use ($novel, $activeStep, $stepData) {
-                $this->persistStepData($novel, $activeStep, $stepData);
-                $novel->status = NovelHelper::STATUS_ONGOING;
-                $novel->save();
-            });
+            $novel->status = NovelHelper::STATUS_ONGOING;
+            $novel->save();
+
+            if (! $this->isChapterContentStep($activeStep)) {
+                $this->novelGeneratorStepService->markCompleted($novel, $activeStep);
+
+                return $this->result(self::STATUS_SUCCESS, $message, $novel);
+            }
+
+            if ($this->chaptersMissingContent($novel)->isNotEmpty()) {
+                return $this->result(self::STATUS_SUCCESS, $message, $novel);
+            }
 
             $this->novelGeneratorStepService->markCompleted($novel, $activeStep);
 
-            return $this->result('success', sprintf('%s generated successfully.', $activeStep->name), $novel);
+            $this->finalizeNovel($novel);
+
+            return $this->result(self::STATUS_SUCCESS, $message, $novel);
         } catch (Exception $exception) {
-            Log::error('Novel generation failed.', array_merge(
-                [
-                    'step'      => $activeStep?->name,
-                    'exception' => $exception->getMessage(),
-                ],
-                $this->aiFailureContext($exception),
-            ));
+            Log::error('Novel generation failed.', [
+                'step'      => $activeStep?->name,
+                'exception' => $exception::class,
+                'reason'    => $exception->getMessage(),
+            ]);
 
             if ($activeStep) {
-                $this->novelGeneratorStepService->markFailed($novel, $activeStep, $exception->getMessage());
+                $this->novelGeneratorStepService->markFailed($novel, $activeStep, $this->userFacingStepError($exception));
             }
 
             $novel->status = NovelHelper::STATUS_FAILED;
             $novel->save();
 
-            return $this->result('error', $this->generationFailureMessage($activeStep), $novel);
+            return $this->result(self::STATUS_ERROR, $this->generationFailureMessage($activeStep), $novel);
         }
     }
 
     public function stop(Novel $novel): array
     {
         if ($novel->status === NovelHelper::STATUS_COMPLETE) {
-            return $this->result('error', 'This novel is already completed.', $novel);
+            return $this->result(self::STATUS_ERROR, 'This novel is already completed.', $novel);
         }
 
         $novel->status = NovelHelper::STATUS_STOPPED;
         $novel->save();
 
-        return $this->result('success', 'Novel generation stopped. You can resume it later.', $novel);
+        return $this->result(self::STATUS_SUCCESS, 'Novel generation stopped. You can resume it later.', $novel);
     }
 
-    private function runFoundationGeneration(StoryBookStep1 $request, AiBrain $aiBrain): array
+    private function runStep(Novel $novel, NovelGeneratorStep $step): string
     {
-        $stepName = AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1;
-        $aiPrompt = $this->foundationStep()->aiPrompt;
-
-        if (! $aiPrompt) {
-            throw new Exception('The Foundation Generator AI prompt is not configured.');
-        }
-
-        $inputs = [
-            'language'               => $this->languageService->findByIdsOrEnglish($request->input('language_id')),
-            'audience'               => $this->audienceService->findById($request->input('audience_id')),
-            'novel_type'             => $this->novelTypeService->findById($request->input('novel_type_id')),
-            'genres'                 => $this->genreService->findByIdsOrRandom($request->input('genre_ids')),
-            'additional_information' => $request->input('additional_information', 'Auto'),
-        ];
-
-        $formattedInput = $this->huggingFaceApiService->step1InputsFormatter($inputs);
-        $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formattedInput);
-
-        return $this->huggingFaceApiService->sendPostRequest($stepName, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
-    }
-
-    private function generateStep(Novel $novel, NovelGeneratorStep $step): array
-    {
-        $aiBrain = $this->aiBrainService->findById($novel->ai_brain_id);
-
         if (! $step->aiPrompt) {
             throw new Exception(sprintf('The AI prompt for "%s" is not configured.', $step->name));
         }
 
-        if ($step->name === AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15) {
-            $this->novelChapterService->generateSummaries($novel, $step->name, $step->aiPrompt, $aiBrain);
+        $aiBrain = $this->aiBrainService->findById($novel->ai_brain_id);
 
-            return [];
-        }
-
-        $formatterMethod = $this->inputFormatterMethod($step->name);
-        $formattedInput = $this->huggingFaceApiService->{$formatterMethod}($novel);
-        $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($step->aiPrompt->prompt, $formattedInput);
-
-        return $this->huggingFaceApiService->sendPostRequest($step->name, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model, $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+        return match ($step->name) {
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION       => $this->runFoundationStep($novel, $step, $aiBrain),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_PLAN_CHAPTER     => $this->runPlanChapterStep($novel, $step, $aiBrain),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT  => $this->runChapterContentStep($novel, $step, $aiBrain),
+            default                                                 => throw new Exception(sprintf('Unsupported novel generator step [%s].', $step->name)),
+        };
     }
 
-    private function continueChapterContents(Novel $novel, NovelGeneratorStep $step): string
+    private function runFoundationStep(Novel $novel, NovelGeneratorStep $step, AiBrain $aiBrain): string
     {
-        $pendingChapters = $this->chaptersMissingContent($novel);
+        $foundation = $this->generateFoundation($step, $aiBrain, $this->foundationContext([
+            'language_id' => $novel->language_id,
+            'audience_id' => $novel->audience_id,
+            'novel_type_id' => $novel->novel_type_id,
+            'genre_ids' => $novel->genres->pluck('id')->all(),
+            'additional_information' => $novel->additional_information,
+        ]));
 
-        if ($pendingChapters->isEmpty()) {
-            $this->novelGeneratorStepService->markCompleted($novel, $step);
-            $this->finalizeNovel($novel);
+        DB::transaction(function () use ($novel, $foundation) {
+            $this->applyFoundation($novel, $foundation);
 
+            $novel->save();
+        });
+
+        return 'Foundation generated successfully.';
+    }
+
+    private function runPlanChapterStep(Novel $novel, NovelGeneratorStep $step, AiBrain $aiBrain): string
+    {
+        $plan = $this->huggingFaceApiService->generate(
+            $step->name,
+            $aiBrain->api_url,
+            $aiBrain->api_key,
+            $aiBrain->model,
+            $step->aiPrompt->prompt,
+            $this->huggingFaceApiService->planChapterInputs($novel),
+            $aiBrain->max_output_tokens,
+            $aiBrain->timeout_seconds,
+        );
+
+        DB::transaction(function () use ($novel, $plan) {
+            $novel->story_structure = $plan['story_structure'];
+            $novel->twists_and_foreshadowing = $plan['twists_and_foreshadowing'];
+            $novel->scene_plans = $plan['scene_plans'];
+            $novel->dialogue_plans = $plan['dialogue_plans'];
+            $novel->chapter_plan = $plan['chapter_plan'];
+            $novel->page_plan = $plan['page_plan'];
+
+            $novel->save();
+
+            $this->novelChapterService->syncChaptersFromPlan($novel, $plan['chapter_plan'], $plan['chapter_summaries']);
+        });
+
+        return 'Plan chapter generated successfully.';
+    }
+
+    private function runChapterContentStep(Novel $novel, NovelGeneratorStep $step, AiBrain $aiBrain): string
+    {
+        $chapter = $this->chaptersMissingContent($novel)->first();
+
+        if (! $chapter) {
             return 'Novel completed successfully.';
         }
 
-        $this->novelGeneratorStepService->markStarted($novel, $step);
-
-        $chapter = $pendingChapters->first();
-
-        $this->generateChapterContent($novel, $chapter, $step);
+        $this->novelChapterService->generateChapterContent($novel, $chapter, $step->name, $step->aiPrompt, $aiBrain);
 
         return sprintf('Chapter %s content generated successfully.', $chapter->no);
     }
 
-    private function generateChapterContent(Novel $novel, NovelChapter $chapter, NovelGeneratorStep $step): void
+    private function generateFoundation(NovelGeneratorStep $step, AiBrain $aiBrain, array $context): array
     {
         if (! $step->aiPrompt) {
-            throw new Exception(sprintf('The AI prompt for "%s" is not configured.', $step->name));
+            throw new Exception('The Foundation AI prompt is not configured.');
         }
 
-        $aiBrain = $this->aiBrainService->findById($novel->ai_brain_id);
+        return $this->huggingFaceApiService->generate(
+            $step->name,
+            $aiBrain->api_url,
+            $aiBrain->api_key,
+            $aiBrain->model,
+            $step->aiPrompt->prompt,
+            $this->huggingFaceApiService->foundationInputs($context),
+            $aiBrain->max_output_tokens,
+            $aiBrain->timeout_seconds,
+        );
+    }
 
-        $this->novelChapterService->generateStep16($novel, $chapter, $step->name, $step->aiPrompt, $aiBrain);
+    private function applyFoundation(Novel $novel, array $foundation): void
+    {
+        $novel->title = $foundation['title'];
+        $novel->sub_title = $foundation['subtitle'];
+        $novel->foundation = $foundation['foundation'];
+        $novel->characters = $foundation['characters'];
+        $novel->world_bible = $foundation['world_bible'];
+        $novel->locations = $foundation['locations'];
+        $novel->factions = $foundation['factions'];
+        $novel->creatures = $foundation['creatures'];
+        $novel->systems = $foundation['systems'];
+        $novel->timeline = $foundation['timeline'];
+    }
+
+    private function foundationContext(array $attributes): array
+    {
+        return [
+            'language' => $this->languageService->findByIdsOrEnglish($attributes['language_id'] ?? null),
+            'audience' => $this->audienceService->findById($attributes['audience_id'] ?? null),
+            'novel_type' => $this->novelTypeService->findById($attributes['novel_type_id'] ?? null),
+            'genres' => $this->genreService->findByIdsOrRandom((array) ($attributes['genre_ids'] ?? [])),
+            'additional_information' => $attributes['additional_information'] ?? 'Auto',
+        ];
     }
 
     private function chaptersMissingContent(Novel $novel): Collection
@@ -259,54 +321,15 @@ class NovelGeneratorService
             ->values();
     }
 
-    private function persistStepData(Novel $novel, NovelGeneratorStep $step, array $stepData): void
+    private function stepByName(string $stepName): NovelGeneratorStep
     {
-        match ($step->name) {
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2  => $novel->characters = $stepData['characters'],
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3  => $novel->world_bible = $stepData['world_bible'],
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4  => $novel->locations = $stepData['locations'],
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5  => $novel->factions = $stepData['factions'],
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6  => $novel->creatures = $stepData['creatures'],
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP7  => $novel->systems = $stepData['systems'],
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8  => $novel->timeline = $stepData['timeline'],
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9  => $novel->story_structure = $stepData['story_structure'],
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10 => $novel->twists_and_foreshadowing = $stepData['twists_and_foreshadowing'],
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11 => $novel->scene_plans = $stepData['scene_plans'],
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12 => $novel->dialogue_plans = $stepData['dialogue_plans'],
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13 => $novel->chapter_plan = $stepData['chapter_plan'],
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14 => $novel->page_plan = $stepData['page_plan'],
-            default                                          => null,
-        };
-    }
-
-    private function inputFormatterMethod(string $stepName): string
-    {
-        return match ($stepName) {
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2  => 'step2InputsFormatter',
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3  => 'step3InputsFormatter',
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4  => 'step4InputsFormatter',
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5  => 'step5InputsFormatter',
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6  => 'step6InputsFormatter',
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP7  => 'step7InputsFormatter',
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8  => 'step8InputsFormatter',
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9  => 'step9InputsFormatter',
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10 => 'step10InputsFormatter',
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11 => 'step11InputsFormatter',
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12 => 'step12InputsFormatter',
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13 => 'step13InputsFormatter',
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14 => 'step14InputsFormatter',
-            default                                          => throw new Exception(sprintf('Unsupported novel generator step [%s].', $stepName)),
-        };
-    }
-
-    private function foundationStep(): NovelGeneratorStep
-    {
-        return $this->novelGeneratorStepService->orderedSteps()->first();
+        return $this->novelGeneratorStepService->stepByName($stepName)
+            ?? throw new Exception(sprintf('The novel generator step [%s] is not configured.', $stepName));
     }
 
     private function isChapterContentStep(NovelGeneratorStep $step): bool
     {
-        return $step->name === AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16;
+        return $step->name === AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT;
     }
 
     private function finalizeNovel(Novel $novel): void
@@ -367,14 +390,9 @@ class NovelGeneratorService
             ->unique()
             ->values();
 
-        $missingSummaries = collect();
         $missingContents = collect();
 
         foreach ($chapters as $chapter) {
-            if (! $this->novelChapterService->hasSummary($chapter)) {
-                $missingSummaries->push((string) $chapter->no);
-            }
-
             if (! $this->novelChapterService->hasContent($chapter)) {
                 $missingContents->push((string) $chapter->no);
             }
@@ -388,10 +406,6 @@ class NovelGeneratorService
 
         if ($missingChapters->isNotEmpty()) {
             $findings[] = 'Missing chapters: ' . $missingChapters->implode(', ') . '.';
-        }
-
-        if ($missingSummaries->isNotEmpty()) {
-            $findings[] = 'Missing summaries: ' . $missingSummaries->implode(', ') . '.';
         }
 
         if ($missingContents->isNotEmpty()) {
@@ -416,16 +430,14 @@ class NovelGeneratorService
             : 'Novel generation failed. Please try again.';
     }
 
-    private function aiFailureContext(Exception $exception): array
+    private function generationLockKey(Novel $novel): string
     {
-        if (! $exception instanceof AiResponseException) {
-            return [];
-        }
+        return sprintf('novel:%s:generation', $novel->getKey());
+    }
 
-        return [
-            'ai_failure' => $exception->context(),
-            'retryable'  => $exception->isRetryable(),
-        ];
+    private function userFacingStepError(Exception $exception): string
+    {
+        return $exception->getMessage();
     }
 
     private function result(string $status, string $message, ?Novel $novel): array

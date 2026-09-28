@@ -20,7 +20,7 @@ const { novel } = defineProps({
     },
 });
 
-const foundationGeneratorForm = useForm({
+const generationForm = useForm({
     additional_information: novel?.additional_information ?? null,
     language_id: novel?.language_id ?? null,
     genre_ids: novel?.genres?.map((genre) => genre.id) ?? [],
@@ -30,7 +30,7 @@ const foundationGeneratorForm = useForm({
 });
 
 const genresApiUrl = computed(() => {
-    const audienceId = foundationGeneratorForm.audience_id;
+    const audienceId = generationForm.audience_id;
 
     if (!audienceId) {
         return route("search.genres");
@@ -45,7 +45,7 @@ const audienceDependentFieldsReset = ref(false);
 const audienceDependentFieldsKey = ref(0);
 
 watch(
-    () => foundationGeneratorForm.audience_id,
+    () => generationForm.audience_id,
     (newAudienceId, oldAudienceId) => {
         if (newAudienceId === oldAudienceId) {
             return;
@@ -53,12 +53,12 @@ watch(
 
         audienceDependentFieldsReset.value = true;
 
-        foundationGeneratorForm.language_id = null;
-        foundationGeneratorForm.genre_ids = [];
-        foundationGeneratorForm.novel_type_id = null;
-        foundationGeneratorForm.additional_information = null;
+        generationForm.language_id = null;
+        generationForm.genre_ids = [];
+        generationForm.novel_type_id = null;
+        generationForm.additional_information = null;
 
-        foundationGeneratorForm.clearErrors(
+        generationForm.clearErrors(
             "language_id",
             "genre_ids",
             "novel_type_id",
@@ -75,34 +75,34 @@ function buildAiBrainSearchUrl() {
     });
 }
 
-const validateFoundation = () => {
-    foundationGeneratorForm.clearErrors();
+const validateGenerationForm = () => {
+    generationForm.clearErrors();
 
     let valid = true;
 
-    if (!foundationGeneratorForm.language_id) {
-        foundationGeneratorForm.setError("language_id", "Language is required");
+    if (!generationForm.language_id) {
+        generationForm.setError("language_id", "Language is required");
         valid = false;
     }
 
     if (
-        !Array.isArray(foundationGeneratorForm.genre_ids) ||
-        foundationGeneratorForm.genre_ids.length === 0
+        !Array.isArray(generationForm.genre_ids) ||
+        generationForm.genre_ids.length === 0
     ) {
-        foundationGeneratorForm.setError("genre_ids", "Genres is required");
+        generationForm.setError("genre_ids", "Genres is required");
         valid = false;
     }
 
-    if (!foundationGeneratorForm.novel_type_id) {
-        foundationGeneratorForm.setError(
+    if (!generationForm.novel_type_id) {
+        generationForm.setError(
             "novel_type_id",
             "Novel type is required",
         );
         valid = false;
     }
 
-    if (!foundationGeneratorForm.audience_id) {
-        foundationGeneratorForm.setError("audience_id", "Audience is required");
+    if (!generationForm.audience_id) {
+        generationForm.setError("audience_id", "Audience is required");
         valid = false;
     }
 
@@ -110,11 +110,11 @@ const validateFoundation = () => {
 };
 
 function submit() {
-    if (foundationGeneratorForm.processing) {
+    if (generationForm.processing) {
         return;
     }
 
-    if (!validateFoundation()) {
+    if (!validateGenerationForm()) {
         return;
     }
 
@@ -124,19 +124,19 @@ function submit() {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
-            foundationGeneratorForm.clearErrors();
+            generationForm.clearErrors();
             emit("completed");
         },
         onError: (errors) => {
-            foundationGeneratorForm.clearErrors();
-            foundationGeneratorForm.setError(errors);
+            generationForm.clearErrors();
+            generationForm.setError(errors);
         },
         onFinish: () => {
             emit("finished");
         },
     };
 
-    foundationGeneratorForm.post(
+    generationForm.post(
         route("back-office.novels.create.generate"),
         requestConfig,
     );
@@ -161,20 +161,20 @@ defineExpose({ submit });
                     </label>
 
                     <InfiniteScrollApiSelect
-                        :form="foundationGeneratorForm"
+                        :form="generationForm"
                         fieldName="audience_id"
                         :selectedItem="novel?.audience"
                         :apiUrl="route('search.audiences')"
                         :multiple="false"
                         placeholder="Select audiences"
-                        :error="foundationGeneratorForm.errors.audience_id"
+                        :error="generationForm.errors.audience_id"
                     />
 
                     <p
-                        v-if="foundationGeneratorForm.errors.audience_id"
+                        v-if="generationForm.errors.audience_id"
                         class="text-red-500 text-sm mt-1"
                     >
-                        {{ foundationGeneratorForm.errors.audience_id }}
+                        {{ generationForm.errors.audience_id }}
                     </p>
                 </div>
 
@@ -186,7 +186,7 @@ defineExpose({ submit });
 
                     <InfiniteScrollApiSelect
                         :key="`language-${audienceDependentFieldsKey}`"
-                        :form="foundationGeneratorForm"
+                        :form="generationForm"
                         fieldName="language_id"
                         :selectedItem="
                             audienceDependentFieldsReset
@@ -196,11 +196,11 @@ defineExpose({ submit });
                         :apiUrl="route('search.languages')"
                         :multiple="false"
                         placeholder="Select languages"
-                        :error="foundationGeneratorForm.errors.language_id"
+                        :error="generationForm.errors.language_id"
                     />
 
-                    <p v-if="foundationGeneratorForm.errors.language_id">
-                        {{ foundationGeneratorForm.errors.language_id }}
+                    <p v-if="generationForm.errors.language_id">
+                        {{ generationForm.errors.language_id }}
                     </p>
                 </div>
 
@@ -212,7 +212,7 @@ defineExpose({ submit });
 
                     <InfiniteScrollApiSelect
                         :key="`genres-${audienceDependentFieldsKey}`"
-                        :form="foundationGeneratorForm"
+                        :form="generationForm"
                         fieldName="genre_ids"
                         :selectedItem="
                             audienceDependentFieldsReset ? null : novel?.genres
@@ -220,14 +220,14 @@ defineExpose({ submit });
                         :apiUrl="genresApiUrl"
                         :multiple="true"
                         placeholder="Select genres"
-                        :error="foundationGeneratorForm.errors.genre_ids"
+                        :error="generationForm.errors.genre_ids"
                     />
 
                     <p
-                        v-if="foundationGeneratorForm.errors.genre_ids"
+                        v-if="generationForm.errors.genre_ids"
                         class="text-red-500 text-sm mt-1"
                     >
-                        {{ foundationGeneratorForm.errors.genre_ids }}
+                        {{ generationForm.errors.genre_ids }}
                     </p>
                 </div>
 
@@ -239,7 +239,7 @@ defineExpose({ submit });
 
                     <InfiniteScrollApiSelect
                         :key="`novel-type-${audienceDependentFieldsKey}`"
-                        :form="foundationGeneratorForm"
+                        :form="generationForm"
                         fieldName="novel_type_id"
                         :selectedItem="
                             audienceDependentFieldsReset
@@ -249,14 +249,14 @@ defineExpose({ submit });
                         :apiUrl="route('search.novel-types')"
                         :multiple="false"
                         placeholder="Select novel types"
-                        :error="foundationGeneratorForm.errors.novel_type_id"
+                        :error="generationForm.errors.novel_type_id"
                     />
 
                     <p
-                        v-if="foundationGeneratorForm.errors.novel_type_id"
+                        v-if="generationForm.errors.novel_type_id"
                         class="text-red-500 text-sm mt-1"
                     >
-                        {{ foundationGeneratorForm.errors.novel_type_id }}
+                        {{ generationForm.errors.novel_type_id }}
                     </p>
                 </div>
 
@@ -266,7 +266,7 @@ defineExpose({ submit });
                     </label>
 
                     <textarea
-                        v-model="foundationGeneratorForm.additional_information"
+                        v-model="generationForm.additional_information"
                         rows="3"
                         placeholder="Any additional context or instructions for the AI..."
                         class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none border-gray-300"
@@ -289,22 +289,22 @@ defineExpose({ submit });
                 class="border-2 border-dashed border-purple-200 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-blue-50"
             >
                 <InfiniteScrollApiSelect
-                    :form="foundationGeneratorForm"
+                    :form="generationForm"
                     fieldName="ai_brain_id"
                     :selectedItem="novel?.ai_brain"
                     :apiUrl="buildAiBrainSearchUrl()"
                     :multiple="false"
                     placeholder="Select AI Brain"
-                    :error="foundationGeneratorForm.errors.ai_brain_id"
+                    :error="generationForm.errors.ai_brain_id"
                     class="ai-brain-select"
                 />
             </div>
 
             <p
-                v-if="foundationGeneratorForm.errors.ai_brain_id"
+                v-if="generationForm.errors.ai_brain_id"
                 class="text-red-500 text-sm"
             >
-                {{ foundationGeneratorForm.errors.ai_brain_id }}
+                {{ generationForm.errors.ai_brain_id }}
             </p>
         </div>
     </div>

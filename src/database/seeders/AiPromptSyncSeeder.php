@@ -43,11 +43,5 @@ class AiPromptSyncSeeder extends Seeder
             $updated++;
         }
 
-        $this->command?->info(sprintf(
-            'AI prompts synchronised: %d created, %d updated, %d unchanged.',
-            $created,
-            $updated,
-            $skipped,
-        ));
     }
 }

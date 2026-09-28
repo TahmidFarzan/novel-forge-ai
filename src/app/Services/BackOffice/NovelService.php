@@ -2,7 +2,7 @@
 
 namespace App\Services\BackOffice;
 
-use App\Http\Requests\StoryBookStep1;
+use App\Http\Requests\NovelGenerationRequest;
 use App\Models\Novel;
 use Exception;
 use Illuminate\Http\Request;
@@ -85,9 +85,9 @@ class NovelService
             ->appends($request->all());
     }
 
-    public function createFromFoundation(StoryBookStep1 $request): array
+    public function createFromGenerationRequest(NovelGenerationRequest $request): array
     {
-        return $this->novelGeneratorService->createNovelFromFoundation($request);
+        return $this->novelGeneratorService->createNovel($request);
     }
 
     public function generate(Novel $novel): array

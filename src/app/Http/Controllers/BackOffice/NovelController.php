@@ -4,7 +4,9 @@ namespace App\Http\Controllers\BackOffice;
 
 use App\Http\Controllers\Controller;
 use App\Helpers\NovelHelper;
-use App\Http\Requests\StoryBookStep1;
+use App\Http\Requests\NovelGenerationRequest;
+use App\Models\Novel;
+use App\Services\BackOffice\NovelGeneratorService;
 use App\Services\BackOffice\NovelGeneratorStepService;
 use App\Services\BackOffice\NovelService;
 use Illuminate\Http\RedirectResponse;
@@ -35,18 +37,15 @@ class NovelController extends Controller
         ]);
     }
 
-    public function create(): InertiaResponse
+    public function create(Request $request): InertiaResponse
     {
         $novel = $this->novelService->new();
         Gate::authorize('view', $novel);
 
-        return Inertia::render('back-office/novels/Create', [
-            'novel' => $novel,
-            'generationSteps' => $this->generationSteps(),
-        ]);
+        return $this->renderGenerationPage($request, $novel);
     }
 
-    public function edit(string $slug): RedirectResponse|InertiaResponse
+    public function edit(Request $request, string $slug): RedirectResponse|InertiaResponse
     {
         $novel = $this->novelService->find($slug);
         Gate::authorize('update', $novel);
@@ -58,20 +57,17 @@ class NovelController extends Controller
             ]);
         }
 
-        return Inertia::render('back-office/novels/Create', [
-            'novel' => $novel,
-            'generationSteps' => $this->generationSteps(),
-        ]);
+        return $this->renderGenerationPage($request, $novel);
     }
 
-    public function createGenerate(StoryBookStep1 $request): RedirectResponse
+    public function createGenerate(NovelGenerationRequest $request): RedirectResponse
     {
         $novel = $this->novelService->new();
         Gate::authorize('create', $novel);
 
-        $result = $this->novelService->createFromFoundation($request);
+        $result = $this->novelService->createFromGenerationRequest($request);
 
-        if ($result['status'] !== 'success' || ! $result['novel']?->slug) {
+        if ($result['status'] !== NovelGeneratorService::STATUS_SUCCESS || ! $result['novel']?->slug) {
             return to_route('back-office.novels.create')->with('flash_message', [
                 'message' => $result['message'],
                 'status'  => $result['status'],
@@ -95,11 +91,12 @@ class NovelController extends Controller
             ]);
         }
 
-        if ($result['status'] === 'error') {
-            return $this->editRedirect($slug, false, $result['message'], $result['status']);
-        }
-
-        return $this->editRedirect($slug, true, $result['message'], $result['status']);
+        return $this->editRedirect(
+            $slug,
+            $result['status'] === NovelGeneratorService::STATUS_SUCCESS,
+            $result['message'],
+            $this->flashStatus($result['status']),
+        );
     }
 
     public function stop(string $slug): RedirectResponse
@@ -109,7 +106,7 @@ class NovelController extends Controller
 
         $result = $this->novelService->stop($novel);
 
-        return $this->editRedirect($slug, false, $result['message'], $result['status'] === 'success' ? 'info' : $result['status']);
+        return $this->editRedirect($slug, false, $result['message'], $this->flashStatus($result['status']));
     }
 
     public function delete(string $slug): RedirectResponse
@@ -126,6 +123,24 @@ class NovelController extends Controller
         ]);
     }
 
+    private function renderGenerationPage(Request $request, Novel $novel): InertiaResponse
+    {
+        return Inertia::render('back-office/novels/Create', [
+            'novel'           => $novel,
+            'generationState' => $this->novelGeneratorStepService->state($novel),
+            'auto'            => $request->boolean('auto'),
+        ]);
+    }
+
+    private function flashStatus(string $status): string
+    {
+        return match ($status) {
+            NovelGeneratorService::STATUS_SUCCESS => 'success',
+            NovelGeneratorService::STATUS_BUSY    => 'info',
+            default                              => 'error',
+        };
+    }
+
     private function editRedirect(string $slug, bool $auto, string $message, string $status): RedirectResponse
     {
         $parameters = $auto ? ['slug' => $slug, 'auto' => 1] : ['slug' => $slug];
@@ -134,17 +149,5 @@ class NovelController extends Controller
             'message' => $message,
             'status'  => $status,
         ]);
-    }
-
-    private function generationSteps(): array
-    {
-        return $this->novelGeneratorStepService->orderedSteps()
-            ->values()
-            ->map(fn ($step) => [
-                'id' => $step->id,
-                'name' => $step->name,
-            ])
-            ->values()
-            ->all();
     }
 }

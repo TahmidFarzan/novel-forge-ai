@@ -3,10 +3,12 @@
 namespace Tests\Feature;
 
 use App\Helpers\AiPromptGeneratorHelper;
+use App\Helpers\SeederHelper;
 use App\Models\AiPrompt;
 use App\Models\NovelGeneratorStep;
 use App\Models\User;
 use Database\Seeders\AiPromptSyncSeeder;
+use Database\Seeders\NovelGeneratorStepSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -22,16 +24,16 @@ class AiPromptSyncSeederTest extends TestCase
         User::factory()->create(['is_super_admin' => true]);
     }
 
-    public function test_it_creates_prompts_that_do_not_exist_yet(): void
+    public function test_it_creates_exactly_the_three_generation_prompts(): void
     {
         $this->seed(AiPromptSyncSeeder::class);
 
-        $this->assertSame(16, AiPrompt::query()->count());
+        $this->assertSame(3, AiPrompt::query()->count());
 
         $this->assertDatabaseHas('ai_prompts', [
-            'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2,
+            'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_PLAN_CHAPTER,
             'step_number' => 2,
-            'prompt' => AiPromptGeneratorHelper::step2Prompt(),
+            'prompt' => AiPromptGeneratorHelper::planChapterPrompt(),
         ]);
     }
 
@@ -40,24 +42,25 @@ class AiPromptSyncSeederTest extends TestCase
         $this->seed(AiPromptSyncSeeder::class);
 
         $prompt = AiPrompt::query()
-            ->where('name', AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2)
+            ->where('name', AiPromptGeneratorHelper::AI_PROMPT_NAME_PLAN_CHAPTER)
             ->firstOrFail();
 
         $this->assertSame(Str::studly($prompt->name), $prompt->code);
+        $this->assertSame('PlanChapter', $prompt->code);
     }
 
     public function test_it_updates_the_stored_prompt_text(): void
     {
         $this->seed(AiPromptSyncSeeder::class);
 
-        $prompt = AiPrompt::query()->where('name', AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1)->firstOrFail();
+        $prompt = AiPrompt::query()->where('name', AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION)->firstOrFail();
 
         $prompt->update(['prompt' => 'stale prompt text']);
 
         $this->seed(AiPromptSyncSeeder::class);
 
         $this->assertSame(
-            AiPromptGeneratorHelper::step1Prompt(),
+            AiPromptGeneratorHelper::foundationPrompt(),
             $prompt->fresh()->prompt,
         );
     }
@@ -76,10 +79,9 @@ class AiPromptSyncSeederTest extends TestCase
     public function test_it_keeps_existing_step_links_intact(): void
     {
         $this->seed(AiPromptSyncSeeder::class);
+        $this->seed(NovelGeneratorStepSeeder::class);
 
-        foreach (NovelGeneratorStep::query()->get() as $step) {
-            $step->update(['prompt' => 'stale']);
-        }
+        $this->assertSame(3, NovelGeneratorStep::query()->count());
 
         $links = NovelGeneratorStep::query()->pluck('ai_prompt_id', 'name')->all();
 
@@ -111,14 +113,45 @@ class AiPromptSyncSeederTest extends TestCase
     {
         $this->seed(AiPromptSyncSeeder::class);
 
-        foreach (AiPrompt::query()->where('step_number', '<=', 15)->get() as $prompt) {
+        foreach (AiPrompt::query()->get() as $prompt) {
             $this->assertStringContainsString('OUTPUT CONTRACT', $prompt->prompt, $prompt->name);
         }
+    }
 
-        $chapterContent = AiPrompt::query()
-            ->where('name', AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16)
-            ->firstOrFail();
+    public function test_the_generator_steps_are_seeded_in_pipeline_order(): void
+    {
+        $this->seed(AiPromptSyncSeeder::class);
+        $this->seed(NovelGeneratorStepSeeder::class);
 
-        $this->assertStringNotContainsString('OUTPUT CONTRACT', $chapterContent->prompt);
+        $steps = NovelGeneratorStep::query()->orderBy('id')->get();
+
+        $this->assertSame(
+            [
+                AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
+                AiPromptGeneratorHelper::AI_PROMPT_NAME_PLAN_CHAPTER,
+                AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT,
+            ],
+            $steps->pluck('name')->all(),
+        );
+
+        $this->assertNull($steps[0]->depend_on_step_ids);
+        $this->assertSame([$steps[0]->id], $steps[1]->depend_on_step_ids);
+        $this->assertSame([$steps[0]->id, $steps[1]->id], $steps[2]->depend_on_step_ids);
+
+        $this->assertSame($steps[0]->id, $steps[1]->previous_step_id);
+        $this->assertSame($steps[1]->id, $steps[2]->previous_step_id);
+        $this->assertNull($steps[2]->next_step_id);
+
+        foreach ($steps as $step) {
+            $this->assertSame($step->name, $step->aiPrompt?->name);
+        }
+    }
+
+    public function test_the_seeded_step_names_match_the_helper_prompts(): void
+    {
+        $stepNames = SeederHelper::novelGeneratorSteps()->pluck('name')->all();
+        $promptNames = SeederHelper::aiPrompts()->pluck('name')->all();
+
+        $this->assertSame($promptNames, $stepNames);
     }
 }

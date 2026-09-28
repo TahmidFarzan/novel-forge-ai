@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Helpers;
+use Illuminate\Support\Str;
 
 class SeederHelper
 {
@@ -311,7 +312,7 @@ class SeederHelper
                 'average_latency' => 0.90,
                 'minimum_wait_time' => 2,
                 'timeout_seconds' => 60,
-                'max_output_tokens' => 20000,
+                'max_output_tokens' => 32000,
             ],
 
             (object) [
@@ -325,7 +326,7 @@ class SeederHelper
                 'average_latency' => 1.50,
                 'minimum_wait_time' => 2,
                 'timeout_seconds' => 60,
-                'max_output_tokens' => 20000,
+                'max_output_tokens' => 32000,
             ],
 
             (object) [
@@ -339,7 +340,7 @@ class SeederHelper
                 'average_latency' => 2.00,
                 'minimum_wait_time' => 2,
                 'timeout_seconds' => 90,
-                'max_output_tokens' => 20000,
+                'max_output_tokens' => 32000,
             ],
 
         ]);
@@ -350,131 +351,27 @@ class SeederHelper
         return collect([
 
             (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1,
-                'code' => 'FoundationGenerator',
+                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
+                'code' => Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION),
                 'step_number' => 1,
                 'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step1Prompt(),
+                'prompt' => AiPromptGeneratorHelper::foundationPrompt(),
             ],
 
             (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2,
-                'code' => 'CharacterGenerator',
+                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_PLAN_CHAPTER,
+                'code' => Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_PLAN_CHAPTER),
                 'step_number' => 2,
                 'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step2Prompt(),
+                'prompt' => AiPromptGeneratorHelper::planChapterPrompt(),
             ],
 
             (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3,
-                'code' => 'WorldBibleGenerator',
+                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT,
+                'code' => Str::studly(AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT),
                 'step_number' => 3,
                 'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step3Prompt(),
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4,
-                'code' => 'LocationGenerator',
-                'step_number' => 4,
-                'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step4Prompt(),
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5,
-                'code' => 'FactionGenerator',
-                'step_number' => 5,
-                'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step5Prompt(),
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6,
-                'code' => 'CreatureGenerator',
-                'step_number' => 6,
-                'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step6Prompt(),
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP7,
-                'code' => 'SystemGenerator',
-                'step_number' => 7,
-                'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step7Prompt(),
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8,
-                'code' => 'TimelineGenerator',
-                'step_number' => 8,
-                'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step8Prompt(),
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9,
-                'code' => 'StoryStructureGenerator',
-                'step_number' => 9,
-                'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step9Prompt(),
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10,
-                'code' => 'TwistsAndForeshadowingGenerator',
-                'step_number' => 10,
-                'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step10Prompt(),
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11,
-                'code' => 'ScenePlansGenerator',
-                'step_number' => 11,
-                'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step11Prompt(),
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12,
-                'code' => 'DialoguePlansGenerator',
-                'step_number' => 12,
-                'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step12Prompt(),
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13,
-                'code' => 'ChapterPlanGenerator',
-                'step_number' => 13,
-                'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step13Prompt(),
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14,
-                'code' => 'PagePlanGenerator',
-                'step_number' => 14,
-                'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step14Prompt(),
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15,
-                'code' => 'ChapterSummaryGenerator',
-                'step_number' => 15,
-                'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step15Prompt(),
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16,
-                'code' => 'ChapterContentGenerator',
-                'step_number' => 16,
-                'depend_on_prompt_ids' => null,
-                'prompt' => AiPromptGeneratorHelper::step16Prompt(),
+                'prompt' => AiPromptGeneratorHelper::chapterContentPrompt(),
             ],
 
         ]);
@@ -485,160 +382,25 @@ class SeederHelper
         return collect([
 
             (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1,
+                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
+                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
                 'depends_on' => [],
             ],
 
             (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2,
+                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_PLAN_CHAPTER,
+                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_PLAN_CHAPTER,
                 'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1,
+                    AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
                 ],
             ],
 
             (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3,
+                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT,
+                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT,
                 'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2,
-                ],
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4,
-                'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3,
-                ],
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5,
-                'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4,
-                ],
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6,
-                'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5,
-                ],
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP7,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP7,
-                'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP6,
-                ],
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8,
-                'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP5,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1,
-                ],
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9,
-                'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP8,
-                ],
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10,
-                'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9,
-                ],
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11,
-                'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP4,
-                ],
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12,
-                'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11,
-                ],
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13,
-                'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9,
-                ],
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP14,
-                'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11,
-                ],
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15,
-                'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11,
-                ],
-            ],
-
-            (object) [
-                'name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16,
-                'prompt_name' => AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP16,
-                'depends_on' => [
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP1,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP2,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP3,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP9,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP10,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP13,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP11,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP12,
-                    AiPromptGeneratorHelper::AI_PROMPT_NAME_STEP15,
+                    AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
+                    AiPromptGeneratorHelper::AI_PROMPT_NAME_PLAN_CHAPTER,
                 ],
             ],
 

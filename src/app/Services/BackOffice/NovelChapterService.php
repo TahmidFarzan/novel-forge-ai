@@ -2,7 +2,6 @@
 
 namespace App\Services\BackOffice;
 
-use App\Helpers\AiPromptGeneratorHelper;
 use App\Models\AiBrain;
 use App\Models\AiPrompt;
 use App\Models\Novel;
@@ -97,58 +96,84 @@ class NovelChapterService
             ->appends($request->all());
     }
 
-    public function generateSummaries(Novel $novel, string $step, AiPrompt $aiPrompt, AiBrain $aiBrain): void
+    public function syncChaptersFromPlan(Novel $novel, array $chapterPlan, array $chapterSummaries): void
     {
-        $chapterPlan = $novel->chapter_plan ?? [];
-
-        if (! is_array($chapterPlan) || empty($chapterPlan)) {
+        if (empty($chapterPlan)) {
             throw new Exception('Chapter plan is empty.');
         }
 
-        foreach ($chapterPlan as $chapterPlanEntry) {
-            $this->generateSummary($novel, $step, (array) $chapterPlanEntry, $aiPrompt, $aiBrain);
+        $summaries = [];
+
+        foreach ($chapterSummaries as $chapterSummary) {
+            $no = (string) ((array) $chapterSummary)['chapter_number'] ?? '';
+
+            if ($no !== '') {
+                $summaries[$no] = (array) $chapterSummary;
+            }
         }
+
+        DB::transaction(function () use ($novel, $chapterPlan, $summaries) {
+            foreach ($chapterPlan as $chapterPlanEntry) {
+                $chapterPlanEntry = (array) $chapterPlanEntry;
+                $no               = (string) ($chapterPlanEntry['chapter_number'] ?? '');
+
+                if ($no === '') {
+                    continue;
+                }
+
+                $summery = $this->encodeChapterSummary($summaries[$no] ?? [], $no);
+
+                $novelChapter = NovelChapter::query()
+                    ->where('novel_id', $novel->id)
+                    ->where('no', $no)
+                    ->first();
+
+                if (! $novelChapter) {
+                    $novelChapter                = new NovelChapter();
+                    $novelChapter->novel_id      = $novel->id;
+                    $novelChapter->no            = $no;
+                    $novelChapter->created_by_id = Auth::id();
+                }
+
+                $novelChapter->title   = (string) ($chapterPlanEntry['title'] ?? $summaries[$no]['chapter_title'] ?? '');
+                $novelChapter->summery = $summery;
+
+                $novelChapter->save();
+            }
+        });
     }
 
-    private function generateSummary(Novel $novel, string $step, array $chapterPlanEntry, AiPrompt $aiPrompt, AiBrain $aiBrain): void
+    public function generateChapterContent(Novel $novel, NovelChapter $novelChapter, string $stepName, AiPrompt $aiPrompt, AiBrain $aiBrain): void
     {
-        $formatedInput = $this->huggingFaceApiService->step15InputsFormatter($novel, $chapterPlanEntry);
-        $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
-        $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
-
-        $this->saveSummaryByNovel($novel, $chapterPlanEntry, $stepData['chapter_summary']);
-    }
-
-    public function generateStep16(Novel $novel, NovelChapter $novelChapter,  string $step,AiPrompt $aiPrompt, AiBrain $aiBrain): void
-    {
-
-        $formatedInput = $this->huggingFaceApiService->step16InputsFormatter($novel,$novelChapter);
-        $fullPrompt = AiPromptGeneratorHelper::generateFullPrompt($aiPrompt->prompt, $formatedInput);
-        $stepData = $this->huggingFaceApiService->sendPostRequest($step, $aiBrain->api_url, $aiBrain->api_key, $aiBrain->model,  $fullPrompt, $aiBrain->max_output_tokens, $aiBrain->timeout_seconds);
+        $stepData = $this->huggingFaceApiService->generate(
+            $stepName,
+            $aiBrain->api_url,
+            $aiBrain->api_key,
+            $aiBrain->model,
+            $aiPrompt->prompt,
+            $this->huggingFaceApiService->chapterContentInputs($novel, $novelChapter),
+            $aiBrain->max_output_tokens,
+            $aiBrain->timeout_seconds,
+        );
 
         $this->saveContentByNovel($novelChapter, $stepData['chapter_content']);
     }
 
-    public function saveSummaryByNovel(Novel $novel, array $chapterPlanEntry, string $summery): void
+    private function encodeChapterSummary(array $chapterSummary, string $no): string
     {
-        DB::transaction(function () use ($novel, $chapterPlanEntry, $summery) {
-            $novelChapter = NovelChapter::query()
-                ->where('novel_id', $novel->id)
-                ->where('no', (string) ($chapterPlanEntry['chapter_number'] ?? ''))
-                ->first();
+        $summary = $chapterSummary['chapter_summary'] ?? null;
 
-            if (! $novelChapter) {
-                $novelChapter                  = new NovelChapter();
-                $novelChapter->novel_id        = $novel->id;
-                $novelChapter->no              = (string) ($chapterPlanEntry['chapter_number'] ?? '');
-                $novelChapter->created_by_id   = Auth::id();
-            }
+        if (! is_array($summary) || $summary === []) {
+            return '';
+        }
 
-            $novelChapter->title   = (string) ($chapterPlanEntry['title'] ?? '');
-            $novelChapter->summery = $summery;
+        $encoded = json_encode($summary, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-            $novelChapter->save();
-        });
+        if (! is_string($encoded)) {
+            return '';
+        }
+
+        return $encoded;
     }
 
     public function saveContentByNovel(NovelChapter $novelChapter, string $content): void
@@ -169,11 +194,6 @@ class NovelChapterService
     public function hasContent(NovelChapter $novelChapter): bool
     {
         return is_string($novelChapter->content) && trim($novelChapter->content) !== '';
-    }
-
-    public function isGenerated(NovelChapter $novelChapter): bool
-    {
-        return $this->hasSummary($novelChapter) && $this->hasContent($novelChapter);
     }
 
     public function delete(Novel $novel, NovelChapter $novelChapter): array

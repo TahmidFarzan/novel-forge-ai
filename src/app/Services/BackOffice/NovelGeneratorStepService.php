@@ -27,6 +27,15 @@ class NovelGeneratorStepService
             ->get();
     }
 
+    public function stepByName(string $name): ?NovelGeneratorStep
+    {
+        return NovelGeneratorStep::query()
+            ->with('aiPrompt')
+            ->where('name', $name)
+            ->orderBy('id')
+            ->first();
+    }
+
     public function initializeProgress(): array
     {
         $progress = [];
@@ -52,23 +61,55 @@ class NovelGeneratorStepService
         return $progress[$step->id] ?? $this->emptyProgressState();
     }
 
+    public function isStepCompleted(Novel $novel, NovelGeneratorStep $step): bool
+    {
+        return ($this->stepProgress($novel, $step)['status'] ?? self::STATUS_PENDING) === self::STATUS_COMPLETED;
+    }
+
     public function nextPendingStep(Novel $novel): ?NovelGeneratorStep
     {
-        foreach ($this->orderedSteps() as $step) {
-            $state = $this->stepProgress($novel, $step);
+        return $this->orderedSteps()
+            ->first(fn (NovelGeneratorStep $step) => ! $this->isStepCompleted($novel, $step));
+    }
 
-            if (($state['status'] ?? self::STATUS_PENDING) !== self::STATUS_COMPLETED) {
-                return $step;
-            }
-        }
+    public function latestCompletedStep(Novel $novel): ?NovelGeneratorStep
+    {
+        return $this->orderedSteps()
+            ->reverse()
+            ->first(fn (NovelGeneratorStep $step) => $this->isStepCompleted($novel, $step));
+    }
 
-        return null;
+    public function state(Novel $novel): array
+    {
+        $steps = $this->orderedSteps()
+            ->map(fn (NovelGeneratorStep $step) => $this->stepState($step, $this->stepProgress($novel, $step)))
+            ->values();
+
+        $latestCompletedStep = $steps
+            ->filter(fn (array $state) => $state['status'] === self::STATUS_COMPLETED)
+            ->last();
+        $nextStep = $steps->first(fn (array $state) => $state['status'] !== self::STATUS_COMPLETED);
+        $failedStep = $steps->firstWhere('status', self::STATUS_FAILED);
+
+        return [
+            'status'                => $novel->status,
+            'steps'                 => $steps->all(),
+            'latest_completed_step' => $this->stepReference($latestCompletedStep),
+            'next_step'             => $this->stepReference($nextStep),
+            'failed_step'           => $this->stepReference($failedStep),
+            'completed_count'       => $steps->where('status', self::STATUS_COMPLETED)->count(),
+            'total_count'           => $steps->count(),
+            'is_complete'           => $steps->isNotEmpty() && $nextStep === null,
+        ];
     }
 
     public function markStarted(Novel $novel, NovelGeneratorStep $step): void
     {
+        $current = $this->stepProgress($novel, $step);
+
         $this->updateStepProgress($novel, $step, [
             'status' => self::STATUS_IN_PROGRESS,
+            'started_at' => $current['started_at'] ?? now()->toISOString(),
             'error' => null,
         ]);
     }
@@ -109,20 +150,42 @@ class NovelGeneratorStepService
         return $this->completedStepCount($novel) >= $totalSteps;
     }
 
+    private function stepState(NovelGeneratorStep $step, array $progress): array
+    {
+        return [
+            'id'          => $step->id,
+            'slug'        => $step->slug,
+            'name'        => $step->name,
+            'status'      => $progress['status'] ?? self::STATUS_PENDING,
+            'started_at'  => $progress['started_at'] ?? null,
+            'finished_at' => $progress['finished_at'] ?? null,
+            'error'       => $progress['error'] ?? null,
+        ];
+    }
+
+    private function stepReference(?array $state): ?array
+    {
+        return $state === null
+            ? null
+            : [
+                'id'   => $state['id'],
+                'name' => $state['name'],
+            ];
+    }
+
     private function updateStepProgress(Novel $novel, NovelGeneratorStep $step, array $changes): void
     {
         $progress = $this->progress($novel);
         $current = $progress[$step->id] ?? $this->emptyProgressState();
 
-        if (($changes['status'] ?? null) === self::STATUS_IN_PROGRESS && ($current['started_at'] ?? null) !== null) {
-            unset($changes['started_at']);
-        }
-
-        if (($changes['status'] ?? null) !== self::STATUS_IN_PROGRESS && ($current['started_at'] ?? null) === null) {
-            $changes['started_at'] = now()->toISOString();
-        }
-
-        $progress[$step->id] = array_merge($this->emptyProgressState(), $current, $changes);
+        $progress[$step->id] = array_merge(
+            $this->emptyProgressState(),
+            $current,
+            $changes,
+            [
+                'started_at' => $current['started_at'] ?? $changes['started_at'] ?? now()->toISOString(),
+            ],
+        );
 
         $novel->generation_steps = $progress;
         $novel->save();

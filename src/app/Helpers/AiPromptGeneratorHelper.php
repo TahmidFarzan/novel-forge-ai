@@ -1,105 +1,91 @@
 <?php
+
 namespace App\Helpers;
 
 class AiPromptGeneratorHelper
 {
-    public const AI_PROMPT_NAME_STEP1 = 'Foundation Generator';
-    public const AI_PROMPT_NAME_STEP2 = 'CHARACTER Generator';
-    public const AI_PROMPT_NAME_STEP3 = 'World Bible Generator';
-    public const AI_PROMPT_NAME_STEP4 = 'Location Generator';
-    public const AI_PROMPT_NAME_STEP5 = 'Faction Generator';
-    public const AI_PROMPT_NAME_STEP6 = 'Creature Generator';
-    public const AI_PROMPT_NAME_STEP7 = 'System Generator';
-    public const AI_PROMPT_NAME_STEP8 = 'Timeline Generator';
-    public const AI_PROMPT_NAME_STEP9 = 'Story Structure Generator';
-    public const AI_PROMPT_NAME_STEP10 = 'Twists and Foreshadowing Generator';
-    public const AI_PROMPT_NAME_STEP11 = 'Scene Plans Generator';
-    public const AI_PROMPT_NAME_STEP12 = 'Dialogue Plans Generator';
-    public const AI_PROMPT_NAME_STEP13 = 'Chapter Plan Generator';
-    public const AI_PROMPT_NAME_STEP14 = 'Page Plan Generator';
-    public const AI_PROMPT_NAME_STEP15 = 'Chapter Summary Generator';
-    public const AI_PROMPT_NAME_STEP16 = 'Chapter Content Generator';
+    public const AI_PROMPT_NAME_FOUNDATION = 'Foundation';
+    public const AI_PROMPT_NAME_PLAN_CHAPTER = 'Plan Chapter';
+    public const AI_PROMPT_NAME_CHAPTER_CONTENT = 'Chapter Content';
 
-    public static function step1Prompt(): string
+    public static function foundationPrompt(): string
     {
         $prompt = "
             You are a professional novel development AI.
 
-            Your task is to create the foundation of a professionally developed novel.
-
-            This step focuses on creating the core narrative foundation that will be expanded through future novel development steps.
+            Your task is to develop the complete story and world package of a novel: its narrative foundation, its cast, and the world that surrounds them.
 
             ==================================================
-            PRIMARY RESPONSIBILITY
+            OVERALL OBJECTIVE
             ==================================================
 
-            Generate:
+            You are performing the equivalent of an eight phase professional novel development pipeline inside this single request.
+
+            The phases are not separate documents. They are one continuous creative process in which each phase is derived from the result of the phase before it.
+
+            Execute them internally, in the order given, and return one single JSON object that contains the result of every phase.
+
+            The result of this request becomes the reference material that later requests use to plan and write the novel. It must therefore be internally consistent, specific, and complete.
+
+            ==================================================
+            INPUT DATA
+            ==================================================
+
+            LANGUAGE:
+
+            {{language}}
+
+            GENRE REQUIREMENT:
+
+            {{genre_prompt_instruction}}
+
+            NOVEL TYPE REQUIREMENT:
+
+            {{novel_type_instruction}}
+
+            TARGET AUDIENCE REQUIREMENT:
+
+            {{audience_instruction}}
+
+            ADDITIONAL NOVEL INFORMATION:
+
+            {{additional_information}}
+
+            ==================================================
+            IMPORTANT GLOBAL RULES
+            ==================================================
+
+            1. Run the phases below in order. A later phase must consume the result of the earlier phases instead of reinventing it.
+
+            2. Everything you decide in a phase is the source of truth for every later phase. Never contradict, rename, or silently replace a fact, a name, a place, a rule, or a motivation that an earlier phase already established.
+
+            3. Integrate the genre requirement, the novel type requirement, the target audience requirement, and the additional novel information into every phase that they affect. When several genres are selected, combine them into one unified story direction instead of treating them as separate story elements. When no additional information exists, use creative judgement to improve originality, depth, and storytelling quality.
+
+            4. Character information in the foundation phase establishes only the direction required for the story. The full cast is produced in the character phase. World information in the foundation phase establishes only the context required for the story. The world bible is produced in the world phase.
+
+            5. Maintain clear cause-and-effect progression. Every major event must have a meaningful relationship with the characters, the conflict, the stakes, or the themes.
+
+            6. Avoid generic, predictable, formulaic, repetitive, mechanical, or shallow storytelling. Do not rely on common formulas unless they are meaningfully transformed into something distinctive.
+
+            7. Generate every string value in the requested language, with natural vocabulary, grammar, tone, cultural expression, and writing style appropriate for that language.
+
+            8. Every phase must stay inside its own scope. Respect the scope limits listed with each phase.
+
+            ==================================================
+            LOGICAL GENERATION PIPELINE
+            ==================================================
+
+            PHASE 1 - STORY FOUNDATION
+            ------------------------------------------
+
+            Responsibility:
 
                 1. Novel Title
                 2. Novel Subtitle
                 3. Novel Foundation
 
-            ==================================================
-            USER INPUT
-            ==================================================
+            The foundation must establish:
 
-            Language:
-            {{language}}
-
-            ==================================================
-            GENRE REQUIREMENT
-            ==================================================
-
-            {{genre_prompt_instruction}}
-
-            Understand all selected genres and combine them into one unified and consistent story direction.
-
-            Maintain:
-
-                - Clear story identity
-                - Balanced genre elements
-                - Logical narrative connection
-                - Consistent tone
-                - Appropriate genre expectations
-
-            When multiple genres are selected, integrate them naturally rather than treating them as separate story elements.
-
-            ==================================================
-            NOVEL TYPE REQUIREMENT
-            ==================================================
-
-            {{novel_type_instruction}}
-
-            Adjust the story according to the selected novel type.
-
-            Consider:
-
-                - Narrative scale
-                - Story complexity
-                - Development depth
-                - Pacing
-                - Conflict structure
-                - Emotional progression
-
-            ==================================================
-            ADDITIONAL NOVEL INFORMATION
-            ==================================================
-
-            {{additional_information}}
-
-            Understand the creative intention behind the user's additional information.
-
-            Apply relevant ideas naturally to the novel foundation while maintaining consistency with the genre, novel type, setting, characters, conflict, themes, and overall story direction.
-
-            If no additional information exists, use creative judgment to improve originality, depth, and storytelling quality.
-
-            ==================================================
-            CORE STORY FOUNDATION
-            ==================================================
-
-            Create a distinctive, meaningful, and expandable novel foundation.
-
-            The foundation should establish:
                 - Core story concept
                 - Premise
                 - Narrative hook
@@ -123,223 +109,33 @@ class AiPromptGeneratorHelper
                 - Resolution direction
                 - Major themes
 
-            Character information should establish only the direction necessary for the story.
+            The foundation must determine:
 
-            Do not create complete character profiles, biographies, or character databases.
-
-            World information should establish only the context necessary for the story.
-
-            Do not create complete world-building documentation or a world bible.
-
-            ==================================================
-            FOUNDATION DEVELOPMENT
-            ==================================================
-
-            Build a strong narrative foundation.
-
-            Determine:
                 - What makes the novel distinctive.
                 - Why readers should care about the story.
-                - What the main character wants.
-                - Why the main character wants it.
+                - What the main character wants, and why.
                 - What prevents the goal.
                 - What is at stake.
-                - What consequences can result from failure.
+                - What consequences result from failure.
                 - How the central conflict develops.
                 - How complications increase.
                 - How important discoveries affect the story.
                 - How turning points change the direction of the narrative.
                 - How the story escalates toward the climax.
                 - What climax direction naturally fits the story.
-                - What resolution direction provides a meaningful continuation of the story's themes and character journey.
+                - What resolution direction continues the story's themes and character journey meaningfully.
 
-            Every major event should have a meaningful relationship with the characters, conflict, stakes, or themes.
+            Scope limits:
 
-            Maintain clear cause-and-effect progression throughout the foundation.
+                - Do not create complete character profiles or a character database.
+                - Do not create world-building documentation or a world bible.
 
-            ==================================================
-            WRITING QUALITY
-            ==================================================
+            PHASE 2 - CHARACTERS
+            ------------------------------------------
 
-            The novel foundation must feel as though it was developed by an experienced professional novelist and story developer.
+            Consumes: the story foundation from phase 1.
 
-            Write with:
-                - Strong narrative judgment
-                - Natural storytelling instincts
-                - Confident creative decisions
-                - Specific and meaningful details
-                - Believable character motivations
-                - Organic emotional progression
-                - Purposeful conflict
-                - Strong cause-and-effect relationships
-                - Distinctive story ideas
-                - Appropriate pacing
-                - Thematic depth
-                - Emotional authenticity
-                - Professional narrative structure
-
-            Avoid generic, predictable, formulaic, repetitive, mechanical, or shallow storytelling.
-
-            Do not rely on common foundation formulas unless they are meaningfully transformed into something distinctive.
-
-            Make important story elements feel intentional and interconnected.
-
-            The result should read naturally and professionally, as if created by an experienced writer with a strong understanding of storytelling and narrative development.
-
-            ==================================================
-            LANGUAGE REQUIREMENT
-            ==================================================
-
-            Generate all output according to:
-
-            {{language}}
-
-            Maintain natural vocabulary, grammar, tone, cultural expression, and writing style appropriate for the selected language.
-
-            ==================================================
-            STORY FOUNDATION REQUIREMENTS
-            ==================================================
-
-            The novel foundation should:
-                - Feel original and professionally developed.
-                - Have a strong and identifiable story premise.
-                - Create immediate reader interest.
-                - Establish a clear narrative direction.
-                - Give the protagonist a meaningful motivation and goal.
-                - Establish meaningful conflict and opposition.
-                - Create meaningful stakes and consequences.
-                - Develop naturally escalating complications.
-                - Support a compelling climax direction.
-                - Provide a satisfying resolution direction.
-                - Maintain thematic coherence.
-                - Create emotional engagement.
-                - Support future novel development steps.
-                - Match the selected genre.
-                - Match the selected novel type.
-                - Respect the requested language.
-                - Naturally incorporate additional novel information.
-
-            ==================================================
-            OUTPUT SCOPE
-            ==================================================
-
-            This generation produces only the initial novel foundation.
-
-            Do not generate:
-                - Complete novel chapters
-                - Chapter-by-chapter plans
-                - Scene-by-scene plans
-                - Complete character profiles
-                - Character databases
-                - Complete world-building documentation
-                - World bibles
-                - Dialogue scripts
-                - Full scenes
-                - Full prose chapters
-                - Unrequested background documentation
-
-            Keep the output focused on the core story foundation required for future development.
-
-            ==================================================
-            OUTPUT FORMAT
-            ==================================================
-
-            Return ONLY valid JSON.
-
-            {
-                \"novel_title\": \"\",
-                \"novel_subtitle\": \"\",
-                \"novel_foundation\": {
-
-                    \"premise\": \"\",
-                    \"story_concept\": \"\",
-                    \"narrative_hook\": \"\",
-                    \"central_question\": \"\",
-                    \"central_theme\": \"\",
-                    \"emotional_direction\": \"\",
-
-                    \"setting\": \"\",
-
-                    \"main_character_direction\": \"\",
-                    \"important_character_roles\": [],
-                    \"central_motivation\": \"\",
-                    \"central_goal\": \"\",
-                    \"character_journey_direction\": \"\",
-
-                    \"central_conflict\": \"\",
-                    \"opposing_force\": \"\",
-                    \"stakes\": \"\",
-                    \"consequences\": \"\",
-
-                    \"opening_situation\": \"\",
-                    \"inciting_event\": \"\",
-                    \"initial_goal\": \"\",
-
-                    \"major_complications\": [],
-                    \"discoveries\": [],
-                    \"turning_points\": [],
-
-                    \"escalation\": \"\",
-                    \"climax_direction\": \"\",
-                    \"resolution_direction\": \"\",
-
-                    \"themes\": []
-                }
-            }
-
-            ==================================================
-            FINAL CHECK
-            ==================================================
-
-            Before returning the result, verify:
-
-                - The title represents the novel's identity.
-                - The subtitle supports the novel's identity.
-                - The premise is distinctive and compelling.
-                - The foundation has a clear narrative direction.
-                - The protagonist has a meaningful motivation and goal.
-                - The central conflict is meaningful.
-                - The opposing force creates genuine obstacles.
-                - Stakes and consequences are clear.
-                - Major complications logically develop the conflict.
-                - Discoveries and turning points meaningfully affect the story.
-                - Escalation leads naturally toward the climax.
-                - The resolution direction fits the story.
-                - Themes are connected to the narrative.
-                - The story feels original and professionally developed.
-                - The writing feels like it was created by an experienced professional writer.
-                - The story does not feel generic, mechanical, or formulaic.
-                - Genre requirements are properly integrated.
-                - Novel type requirements are properly integrated.
-                - Additional novel information is naturally incorporated.
-                - The output contains only the requested novel foundation.
-                - No complete character profiles are created.
-                - No world bible is created.
-                - No chapter plan is created.
-                - No scene plan is created.
-                - The requested language is respected.
-                - The response is valid JSON only.
-                - Do not return explanations, markdown, or additional text outside the JSON.
-
-        " . self::jsonOutputContract();
-
-        return $prompt;
-    }
-
-    public static function step2Prompt(): string
-    {
-        $prompt = "
-            You are a professional novel character development AI.
-
-            Your task is to create professionally developed characters for an existing novel foundation.
-
-            This step focuses only on creating the character foundation required to support the existing story.
-
-            ==================================================
-            PRIMARY RESPONSIBILITY
-            ==================================================
-
-            Generate:
+            Responsibility:
 
                 1. Main Character
                 2. Supporting Characters
@@ -347,41 +143,7 @@ class AiPromptGeneratorHelper
                 4. Character Relationships
                 5. Character Development Direction
 
-            ==================================================
-            EXISTING NOVEL FOUNDATION
-            ==================================================
-
-            {{foundation}}
-
-            Carefully analyze the existing novel foundation.
-
-            Understand:
-
-                - Story premise
-                - Story concept
-                - Narrative direction
-                - Genre identity
-                - Themes
-                - Setting
-                - Central conflict
-                - Opposing force
-                - Stakes
-                - Emotional direction
-                - Character requirements
-
-            Create characters that naturally support the existing story.
-
-            Do not change, rewrite, or expand the foundation.
-
-            The existing novel foundation is the source of truth.
-
-            ==================================================
-            CHARACTER CREATION REQUIREMENTS
-            ==================================================
-
-            Create meaningful and professionally developed characters.
-
-            Every character should have:
+            Every character must have:
 
                 - Clear narrative purpose
                 - Role in the story
@@ -395,11 +157,7 @@ class AiPromptGeneratorHelper
                 - Relationship purpose
                 - Character development direction
 
-            ==================================================
-            MAIN CHARACTER REQUIREMENTS
-            ==================================================
-
-            The main character should establish:
+            The main character must establish:
 
                 - Identity direction
                 - Role in the story
@@ -411,11 +169,7 @@ class AiPromptGeneratorHelper
                 - Growth direction
                 - Connection with the central conflict
 
-            ==================================================
-            SUPPORTING CHARACTER REQUIREMENTS
-            ==================================================
-
-            Supporting characters should establish:
+            Supporting characters must establish:
 
                 - Their purpose in the narrative
                 - Relationship with the protagonist
@@ -423,145 +177,25 @@ class AiPromptGeneratorHelper
                 - Contribution to themes
                 - Emotional or narrative importance
 
-
-            ==================================================
-            OPPOSING CHARACTER REQUIREMENTS
-            ==================================================
-
-            Opposing characters should establish:
+            Opposing characters must establish:
 
                 - Identity direction
                 - Goal
                 - Motivation
                 - Method of opposition
-                - Conflict with protagonist
+                - Conflict with the protagonist
                 - Narrative importance
 
-            ==================================================
-            CHARACTER QUALITY
-            ==================================================
+            Scope limits:
 
-            Characters must feel:
+                - Do not create complete biographies, childhood histories, family trees, or detailed life timelines.
 
-                - Original
-                - Memorable
-                - Emotionally believable
-                - Connected to the story
-                - Suitable for the genre
-                - Professionally developed
+            PHASE 3 - WORLD BIBLE
+            ------------------------------------------
 
+            Consumes: the story foundation from phase 1 and the characters from phase 2.
 
-            Avoid:
-
-                - Generic characters
-                - Random characters
-                - Unnecessary characters
-                - Flat personalities
-                - Character stereotypes without purpose
-
-
-            ==================================================
-            OUTPUT SCOPE
-            ==================================================
-
-                This generation creates only the initial character foundation.
-
-                Do not generate:
-
-                    - Complete biographies
-                    - Childhood histories
-                    - Family trees
-                    - Detailed life timelines
-                   - Character databases
-                  - World-building documents
-                  - Chapter plans
-                  - Scene plans
-                  - Dialogue scripts
-
-
-                Keep characters focused on information required for future novel development.
-
-
-            ==================================================
-            OUTPUT FORMAT
-            ==================================================
-
-            Return ONLY valid JSON.
-
-
-            {
-                \"characters\": [
-
-                    {
-                        \"name\": \"\",
-                        \"role\": \"\",
-                        \"character_type\": \"\",
-                        \"personality\": \"\",
-                        \"appearance_direction\": \"\",
-                        \"background_direction\": \"\",
-                        \"motivation\": \"\",
-                        \"goal\": \"\",
-                        \"strengths\": [],
-                        \"weaknesses\": [],
-                        \"internal_conflict\": \"\",
-                        \"external_conflict\": \"\",
-                        \"relationship_to_main_character\": \"\",
-                        \"character_arc_direction\": \"\"
-                    }
-
-                ],
-
-               \"relationships\": [
-
-                    {
-                        \"characters\": \"\",
-                        \"relationship\": \"\",
-                        \"story_purpose\": \"\"
-                    }
-
-                ]
-            }
-
-
-            ==================================================
-            FINAL CHECK
-            ==================================================
-
-            Before returning the result, verify:
-
-                - Characters directly support the existing foundation.
-                - Main character supports the central conflict.
-                - Supporting characters have clear narrative purposes.
-                - Opposing characters create meaningful obstacles.
-                - Character motivations are believable.
-                - Character relationships support the story.
-                - Character arcs connect with themes.
-                - No unnecessary characters are created.
-                - No complete biographies are created.
-                - No world-building is created.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
-
-        " . self::jsonOutputContract();
-
-        return $prompt;
-    }
-
-    public static function step3Prompt(): string
-    {
-        $prompt = "
-            You are a professional novel world-building AI.
-
-            Your task is to create a professionally developed world bible for an existing novel foundation and character set.
-
-            This step focuses only on creating the world context required to support the existing story.
-
-            ==================================================
-            PRIMARY RESPONSIBILITY
-            ==================================================
-
-            Generate:
+            Responsibility:
 
                 1. World Overview
                 2. History and Lore
@@ -569,63 +203,7 @@ class AiPromptGeneratorHelper
                 4. Rules and Systems
                 5. Key World Elements
 
-            ==================================================
-            EXISTING NOVEL FOUNDATION
-            ==================================================
-
-            {{foundation}}
-
-            Carefully analyze the existing novel foundation.
-
-            Understand:
-
-                - Story premise
-                - Story concept
-                - Narrative direction
-                - Genre identity
-                - Themes
-                - Setting direction
-                - Central conflict
-                - Opposing force
-                - Stakes
-                - Emotional direction
-
-            Build the world bible to naturally support the existing story.
-
-            Do not change, rewrite, or expand the foundation.
-
-            The existing novel foundation is the source of truth.
-
-            ==================================================
-            EXISTING CHARACTERS
-            ==================================================
-
-            {{characters}}
-
-            Carefully analyze the existing characters.
-
-            Understand:
-
-                - Main character
-                - Supporting characters
-                - Opposing characters
-                - Character motivations and goals
-                - Character relationships
-                - Character development direction
-
-            Build the world bible around the characters so that their goals, conflicts, origins, and relationships feel naturally rooted in the world.
-
-            Do not change, rewrite, or expand the characters.
-
-            The existing characters are the source of truth.
-
-            ==================================================
-            WORLD OVERVIEW REQUIREMENTS
-            ==================================================
-
-            Establish the fundamental identity of the world.
-
-            The world overview should define:
+            The world overview must define:
 
                 - World name and nature
                 - Type of world and its scale
@@ -635,13 +213,7 @@ class AiPromptGeneratorHelper
                 - Relationship between the world and the story conflict
                 - General tone and atmosphere of the world
 
-            ==================================================
-            HISTORY AND LORE REQUIREMENTS
-            ==================================================
-
-            Establish the historical and mythological foundation of the world.
-
-            The history and lore should include:
+            The history and lore must include:
 
                 - Significant historical eras
                 - Major historical events
@@ -652,13 +224,7 @@ class AiPromptGeneratorHelper
                 - Historical connections to the story conflict
                 - Secrets or forgotten knowledge
 
-            ==================================================
-            CULTURES AND SOCIETIES REQUIREMENTS
-            ==================================================
-
-            Establish the peoples and societies of the world.
-
-            The cultures and societies should include:
+            The cultures and societies must include:
 
                 - Major cultures
                 - Social structures
@@ -670,13 +236,7 @@ class AiPromptGeneratorHelper
                 - Cultural tensions
                 - Connection between cultures and the characters
 
-            ==================================================
-            RULES AND SYSTEMS REQUIREMENTS
-            ==================================================
-
-            Establish the functional laws of the world.
-
-            The rules and systems should include:
+            The rules and systems must include:
 
                 - Magic, technology, or supernatural systems
                 - Sources of power and their costs
@@ -686,13 +246,7 @@ class AiPromptGeneratorHelper
                 - Political systems
                 - Any system that affects the characters and conflict
 
-            ==================================================
-            KEY WORLD ELEMENTS REQUIREMENTS
-            ==================================================
-
-            Establish the distinctive elements of the world.
-
-            The key world elements should include:
+            The key world elements must include:
 
                 - Unique features of the world
                 - Important artifacts or objects
@@ -702,55 +256,417 @@ class AiPromptGeneratorHelper
                 - Elements that directly influence the story
                 - Elements connected to character goals
 
+            The world must be internally consistent, and the characters' goals, conflicts, origins, and relationships must feel naturally rooted in it.
+
+            Scope limits:
+
+                - Do not create complete location databases, detailed maps, faction structures, creature databases, or a chronology. Those are produced by later phases of this request.
+
+            PHASE 4 - LOCATIONS
+            ------------------------------------------
+
+            Consumes: the world bible from phase 3 and the characters from phase 2.
+
+            Responsibility:
+
+                1. Major Locations
+                2. Cities and Regions
+                3. Important Places
+                4. Environment Details
+                5. Location Significance
+
+            Major locations must define:
+
+                - Name and type of location
+                - Geographic position
+                - General description and atmosphere
+                - Importance to the world
+                - Connection to the story conflict
+
+            Cities and regions must define:
+
+                - City or region name
+                - Population and culture direction
+                - Layout and architecture direction
+                - Economy and governance
+                - Social atmosphere
+                - Connection to the characters
+
+            Important places must define:
+
+                - Place name and type
+                - Location within the world
+                - Purpose and function
+                - Description and atmosphere
+                - Significance to the story
+                - Presence in key scenes or events
+
+            Environment details must include:
+
+                - Climate and weather direction
+                - Terrain and natural features
+                - Flora and fauna direction
+                - Unique environmental characteristics
+                - How the environment affects daily life and travel
+                - Environmental connection to the conflict
+
+            Location significance must define, for each location:
+
+                - Role in the narrative
+                - Connection to character goals
+                - Connection to the central conflict
+                - Events likely to occur there
+                - Emotional or thematic importance
+
+            Locations must be places the characters can naturally inhabit, travel through, and interact with, and they must not contradict the world bible.
+
+            Scope limits:
+
+                - Do not create maps, or descriptions of locations that do not serve the story.
+
+            PHASE 5 - FACTIONS AND ORGANIZATIONS
+            ------------------------------------------
+
+            Consumes: the world bible from phase 3 and the locations from phase 4.
+
+            Responsibility:
+
+                1. Factions
+                2. Organizations
+                3. Ideologies and Goals
+                4. Key Members
+                5. Relationships and Conflicts
+                6. Influence in Story
+
+            Each faction must define:
+
+                - Faction name
+                - Faction type
+                - Purpose and reason for existing
+                - Structure and hierarchy
+                - Influence and reach
+                - Connection to the story conflict
+
+            Each organization must define:
+
+                - Organization name
+                - Organization type
+                - Mission and function
+                - Membership direction
+                - Resources and power
+                - Connection to the factions and story
+
+            Ideologies and goals must define, for each faction:
+
+                - Core ideology
+                - Values and beliefs
+                - Ultimate goals
+                - Methods used to achieve goals
+                - Boundaries and limits
+                - How ideology drives their actions
+
+            Key members must define:
+
+                - Member name
+                - Position within the faction
+                - Role and responsibility
+                - Motivation and personal goals
+                - Relationship to the main characters
+                - Narrative importance
+
+            Relationships and conflicts must define:
+
+                - Alliances between factions
+                - Rivalries and enmities
+                - Areas of cooperation
+                - Sources of conflict
+                - Historical grievances
+                - How these dynamics affect the story
+
+            Influence in story must define:
+
+                - Role of each faction in the central conflict
+                - How factions affect the main characters
+                - How factions influence key events
+                - How their influence changes as the story progresses
+                - Their contribution to themes
+
+            Factions must emerge naturally from the established world and must operate naturally within the established locations.
+
+            PHASE 6 - CREATURES AND BEINGS
+            ------------------------------------------
+
+            Consumes: the world bible from phase 3, the locations from phase 4, and the factions from phase 5.
+
+            Responsibility:
+
+                1. Creature and Species List
+                2. Traits and Abilities
+                3. Behavior and Ecology
+                4. Role in World and Story
+                5. Visual Descriptions
+
+            The creature and species list must define:
+
+                - Name
+                - Species or being type
+                - Classification
+                - Where it is found
+                - Purpose in the world
+
+            Traits and abilities must define, for each creature:
+
+                - Physical traits
+                - Natural abilities
+                - Special powers or features
+                - Strengths
+                - Weaknesses
+                - Limitations
+
+            Behavior and ecology must define, for each creature:
+
+                - Behavioral patterns
+                - Diet and survival
+                - Habitat and territory
+                - Reproduction or propagation
+                - Social structure
+                - Relationship with the environment
+                - Relationship with other creatures
+
+            Role in world and story must define, for each creature:
+
+                - Role within the world
+                - Connection to cultures and factions
+                - Connection to the central conflict
+                - Presence in key events
+                - Contribution to themes
+                - Narrative importance
+
+            Visual descriptions must define, for each creature:
+
+                - Overall appearance
+                - Size and silhouette
+                - Coloring and texture
+                - Distinctive markings
+                - Movement and mannerisms
+                - Sensory presence
+
+            Creatures must belong naturally in the established world, inhabit the established environments, and connect meaningfully with the factions that use, fear, protect, or oppose them.
+
+            Scope limits:
+
+                - Do not create creatures that do not serve the story.
+
+            PHASE 7 - WORLD SYSTEMS
+            ------------------------------------------
+
+            Consumes: the world bible from phase 3, the creatures from phase 6, and the factions from phase 5.
+
+            Responsibility:
+
+                1. System Types and Rules
+                2. Mechanics and Limitations
+                3. Effect on Society and Story
+                4. Examples of Usage
+
+            System types and rules must define:
+
+                - Name
+                - Type
+                - Core purpose
+                - Source of power or function
+                - Scope of the system
+                - Fundamental rules
+
+            Mechanics and limitations must define, for each system:
+
+                - How it is used
+                - Conditions and requirements
+                - Costs and consequences
+                - Restrictions and limits
+                - Balance and fairness
+                - Failure conditions
+
+            Effect on society and story must define, for each system:
+
+                - Impact on daily life
+                - Impact on culture and institutions
+                - Impact on economy and politics
+                - Who benefits and who is harmed
+                - Connection to the central conflict
+                - Role in key events
+                - Contribution to themes
+
+            Examples of usage must define, for each system:
+
+                - Everyday usage
+                - Combat or conflict usage
+                - Cultural or ceremonial usage
+                - Powerful or rare usage
+                - Misuse or forbidden usage
+
+            Systems must be consistent with the established world, must interact meaningfully with the creatures and their abilities, and must be used, controlled, or struggled over by the factions.
+
+            Scope limits:
+
+                - Do not invent system rules beyond what the story needs.
+
+            PHASE 8 - WORLD TIMELINE
+            ------------------------------------------
+
+            Consumes: the world bible from phase 3, the factions from phase 5, and the story foundation from phase 1.
+
+            Responsibility:
+
+                1. Major Historical Events
+                2. Past Events
+                3. Present Events
+                4. Future Events
+                5. Key Turning Points
+                6. Timeline Summary
+
+            Major historical events must define:
+
+                - Name
+                - Date or era
+                - Description
+                - Causes
+                - Consequences
+                - Historical importance
+
+            Past events must define:
+
+                - Name
+                - Date or era
+                - Description
+                - Relationship to current tensions
+                - Connection to the story
+
+            Present events must define:
+
+                - Name
+                - Current situation
+                - Driving forces
+                - Ongoing conflicts
+                - Connection to the inciting event
+
+            Future events must define:
+
+                - Name
+                - Projected course
+                - Relationship to the climax direction
+                - Relationship to the resolution direction
+                - Possible outcomes
+
+            Key turning points must define:
+
+                - Name
+                - When it occurs
+                - What changes
+                - Immediate effects
+                - Long-term effects
+                - Connection to characters
+
+            The timeline summary must give a clear chronological overview.
+
+            The timeline must emerge naturally from the established world history, must include the rise, fall, and interactions of the factions, and must connect the story foundation events to the larger world chronology.
+
+            Scope limits:
+
+                - Do not create the plot structure, the scene breakdown, the chapter plan, or any prose.
+
             ==================================================
-            WORLD QUALITY
+            DEPENDENCY RULES
             ==================================================
 
-            The world must feel:
+            The following dependencies are mandatory. They are the reason the phases must be executed in order.
 
-                - Original
-                - Coherent
-                - Internally consistent
-                - Meaningfully connected to the story
-                - Suitable for the genre
-                - Professionally developed
+                Phase 2 must be built on the foundation established in phase 1.
+                Phase 3 must be built on the foundation from phase 1 and the characters from phase 2, and must root the characters' origins and goals in the world.
+                Phase 4 must exist inside the world of phase 3 and must host the characters of phase 2.
+                Phase 5 must emerge from the world of phase 3 and must operate inside the locations of phase 4.
+                Phase 6 must belong to the world of phase 3, inhabit the locations of phase 4, and relate to the factions of phase 5.
+                Phase 7 must be consistent with the world of phase 3 and must interact with the creatures of phase 6 and the factions of phase 5.
+                Phase 8 must extend the world history of phase 3, cover the rise and fall of the factions of phase 5, and align with the foundation events of phase 1.
 
-            Avoid:
-
-                - Generic settings
-                - Random world details
-                - Contradictory world rules
-                - Unnecessary world-building
-                - World elements that do not serve the story
+            Where a later phase adds a detail, the detail must extend the earlier phase instead of replacing it. A name, a place, a rule, an organisation, or a motivation introduced in an earlier phase must reappear unchanged wherever it is referenced later.
 
             ==================================================
-            OUTPUT SCOPE
+            FINAL OUTPUT REQUIREMENTS
             ==================================================
 
-            This generation creates only the initial world bible.
+            Return one single JSON object that contains the result of all eight phases.
 
-            Do not generate:
+            Do not split the phases across separate responses.
 
-                - Complete location databases
-                - Detailed maps
-                - Faction structures
-                - Creature databases
-                - Dynamic system rules beyond what the story needs
-                - Timelines
-                - Story structure
-                - Chapter plans
-                - Scene plans
-                - Dialogue scripts
+            Do not return the phases one at a time.
 
-            Keep the world bible focused on information required for future novel development.
+            Do not merge two phases into one field, and do not rename a field.
 
             ==================================================
-            OUTPUT FORMAT
+            JSON STRUCTURE
             ==================================================
 
             Return ONLY valid JSON.
 
             {
+                \"novel_title\": \"\",
+                \"novel_subtitle\": \"\",
+                \"novel_foundation\": {
+                    \"premise\": \"\",
+                    \"story_concept\": \"\",
+                    \"narrative_hook\": \"\",
+                    \"central_question\": \"\",
+                    \"central_theme\": \"\",
+                    \"emotional_direction\": \"\",
+                    \"setting\": \"\",
+                    \"main_character_direction\": \"\",
+                    \"important_character_roles\": [],
+                    \"central_motivation\": \"\",
+                    \"central_goal\": \"\",
+                    \"character_journey_direction\": \"\",
+                    \"central_conflict\": \"\",
+                    \"opposing_force\": \"\",
+                    \"stakes\": \"\",
+                    \"consequences\": \"\",
+                    \"opening_situation\": \"\",
+                    \"inciting_event\": \"\",
+                    \"initial_goal\": \"\",
+                    \"major_complications\": [],
+                    \"discoveries\": [],
+                    \"turning_points\": [],
+                    \"escalation\": \"\",
+                    \"climax_direction\": \"\",
+                    \"resolution_direction\": \"\",
+                    \"themes\": []
+                },
+                \"characters\": {
+                    \"characters\": [
+                        {
+                            \"name\": \"\",
+                            \"role\": \"\",
+                            \"character_type\": \"\",
+                            \"personality\": \"\",
+                            \"appearance_direction\": \"\",
+                            \"background_direction\": \"\",
+                            \"motivation\": \"\",
+                            \"goal\": \"\",
+                            \"strengths\": [],
+                            \"weaknesses\": [],
+                            \"internal_conflict\": \"\",
+                            \"external_conflict\": \"\",
+                            \"relationship_to_main_character\": \"\",
+                            \"character_arc_direction\": \"\"
+                        }
+                    ],
+                    \"relationships\": [
+                        {
+                            \"characters\": \"\",
+                            \"relationship\": \"\",
+                            \"story_purpose\": \"\"
+                        }
+                    ]
+                },
                 \"world_bible\": {
                     \"world_overview\": {
                         \"world_name_and_nature\": \"\",
@@ -801,218 +717,7 @@ class AiPromptGeneratorHelper
                             \"story_influence\": \"\"
                         }
                     ]
-                }
-            }
-
-            ==================================================
-            FINAL CHECK
-            ==================================================
-
-            Before returning the result, verify:
-
-                - The world bible directly supports the existing foundation.
-                - The world bible supports the existing characters.
-                - The world is internally consistent.
-                - The world feels original and professionally developed.
-                - Cultures connect naturally with the characters.
-                - Rules and systems are clear and consistent.
-                - No complete location database is created.
-                - No faction database is created.
-                - No creature database is created.
-                - No timeline is created.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
-        " . self::jsonOutputContract();
-
-        return $prompt;
-    }
-
-    public static function step4Prompt(): string
-    {
-        $prompt = "
-            You are a professional novel location development AI.
-
-            Your task is to create professionally developed locations for an existing novel foundation, characters, and world bible.
-
-            This step focuses only on creating the locations required to support the existing story.
-
-            ==================================================
-            PRIMARY RESPONSIBILITY
-            ==================================================
-
-            Generate:
-
-                1. Major Locations
-                2. Cities and Regions
-                3. Important Places
-                4. Environment Details
-                5. Location Significance
-
-            ==================================================
-            EXISTING WORLD BIBLE
-            ==================================================
-
-            {{world_bible}}
-
-            Carefully analyze the existing world bible.
-
-            Understand:
-
-                - World overview
-                - History and lore
-                - Cultures and societies
-                - Rules and systems
-                - Key world elements
-
-            Create locations that naturally exist within the established world.
-
-            Do not change, rewrite, or expand the world bible.
-
-            The existing world bible is the source of truth.
-
-            ==================================================
-            EXISTING CHARACTERS
-            ==================================================
-
-            {{characters}}
-
-            Carefully analyze the existing characters.
-
-            Understand:
-
-                - Character origins
-                - Character goals
-                - Character relationships
-                - Places relevant to their journey
-
-            Create locations that the characters can naturally inhabit, travel through, and interact with.
-
-            Do not change, rewrite, or expand the characters.
-
-            The existing characters are the source of truth.
-
-            ==================================================
-            MAJOR LOCATIONS REQUIREMENTS
-            ==================================================
-
-            Establish the primary locations that anchor the story.
-
-            Major locations should define:
-
-                - Name and type of location
-                - Geographic position
-                - General description and atmosphere
-                - Importance to the world
-                - Connection to the story conflict
-
-            ==================================================
-            CITIES AND REGIONS REQUIREMENTS
-            ==================================================
-
-            Establish the populated centers and broader regions.
-
-            Cities and regions should define:
-
-                - City or region name
-                - Population and culture direction
-                - Layout and architecture direction
-                - Economy and governance
-                - Social atmosphere
-                - Connection to the characters
-
-            ==================================================
-            IMPORTANT PLACES REQUIREMENTS
-            ==================================================
-
-            Establish the significant individual places within the world.
-
-            Important places should define:
-
-                - Place name and type
-                - Location within the world
-                - Purpose and function
-                - Description and atmosphere
-                - Significance to the story
-                - Presence in key scenes or events
-
-            ==================================================
-            ENVIRONMENT DETAILS REQUIREMENTS
-            ==================================================
-
-            Establish the sensory and environmental reality of the locations.
-
-            Environment details should include:
-
-                - Climate and weather direction
-                - Terrain and natural features
-                - Flora and fauna direction
-                - Unique environmental characteristics
-                - How the environment affects daily life and travel
-                - Environmental connection to the conflict
-
-            ==================================================
-            LOCATION SIGNIFICANCE REQUIREMENTS
-            ==================================================
-
-            Establish why each location matters to the story.
-
-            Location significance should define:
-
-                - Role in the narrative
-                - Connection to character goals
-                - Connection to the central conflict
-                - Events likely to occur there
-                - Emotional or thematic importance
-
-            ==================================================
-            LOCATION QUALITY
-            ==================================================
-
-            Locations must feel:
-
-                - Original
-                - Memorable
-                - Visually and emotionally clear
-                - Connected to the world bible
-                - Suitable for the genre
-                - Professionally developed
-
-            Avoid:
-
-                - Generic locations
-                - Random locations
-                - Unnecessary locations
-                - Locations that contradict the world bible
-                - Locations that do not serve the story
-
-            ==================================================
-            OUTPUT SCOPE
-            ==================================================
-
-            This generation creates only the initial location set.
-
-            Do not generate:
-
-                - Complete maps
-                - Faction databases
-                - Creature databases
-                - Dynamic system rules
-                - Timelines
-                - Story structure
-                - Chapter plans
-                - Scene plans
-                - Dialogue scripts
-
-            Keep locations focused on information required for future novel development.
-
-            ==================================================
-            OUTPUT FORMAT
-            ==================================================
-
-            Return ONLY valid JSON.
-
-            {
+                },
                 \"locations\": {
                     \"major_locations\": [
                         {
@@ -1062,232 +767,7 @@ class AiPromptGeneratorHelper
                             \"emotional_or_thematic_importance\": \"\"
                         }
                     ]
-                }
-            }
-
-            ==================================================
-            FINAL CHECK
-            ==================================================
-
-            Before returning the result, verify:
-
-                - Locations directly support the existing world bible.
-                - Locations naturally support the existing characters.
-                - No location contradicts the established world.
-                - No unnecessary locations are created.
-                - No complete maps are created.
-                - No faction databases are created.
-                - No creature databases are created.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
-        " . self::jsonOutputContract();
-
-        return $prompt;
-    }
-
-    public static function step5Prompt(): string
-    {
-        $prompt = "
-            You are a professional novel faction and organization development AI.
-
-            Your task is to create professionally developed factions for an existing novel foundation, world bible, and locations.
-
-            This step focuses only on creating the factions and organizations required to support the existing story.
-
-            ==================================================
-            PRIMARY RESPONSIBILITY
-            ==================================================
-
-            Generate:
-
-                1. Factions
-                2. Organizations
-                3. Ideologies and Goals
-                4. Key Members
-                5. Relationships and Conflicts
-                6. Influence in Story
-
-            ==================================================
-            EXISTING WORLD BIBLE
-            ==================================================
-
-            {{world_bible}}
-
-            Carefully analyze the existing world bible.
-
-            Understand:
-
-                - World overview
-                - History and lore
-                - Cultures and societies
-                - Rules and systems
-                - Key world elements
-
-            Create factions that naturally emerge from the established world.
-
-            Do not change, rewrite, or expand the world bible.
-
-            The existing world bible is the source of truth.
-
-            ==================================================
-            EXISTING LOCATIONS
-            ==================================================
-
-            {{locations}}
-
-            Carefully analyze the existing locations.
-
-            Understand:
-
-                - Major locations
-                - Cities and regions
-                - Important places
-                - Environment details
-                - Location significance
-
-            Create factions that naturally operate within these locations.
-
-            Do not change, rewrite, or expand the locations.
-
-            The existing locations are the source of truth.
-
-            ==================================================
-            FACTIONS REQUIREMENTS
-            ==================================================
-
-            Establish the primary factions of the story.
-
-            Each faction should define:
-
-                - Faction name
-                - Faction type
-                - Purpose and reason for existing
-                - Structure and hierarchy
-                - Influence and reach
-                - Connection to the story conflict
-
-            ==================================================
-            ORGANIZATIONS REQUIREMENTS
-            ==================================================
-
-            Establish the formal organizations within the world.
-
-            Each organization should define:
-
-                - Organization name
-                - Organization type
-                - Mission and function
-                - Membership direction
-                - Resources and power
-                - Connection to the factions and story
-
-            ==================================================
-            IDEOLOGIES AND GOALS REQUIREMENTS
-            ==================================================
-
-            Establish what each faction believes and wants.
-
-            Ideologies and goals should define:
-
-                - Core ideology
-                - Values and beliefs
-                - Ultimate goals
-                - Methods used to achieve goals
-                - Boundaries and limits
-                - How ideology drives their actions
-
-            ==================================================
-            KEY MEMBERS REQUIREMENTS
-            ==================================================
-
-            Establish the important individuals within factions.
-
-            Key members should define:
-
-                - Member name
-                - Position within the faction
-                - Role and responsibility
-                - Motivation and personal goals
-                - Relationship to the main characters
-                - Narrative importance
-
-            ==================================================
-            RELATIONSHIPS AND CONFLICTS REQUIREMENTS
-            ==================================================
-
-            Establish how factions interact and oppose one another.
-
-            Relationships and conflicts should define:
-
-                - Alliances between factions
-                - Rivalries and enmities
-                - Areas of cooperation
-                - Sources of conflict
-                - Historical grievances
-                - How these dynamics affect the story
-
-            ==================================================
-            INFLUENCE IN STORY REQUIREMENTS
-            ==================================================
-
-            Establish how factions shape the narrative.
-
-            Influence in story should define:
-
-                - Role of each faction in the central conflict
-                - How factions affect the main characters
-                - How factions influence key events
-                - How their influence changes as the story progresses
-                - Their contribution to themes
-
-            ==================================================
-            FACTION QUALITY
-            ==================================================
-
-            Factions must feel:
-
-                - Original
-                - Memorable
-                - Believable as real power structures
-                - Connected to the world bible
-                - Connected to the locations
-                - Suitable for the genre
-                - Professionally developed
-
-            Avoid:
-
-                - Generic factions
-                - Random organizations
-                - Unnecessary groups
-                - Factions that contradict the world bible
-                - Factions that do not serve the story
-
-            ==================================================
-            OUTPUT SCOPE
-            ==================================================
-
-            This generation creates only the initial faction set.
-
-            Do not generate:
-
-                - Complete creature databases
-                - Dynamic system rules
-                - Timelines
-                - Story structure
-                - Chapter plans
-                - Scene plans
-                - Dialogue scripts
-
-            Keep factions focused on information required for future novel development.
-
-            ==================================================
-            OUTPUT FORMAT
-            ==================================================
-
-            Return ONLY valid JSON.
-
-            {
+                },
                 \"factions\": {
                     \"factions\": [
                         {
@@ -1350,242 +830,7 @@ class AiPromptGeneratorHelper
                             \"contribution_to_themes\": \"\"
                         }
                     ]
-                }
-            }
-
-            ==================================================
-            FINAL CHECK
-            ==================================================
-
-            Before returning the result, verify:
-
-                - Factions directly support the existing world bible.
-                - Factions naturally operate within the existing locations.
-                - Factions interact with the existing characters in meaningful ways.
-                - No faction contradicts the established world.
-                - No unnecessary factions are created.
-                - Key members serve clear narrative purposes.
-                - Relationships and conflicts drive the story.
-                - No creature databases are created.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
-        " . self::jsonOutputContract();
-
-        return $prompt;
-    }
-
-    public static function step6Prompt(): string
-    {
-        $prompt = "
-            You are a professional novel creature and being development AI.
-
-            Your task is to create professionally developed creatures, species, and special beings for an existing novel foundation, world bible, locations, and factions.
-
-            This step focuses only on creating the creatures required to support the existing story.
-
-            ==================================================
-            PRIMARY RESPONSIBILITY
-            ==================================================
-
-            Generate:
-
-                1. Creature / Species List
-                2. Traits and Abilities
-                3. Behavior and Ecology
-                4. Role in World / Story
-                5. Visual Description
-
-            ==================================================
-            EXISTING WORLD BIBLE
-            ==================================================
-
-            {{world_bible}}
-
-            Carefully analyze the existing world bible.
-
-            Understand:
-
-                - World overview
-                - History and lore
-                - Cultures and societies
-                - Rules and systems
-                - Key world elements
-
-            Create creatures that naturally belong to the established world.
-
-            Do not change, rewrite, or expand the world bible.
-
-            The existing world bible is the source of truth.
-
-            ==================================================
-            EXISTING LOCATIONS
-            ==================================================
-
-            {{locations}}
-
-            Carefully analyze the existing locations.
-
-            Understand:
-
-                - Major locations
-                - Cities and regions
-                - Important places
-                - Environment details
-                - Location significance
-
-            Create creatures that naturally inhabit the established environments.
-
-            Do not change, rewrite, or expand the locations.
-
-            The existing locations are the source of truth.
-
-            ==================================================
-            EXISTING FACTIONS
-            ==================================================
-
-            {{factions}}
-
-            Carefully analyze the existing factions.
-
-            Understand:
-
-                - Factions and organizations
-                - Ideologies and goals
-                - Key members
-                - Relationships and conflicts
-                - Influence in story
-
-            Create creatures that connect meaningfully with the factions that use, fear, protect, or oppose them.
-
-            Do not change, rewrite, or expand the factions.
-
-            The existing factions are the source of truth.
-
-            ==================================================
-            CREATURE / SPECIES LIST REQUIREMENTS
-            ==================================================
-
-            Establish the creatures and beings that exist in the world.
-
-            Each creature should define:
-
-                - Creature name
-                - Species or being type
-                - Classification
-                - Where it is found
-                - Overall purpose in the world
-
-            ==================================================
-            TRAITS AND ABILITIES REQUIREMENTS
-            ==================================================
-
-            Establish what each creature can do and what it is like.
-
-            Traits and abilities should define:
-
-                - Physical traits
-                - Natural abilities
-                - Special powers or features
-                - Strengths
-                - Weaknesses
-                - Limitations
-
-            ==================================================
-            BEHAVIOR AND ECOLOGY REQUIREMENTS
-            ==================================================
-
-            Establish how each creature lives and behaves.
-
-            Behavior and ecology should define:
-
-                - Behavioral patterns
-                - Diet and survival methods
-                - Habitat and territory
-                - Reproduction or propagation direction
-                - Social structure
-                - Relationship with the environment
-                - Relationship with other creatures
-
-            ==================================================
-            ROLE IN WORLD / STORY REQUIREMENTS
-            ==================================================
-
-            Establish why each creature matters.
-
-            Role in world and story should define:
-
-                - Role within the world
-                - Connection to cultures and factions
-                - Connection to the central conflict
-                - Presence in key events
-                - Contribution to themes
-                - Narrative importance
-
-            ==================================================
-            VISUAL DESCRIPTION REQUIREMENTS
-            ==================================================
-
-            Establish how each creature appears.
-
-            Visual description should define:
-
-                - Overall appearance
-                - Size and silhouette
-                - Coloring and texture
-                - Distinctive markings
-                - Movement and mannerisms
-                - Sensory presence
-
-            This field is optional.
-
-            If it does not fit the creature or the story, an empty or minimal value is acceptable.
-
-            ==================================================
-            CREATURE QUALITY
-            ==================================================
-
-            Creatures must feel:
-
-                - Original
-                - Memorable
-                - Believable within the world
-                - Connected to the story
-                - Suitable for the genre
-                - Professionally developed
-
-            Avoid:
-
-                - Generic creatures
-                - Random creatures
-                - Unnecessary creatures
-                - Creatures that contradict the world bible
-                - Creatures that do not serve the story
-
-            ==================================================
-            OUTPUT SCOPE
-            ==================================================
-
-            This generation creates only the initial creature set.
-
-            Do not generate:
-
-                - Dynamic system rules
-                - Complete timelines
-                - Story structure
-                - Chapter plans
-                - Scene plans
-                - Dialogue scripts
-
-            Keep creatures focused on information required for future novel development.
-
-            ==================================================
-            OUTPUT FORMAT
-            ==================================================
-
-            Return ONLY valid JSON.
-
-            {
+                },
                 \"creatures\": {
                     \"creatures_and_species\": [
                         {
@@ -1641,232 +886,16 @@ class AiPromptGeneratorHelper
                             \"sensory_presence\": \"\"
                         }
                     ]
-                }
-            }
-
-            ==================================================
-            FINAL CHECK
-            ==================================================
-
-            Before returning the result, verify:
-
-                - Creatures directly support the existing world bible.
-                - Creatures naturally inhabit the existing locations.
-                - Creatures connect meaningfully with the existing factions.
-                - No creature contradicts the established world.
-                - No unnecessary creatures are created.
-                - Traits and abilities are consistent with the world rules.
-                - Behavior and ecology feel natural.
-                - No dynamic system rules are created.
-                - No complete timelines are created.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
-        " . self::jsonOutputContract();
-
-        return $prompt;
-    }
-
-    public static function step7Prompt(): string
-    {
-        $prompt = "
-            You are a professional novel world system development AI.
-
-            Your task is to create professionally developed world systems for an existing novel foundation, world bible, creatures, and factions.
-
-            This step focuses only on creating the systems required to support the existing story.
-
-            ==================================================
-            PRIMARY RESPONSIBILITY
-            ==================================================
-
-            Generate:
-
-                1. System Types and Rules
-                2. Mechanics and Limitations
-                3. Effect on Society and Story
-                4. Examples of Usage
-
-            ==================================================
-            EXISTING WORLD BIBLE
-            ==================================================
-
-            {{world_bible}}
-
-            Carefully analyze the existing world bible.
-
-            Understand:
-
-                - World overview
-                - History and lore
-                - Cultures and societies
-                - Rules and systems
-                - Key world elements
-
-            Create systems that are consistent with the established world.
-
-            Do not change, rewrite, or expand the world bible.
-
-            The existing world bible is the source of truth.
-
-            ==================================================
-            EXISTING CREATURES
-            ==================================================
-
-            {{creatures}}
-
-            Carefully analyze the existing creatures.
-
-            Understand:
-
-                - Creatures and species
-                - Traits and abilities
-                - Behavior and ecology
-                - Role in world and story
-                - Visual descriptions
-
-            Create systems that interact meaningfully with the creatures and their abilities.
-
-            Do not change, rewrite, or expand the creatures.
-
-            The existing creatures are the source of truth.
-
-            ==================================================
-            EXISTING FACTIONS
-            ==================================================
-
-            {{factions}}
-
-            Carefully analyze the existing factions.
-
-            Understand:
-
-                - Factions and organizations
-                - Ideologies and goals
-                - Key members
-                - Relationships and conflicts
-                - Influence in story
-
-            Create systems that are used, controlled, or struggled over by the factions.
-
-            Do not change, rewrite, or expand the factions.
-
-            The existing factions are the source of truth.
-
-            ==================================================
-            SYSTEM TYPES AND RULES REQUIREMENTS
-            ==================================================
-
-            Establish what systems exist and how they work.
-
-            System types and rules should define:
-
-                - System name
-                - System type
-                - Core purpose
-                - Fundamental rules
-                - Sources of power or function
-                - Scope of the system
-
-            ==================================================
-            MECHANICS AND LIMITATIONS REQUIREMENTS
-            ==================================================
-
-            Establish the operational details of each system.
-
-            Mechanics and limitations should define:
-
-                - How the system is activated or used
-                - Conditions and requirements
-                - Costs and consequences
-                - Restrictions and limits
-                - Balance and fairness of the system
-                - Failure conditions
-
-            ==================================================
-            EFFECT ON SOCIETY AND STORY REQUIREMENTS
-            ==================================================
-
-            Establish how each system shapes the world and narrative.
-
-            Effect on society and story should define:
-
-                - Impact on daily life
-                - Impact on culture and institutions
-                - Impact on economy and politics
-                - Who benefits and who is harmed
-                - Connection to the central conflict
-                - Role in key events
-                - Contribution to themes
-
-            ==================================================
-            EXAMPLES OF USAGE REQUIREMENTS
-            ==================================================
-
-            Establish concrete examples of each system in action.
-
-            Examples of usage should include:
-
-                - Everyday usage examples
-                - Combat or conflict usage
-                - Cultural or ceremonial usage
-                - Powerful or rare usage
-                - Misuse or forbidden usage
-
-            ==================================================
-            SYSTEM QUALITY
-            ==================================================
-
-            Systems must feel:
-
-                - Original
-                - Coherent
-                - Internally consistent
-                - Meaningfully connected to the story
-                - Suitable for the genre
-                - Professionally developed
-
-            Avoid:
-
-                - Generic systems
-                - Random systems
-                - Unnecessary systems
-                - Systems that contradict the world bible
-                - Systems that do not serve the story
-
-            ==================================================
-            OUTPUT SCOPE
-            ==================================================
-
-            This generation creates only the initial system set.
-
-            Do not generate:
-
-                - Complete creature databases
-                - Complete timelines
-                - Story structure
-                - Chapter plans
-                - Scene plans
-                - Dialogue scripts
-
-            Keep systems focused on information required for future novel development.
-
-            ==================================================
-            OUTPUT FORMAT
-            ==================================================
-
-            Return ONLY valid JSON.
-
-            {
+                },
                 \"systems\": {
                     \"system_types_and_rules\": [
                         {
                             \"name\": \"\",
                             \"type\": \"\",
                             \"core_purpose\": \"\",
-                            \"fundamental_rules\": [],
                             \"source_of_power_or_function\": \"\",
-                            \"scope_of_system\": \"\"
+                            \"scope_of_system\": \"\",
+                            \"fundamental_rules\": []
                         }
                     ],
                     \"mechanics_and_limitations\": [
@@ -1902,256 +931,7 @@ class AiPromptGeneratorHelper
                             \"misuse_or_forbidden_usage\": \"\"
                         }
                     ]
-                }
-            }
-
-            ==================================================
-            FINAL CHECK
-            ==================================================
-
-            Before returning the result, verify:
-
-                - Systems directly support the existing world bible.
-                - Systems interact meaningfully with the existing creatures.
-                - Systems connect naturally with the existing factions.
-                - No system contradicts the established world.
-                - No unnecessary systems are created.
-                - Mechanics and limitations are consistent.
-                - Examples of usage are concrete and specific.
-                - No complete creature databases are created.
-                - No complete timelines are created.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
-        " . self::jsonOutputContract();
-
-        return $prompt;
-    }
-
-    public static function step8Prompt(): string
-    {
-        $prompt = "
-            You are a professional novel timeline and world history development AI.
-
-            Your task is to create a professionally developed chronological history for an existing novel foundation, world bible, and factions.
-
-            This step focuses only on creating the timeline required to support the existing story.
-
-            ==================================================
-            PRIMARY RESPONSIBILITY
-            ==================================================
-
-            Generate:
-
-                1. Major Historical Events
-                2. Past Events
-                3. Present Events
-                4. Future Events
-                5. Key Turning Points
-                6. Timeline Summary
-
-            ==================================================
-            EXISTING WORLD BIBLE
-            ==================================================
-
-            {{world_bible}}
-
-            Carefully analyze the existing world bible.
-
-            Understand:
-
-                - World overview
-                - History and lore
-                - Cultures and societies
-                - Rules and systems
-                - Key world elements
-
-            Create a timeline that naturally emerges from the established world history.
-
-            Do not change, rewrite, or expand the world bible.
-
-            The existing world bible is the source of truth.
-
-            ==================================================
-            EXISTING FACTIONS
-            ==================================================
-
-            {{factions}}
-
-            Carefully analyze the existing factions.
-
-            Understand:
-
-                - Factions and organizations
-                - Ideologies and goals
-                - Key members
-                - Relationships and conflicts
-                - Influence in story
-
-            Create timeline events that include the rise, fall, and interactions of the factions.
-
-            Do not change, rewrite, or expand the factions.
-
-            The existing factions are the source of truth.
-
-            ==================================================
-            EXISTING NOVEL FOUNDATION
-            ==================================================
-
-            {{foundation}}
-
-            Carefully analyze the existing novel foundation.
-
-            Understand:
-
-                - Story premise
-                - Story concept
-                - Narrative direction
-                - Important events
-                - Turning points
-                - Inciting event
-                - Initial goal
-                - Escalation
-                - Climax direction
-                - Resolution direction
-
-            Create a timeline that connects the story foundation events to the larger world chronology.
-
-            Do not change, rewrite, or expand the foundation.
-
-            The existing foundation is the source of truth.
-
-            ==================================================
-            MAJOR HISTORICAL EVENTS REQUIREMENTS
-            ==================================================
-
-            Establish the important events in world history.
-
-            Major historical events should define:
-
-                - Event name
-                - Date or era
-                - Event description
-                - Causes
-                - Consequences
-                - Historical importance
-
-            ==================================================
-            PAST EVENTS REQUIREMENTS
-            ==================================================
-
-            Establish the events that occurred before the story begins.
-
-            Past events should define:
-
-                - Event name
-                - Date or era
-                - Event description
-                - Relationship to current tensions
-                - Connection to the story
-
-            ==================================================
-            PRESENT EVENTS REQUIREMENTS
-            ==================================================
-
-            Establish the events occurring as the story begins.
-
-            Present events should define:
-
-                - Event name
-                - Current situation
-                - Driving forces
-                - Ongoing conflicts
-                - Direct connection to the inciting event
-
-            ==================================================
-            FUTURE EVENTS REQUIREMENTS
-            ==================================================
-
-            Establish the likely or projected events ahead.
-
-            Future events should define:
-
-                - Event name
-                - Projected course
-                - Possible outcomes
-                - Relationship to the climax direction
-                - Relationship to the resolution direction
-
-            ==================================================
-            KEY TURNING POINTS REQUIREMENTS
-            ==================================================
-
-            Establish the moments that change the direction of the world and story.
-
-            Key turning points should define:
-
-                - Turning point name
-                - When it occurs
-                - What changes
-                - Immediate effects
-                - Long-term effects
-                - Connection to the characters
-
-            ==================================================
-            TIMELINE SUMMARY REQUIREMENTS
-            ==================================================
-
-            Establish a clear chronological overview.
-
-            The timeline summary should:
-
-                - Summarize the full chronology
-                - Present the most important events in order
-                - Show the connection between the world history and the story
-                - Provide a clear sense of cause and effect
-                - Support future novel development steps
-
-            ==================================================
-            TIMELINE QUALITY
-            ==================================================
-
-            The timeline must feel:
-
-                - Logical
-                - Coherent
-                - Chronologically consistent
-                - Meaningfully connected to the story
-                - Suitable for the genre
-                - Professionally developed
-
-            Avoid:
-
-                - Random events
-                - Contradictory dates
-                - Events disconnected from the world
-                - Events disconnected from the story
-                - Unnecessary timeline entries
-
-            ==================================================
-            OUTPUT SCOPE
-            ==================================================
-
-            This generation creates only the initial world timeline.
-
-            Do not generate:
-
-                - Complete creature databases
-                - Dynamic system rules
-                - Story structure
-                - Chapter plans
-                - Scene plans
-                - Dialogue scripts
-
-            Keep the timeline focused on information required for future novel development.
-
-            ==================================================
-            OUTPUT FORMAT
-            ==================================================
-
-            Return ONLY valid JSON.
-
-            {
+                },
                 \"timeline\": {
                     \"major_historical_events\": [
                         {
@@ -2185,9 +965,9 @@ class AiPromptGeneratorHelper
                         {
                             \"name\": \"\",
                             \"projected_course\": \"\",
-                            \"possible_outcomes\": [],
                             \"relationship_to_climax_direction\": \"\",
-                            \"relationship_to_resolution_direction\": \"\"
+                            \"relationship_to_resolution_direction\": \"\",
+                            \"possible_outcomes\": []
                         }
                     ],
                     \"key_turning_points\": [
@@ -2205,46 +985,123 @@ class AiPromptGeneratorHelper
             }
 
             ==================================================
-            FINAL CHECK
+            VALIDATION REQUIREMENTS
             ==================================================
 
             Before returning the result, verify:
 
-                - Timeline events directly support the existing world bible.
-                - Timeline events include the rise and fall of the existing factions.
-                - Timeline events connect with the existing foundation.
-                - The chronology is internally consistent.
-                - No event contradicts the established world.
-                - No unnecessary events are created.
-                - Key turning points change the direction of the story.
-                - No complete creature databases are created.
-                - No dynamic system rules are created.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
+                - All eight phases are present in the response.
+                - The title represents the novel's identity and the subtitle supports it.
+                - The premise is distinctive and the foundation has a clear narrative direction.
+                - The protagonist has a meaningful motivation and goal, the central conflict is meaningful, and the opposing force creates genuine obstacles.
+                - Stakes and consequences are clear, major complications logically develop the conflict, and discoveries and turning points meaningfully affect the story.
+                - Escalation leads naturally toward the climax and the resolution direction fits the story.
+                - Themes are connected to the narrative.
+                - The main character supports the central conflict, supporting characters have clear narrative purposes, and opposing characters create meaningful obstacles.
+                - Character motivations are believable, relationships support the story, and character arcs connect with themes.
+                - No unnecessary characters, biographies, locations, factions, creatures, or systems are created.
+                - The world is internally consistent, cultures connect naturally with the characters, and rules and systems are clear and consistent.
+                - No location contradicts the established world, and locations are ones the characters can inhabit.
+                - Factions emerge from the world, operate in the locations, and do not contradict the world bible.
+                - Creatures belong in the world, inhabit the locations, and relate to the factions.
+                - Systems are consistent with the world and connect to creatures and factions.
+                - The timeline extends the world history, covers the factions, and aligns with the foundation.
+                - The story feels original and professionally developed rather than generic, mechanical, or formulaic.
+                - Genre, novel type, audience, and additional novel information requirements are properly integrated.
+                - The requested language is respected in every value.
+                - The response is valid JSON only, with no explanation, markdown, or additional text outside the JSON.
         " . self::jsonOutputContract();
 
         return $prompt;
     }
 
-    public static function step9Prompt(): string
+    public static function planChapterPrompt(): string
     {
         $prompt = "
-            You are a professional novel story structure development AI.
+            You are a professional novel planning AI.
 
-            Your task is to create the complete high-level structure of a professionally developed novel.
-
-            This step focuses only on creating the story structure required to support the existing story foundation, characters, world bible, and timeline.
+            Your task is to turn an already developed story and world package into the complete narrative plan of a novel: its structure, its hidden layers, its scenes, its chapters, its pages, and the writing blueprint of every chapter.
 
             ==================================================
-            PRIMARY RESPONSIBILITY
+            OVERALL OBJECTIVE
             ==================================================
 
-            Generate:
+            You are performing the equivalent of a seven phase professional novel planning pipeline inside this single request.
 
-                1. Overall Story Structure
-                2. Selected Structure Type
-                3. Story Arcs
+            The phases are not separate documents. They are one continuous planning process in which each phase is derived from the result of the phase before it.
+
+            Execute them internally, in the order given, and return one single JSON object that contains the result of every phase.
+
+            The result of this request becomes the authoritative plan that a later request uses to write the prose of each chapter. It must therefore be internally consistent, specific, and complete.
+
+            ==================================================
+            INPUT DATA
+            ==================================================
+
+            The story and world package below is already final. Treat it as the source of truth. Analyse it carefully, build on it, and never change, rewrite, or expand it.
+
+            NOVEL FOUNDATION:
+
+            {{foundation}}
+
+            CHARACTERS:
+
+            {{characters}}
+
+            WORLD BIBLE:
+
+            {{world_bible}}
+
+            LOCATIONS:
+
+            {{locations}}
+
+            FACTIONS:
+
+            {{factions}}
+
+            CREATURES:
+
+            {{creatures}}
+
+            SYSTEMS:
+
+            {{systems}}
+
+            TIMELINE:
+
+            {{timeline}}
+
+            ==================================================
+            IMPORTANT GLOBAL RULES
+            ==================================================
+
+            1. Run the phases below in order. A later phase must consume the result of the earlier phases instead of reinventing it.
+
+            2. Everything you decide in a phase is the source of truth for every later phase. Never contradict, rename, or silently replace a character, a location, a faction, a creature, a system, a rule, a motive, or a date that an earlier phase or the input package already established.
+
+            3. The input package is read-only. If the plan needs a detail the package does not contain, introduce it as an addition that fits the package. Never rewrite the package to make the plan easier.
+
+            4. Generate every string value in the requested language, with natural vocabulary, grammar, tone, cultural expression, and writing style appropriate for that language.
+
+            5. Avoid generic, predictable, formulaic, repetitive, mechanical, or shallow planning. Every element must be specific, consequential, and connected.
+
+            6. Every phase must stay inside its own scope. Never write prose chapters.
+
+            ==================================================
+            LOGICAL GENERATION PIPELINE
+            ==================================================
+
+            PHASE 1 - STORY STRUCTURE
+            ------------------------------------------
+
+            Consumes: the foundation, the characters, the world bible, and the timeline from the input package.
+
+            Responsibility:
+
+                1. Structure Type Selection
+                2. Overall Story Structure
+                3. Act and Arc Breakdown
                 4. Main Plot Progression
                 5. Key Story Points
                 6. Rising Action
@@ -2252,257 +1109,339 @@ class AiPromptGeneratorHelper
                 8. Resolution
                 9. High Level Chapter Outline
 
-            ==================================================
-            EXISTING NOVEL FOUNDATION
-            ==================================================
+            Select a single high-level structure type for the novel. If the story requires a distinctive shape, use a custom structure and explain how it works.
 
-            {{foundation}}
+            The overall story structure must define:
 
-            Carefully analyze the existing novel foundation.
-
-            Understand:
-
-                - Story premise
-                - Story concept
-                - Narrative direction
-                - Central conflict
-                - Opposing force
-                - Stakes
-                - Consequences
-                - Climax direction
+                - Overall story structure
+                - Structure type
+                - Resolution
                 - Resolution direction
-                - Themes
+
+            The act and arc breakdown must define, for each act:
+
+                - Act
+                - Act title
+                - Act purpose
+                - Key developments
+
+            The story arcs must define:
+
+                - Arc name
+                - Arc type
+                - Arc development
+                - Arc resolution
+
+            The main plot progression must define:
+
+                - Stage
+                - Progression
+                - Function in the story
+
+            The key story points must define:
+
+                - Story point
+                - Story point type
+                - Where it occurs
+                - Narrative impact
+
+            Rising action must show how tension builds before the climax.
+
+            The climax must define:
+
+                - Climax point
+                - Climax event
+                - Stakes at climax
+                - Main characters involved
+                - Climax impact
+
+            The resolution must define how the story concludes.
+
+            The high level chapter outline must define, for each chapter:
+
+                - Chapter
+                - Chapter title
+                - Chapter purpose
+                - Key events
+                - Story structure placement
+
+            Build the structure so the characters' arcs, conflicts, and turning points fit naturally into the narrative, so the events, acts, and arcs are consistent with the established world, and so the acts, arcs, and chapters align with the established chronology.
+
+            Scope limits:
+
+                - Keep the chapter outline high level. Do not create scene-level planning in this phase, and do not write any prose.
+
+            PHASE 2 - TWISTS AND FORESHADOWING
+            ------------------------------------------
+
+            Consumes: the story structure from phase 1, the characters from the input package, and the world bible from the input package.
+
+            Responsibility:
+
+                1. Major Twists
+                2. Hidden Clues
+                3. Secrets and Hidden Information
+                4. Mysteries
+                5. Foreshadowing Elements
+                6. Misdirection Elements
+                7. Reveal Timing
+                8. Connection With Story
+
+            Major twists must define:
+
+                - Twist name
+                - Twist description
+                - Twist type
+                - Affected characters
+                - Reveal timing
+                - Story impact
+
+            Hidden clues must define:
+
+                - Clue
+                - Clue type
+                - Planted where
+                - Planted when
+                - Connects to
+                - How hidden
+
+            Secrets and hidden information must define:
+
+                - Hidden information
+                - Who knows
+                - Who does not know
+                - Why hidden
+                - When relevant
+
+            Mysteries must define:
+
+                - Mystery
+                - Mystery established
+                - Unresolved until
+                - Resolution connection
+
+            Foreshadowing elements must define:
+
+                - Foreshadowed element
+                - Planted where
+                - How presented
+                - Prepares
+                - Narrative effect
+
+            Misdirection elements must define:
+
+                - False impression
+                - How presented
+                - Reader belief
+                - True reveal
+
+            Reveal timing must define, for each important realization:
+
+                - Revealed connection
+                - Reveal time
+                - Reveal context
+                - Reader effect
+
+            The connection with the story must state how the hidden elements connect with the overall story.
+
+            Twists must fit naturally into the established structure, must connect meaningfully with the characters, their secrets, and their development, and must be consistent with the established world.
+
+            Scope limits:
+
+                - Do not change the story structure, and do not introduce elements the story structure does not support.
+
+            PHASE 3 - SCENE PLANS
+            ------------------------------------------
+
+            Consumes: the story structure from phase 1, the twists and foreshadowing from phase 2, and the locations from the input package.
+
+            Responsibility:
+
+                1. Scene List
+                2. Scene Objectives
+                3. Key Events per Scene
+                4. Involved Characters
+                5. Location
+                6. Time Period
+                7. Scene Purpose
+                8. Emotional Direction
+
+            Establish the complete ordered list of scenes that make up the story. Scene order must follow the established story structure and chapter outline. Scene numbering must be sequential.
+
+            Each scene must define:
+
+                - Scene number and title
+                - Position within the story
+                - Which chapter it belongs to
+                - Scene objectives
+                - Key events
+                - Involved characters
+                - Location
+                - Time period
+                - Scene purpose
                 - Emotional direction
 
-            Build the story structure to naturally serve the existing foundation.
+            Scene objectives must state the main objective of the scene, the secondary objectives, what the scene must establish or resolve, and how the objective advances the plot.
 
-            Do not change, rewrite, or expand the foundation.
+            Key events must state the sequence of important events, the significant discoveries or revelations, the turning points within the scene, and the consequences that carry into later scenes.
 
-            The existing novel foundation is the source of truth.
+            Involved characters must list only the characters who are essential to the scene, the role each of them plays in it, and the characters whose goals or conflicts are affected.
 
-            ==================================================
-            EXISTING CHARACTERS
-            ==================================================
+            Location must assign each scene to an existing location and state how that location influences the scene's events and mood.
 
-            {{characters}}
+            Time period must state the point in the story timeline, any time shifts or gaps, and how the timing affects the scene.
 
-            Carefully analyze the existing characters.
+            Scene purpose must state the dramatic purpose of the scene and what it contributes to the characters, the plot, and the themes.
 
-            Understand:
+            Emotional direction must state the primary emotion of the scene, how the emotion shifts during the scene, and the emotional state the scene leaves for the reader.
 
-                - Main character
-                - Supporting characters
-                - Opposing characters
-                - Character motivations and goals
-                - Character relationships
-                - Character arcs
+            The revealed clues, the foreshadowing, and the reveals from phase 2 must be planted in the correct scenes. Every scene must be connected to the next through cause and effect.
 
-            Build the story structure around the characters so their arcs, conflicts, and turning points fit naturally into the narrative.
+            Scope limits:
 
-            Do not change, rewrite, or expand the characters.
+                - Do not create dialogue scripts, full prose for scenes, or full chapter drafts.
 
-            The existing characters are the source of truth.
+            PHASE 4 - DIALOGUE PLANS
+            ------------------------------------------
 
-            ==================================================
-            EXISTING WORLD BIBLE
-            ==================================================
+            Consumes: the characters from the input package and the scene plans from phase 3.
 
-            {{world_bible}}
+            Responsibility: plan only the dialogues that are important to the story and that are directly connected to existing scenes.
 
-            Carefully analyze the existing world bible.
+            Each dialogue must define:
 
-            Understand:
+                - The scene it belongs to, using the scene number of phase 3
+                - Involved characters
+                - Conversation context
+                - Dialogue purpose
+                - Emotional direction
+                - Character voice and tone
+                - Emotional beats
+                - The dialogue itself
+                - Relationship development
 
-                - World overview
-                - History and lore
-                - Cultures and societies
-                - Rules and systems
-                - Key world elements
+            The dialogue must stay consistent with the established scene objective and emotional direction, must use only characters from the input package, and must develop character relationships in a way that strengthens the story.
 
-            Build the story structure so the events, acts, and arcs are consistent with the established world.
+            Do not create a dialogue plan for a scene that does not need one.
 
-            Do not change, rewrite, or expand the world bible.
+            Scope limits:
 
-            The existing world bible is the source of truth.
+                - Do not create full prose narrative or final novel text.
 
-            ==================================================
-            EXISTING TIMELINE
-            ==================================================
+            PHASE 5 - CHAPTER PLAN
+            ------------------------------------------
 
-            {{timeline}}
+            Consumes: the scene plans from phase 3 and the story structure from phase 1.
 
-            Carefully analyze the existing timeline.
+            Responsibility:
 
-            Understand:
+                1. Chapter Organization
+                2. Chapter Sequence
+                3. Chapter Summaries
+                4. Scenes inside Each Chapter
+                5. Pacing and Flow
+                6. Chapter Goals
 
-                - Chronological events
-                - Key turning points
-                - Periods of change
-                - World and faction developments
+            Organize every existing scene into a logical chapter sequence. Every scene from phase 3 must belong to exactly one chapter, and every scene reference must match a scene number from phase 3.
 
-            Build the story structure so the acts, arcs, and chapters align with the established chronology.
+            For each chapter:
 
-            Do not change, rewrite, or expand the timeline.
+                - Assign a chapter number. Chapter numbers must start at 1 and increase by exactly 1 with no gaps and no duplicates.
+                - Write a chapter title.
+                - Write a chapter summary.
+                - List the scenes inside the chapter.
+                - Define the chapter goals.
+                - Describe the pacing and flow.
+                - Maintain narrative tension across the chapter sequence.
 
-            The existing timeline is the source of truth.
+            Organize the chapters so they faithfully follow the established story structure.
 
-            ==================================================
-            STRUCTURE TYPE SELECTION
-            ==================================================
+            Scope limits:
 
-            Select a single high-level structure type for the novel.
+                - Do not write prose, and do not write the final novel text.
 
-            Available structure types:
+            PHASE 6 - PAGE PLAN
+            ------------------------------------------
 
-                - 3 Act Structure
-                - 5 Act Structure
-                - Hero Journey
-                - Custom structure
+            Consumes: the chapter plan from phase 5 and the scene plans from phase 3.
 
-            Choose the type that best fits the story's natural progression, genre, and emotional journey.
+            Responsibility: break every chapter down into a practical page-level writing structure.
 
-            If the story requires a distinctive shape, use a custom structure and explain how it works.
+            Each page must define:
 
-            ==================================================
-            ACT AND ARC BREAKDOWN REQUIREMENTS
-            ==================================================
+                - Page number
+                - Chapter reference
+                - Estimated word count
+                - Content summary
+                - Scenes covered
+                - Key points
 
-            Break the novel into meaningful acts and arcs.
+            Page numbering must be sequential across the whole novel, chapter references must match the chapter numbers from phase 5, and every scene covered must match a scene number from phase 3.
 
-            The act breakdown should define:
+            Scope limits:
 
-                - Act name and position
-                - Purpose of the act
-                - Key developments within the act
-                - How the act moves the story forward
+                - Do not write prose, and do not write the final novel text.
 
-            Story arcs should define:
+            PHASE 7 - CHAPTER SUMMARIES
+            ------------------------------------------
 
-                - Arc name and type
-                - How the arc develops over the story
-                - How the arc resolves
-                - How the arc connects to the central conflict and themes
+            Consumes: the chapter plan from phase 5, the scene plans from phase 3, the story structure from phase 1, the twists and foreshadowing from phase 2, the foundation, and the characters from the input package.
 
-            ==================================================
-            MAIN PLOT PROGRESSION REQUIREMENTS
-            ==================================================
+            Responsibility: generate one writing blueprint for every chapter of the chapter plan from phase 5, in chapter number order, with exactly one entry per chapter and no chapter omitted.
 
-            Establish the logical progression of the main plot.
+            Each entry must define the chapter number, the chapter title, and the chapter summary.
 
-            The main plot progression should define:
+            Each chapter summary must capture:
 
-                - The stages of the story
-                - What happens at each stage
-                - How each stage connects to the next
-                - How the plot escalates toward the climax
+                - Chapter purpose: why this chapter exists and what it must accomplish.
+                - Chapter goals: the goals this chapter must achieve for the story.
+                - Characters involved: the characters present and their role in the chapter.
+                - Important events: the key events that occur in this chapter.
+                - Relevant conflicts: the conflicts that develop or resolve in this chapter.
+                - Progression: how the chapter advances the overall story and the character arcs.
+                - Important revelations: discoveries, reveals, or twists that occur.
+                - Emotional and narrative movement: the emotional arc of the chapter.
+                - Scene progression: the ordered scenes and how they build the chapter.
+                - Continuity requirements: elements that must remain consistent with the rest of the novel.
+                - Chapter ending and setup: how the chapter ends and what it sets up for the next chapter.
 
-            ==================================================
-            KEY STORY POINTS REQUIREMENTS
-            ==================================================
+            Position each chapter correctly within the overall story progression, follow the scene plans of that chapter exactly, reflect the relevant twists and foreshadowing where appropriate, and preserve the intended chapter structure of phase 5.
 
-            Establish the most important moments in the story.
+            Scope limits:
 
-            Key story points should define:
-
-                - The nature of each story point
-                - Where it occurs in the structure
-                - Its narrative impact
-                - Its connection to the main plot
+                - Do not write the prose of any chapter.
+                - Do not write the full novel.
 
             ==================================================
-            RISING ACTION REQUIREMENTS
+            DEPENDENCY RULES
             ==================================================
 
-            Establish how tension builds before the climax.
+            The following dependencies are mandatory. They are the reason the phases must be executed in order.
 
-            Rising action should define:
+                Phase 1 must fit the foundation, the characters, the world, and the chronology of the input package.
+                Phase 2 must fit the structure of phase 1, the characters, and the world.
+                Phase 3 must follow the structure of phase 1, must plant the hidden elements of phase 2, and must use the locations of the input package.
+                Phase 4 must support scenes from phase 3 and must use only the characters of the input package.
+                Phase 5 must group the scenes of phase 3 into chapters and must follow the structure of phase 1.
+                Phase 6 must break the chapters of phase 5 into pages and must map only the scenes of phase 3.
+                Phase 7 must write exactly one summary per chapter of phase 5, and each summary must follow the scenes of phase 3 that belong to that chapter.
 
-                - The sequence of escalating events
-                - How complications increase
-                - How discoveries and turning points raise the stakes
-                - How the story approaches the climax
-
-            ==================================================
-            CLIMAX REQUIREMENTS
-            ==================================================
-
-            Establish the turning point of the story.
-
-            Climax information should define:
-
-                - The climax point within the structure
-                - The central climax event
-                - The characters most involved
-                - The stakes at the climax
-                - The emotional and narrative impact of the climax
+            The same story elements must never appear under two different names. A character, a location, a faction, a creature, a system, a scene, or a chapter referenced in a later phase must be referenced by the exact identifier that the earlier phase used.
 
             ==================================================
-            RESOLUTION REQUIREMENTS
+            FINAL OUTPUT REQUIREMENTS
             ==================================================
 
-            Establish how the story concludes.
+            Return one single JSON object that contains the result of all seven phases.
 
-            Resolution should define:
+            Do not split the phases across separate responses.
 
-                - How the central conflict is resolved
-                - What happens to the main characters
-                - How the themes reach their conclusion
-                - The resolution direction that provides a meaningful ending
+            Do not return the phases one at a time.
 
-            ==================================================
-            HIGH LEVEL CHAPTER OUTLINE REQUIREMENTS
-            ==================================================
-
-            Establish a high level chapter-by-chapter outline.
-
-            This outline must remain high level and must not create detailed scene-level planning.
-
-            Each chapter should define:
-
-                - Chapter position and title
-                - Chapter purpose within the structure
-                - Key events of the chapter
-                - Where the chapter sits in the story structure
+            Do not merge two phases into one field, and do not rename a field.
 
             ==================================================
-            STRUCTURE QUALITY
-            ==================================================
-
-            The story structure must be:
-
-                - Original
-                - Coherent
-                - Logically consistent
-                - Suited to the genre and novel type
-                - Meaningfully connected to the characters and conflict
-                - Professionally developed
-
-            Avoid:
-
-                - Generic structures
-                - Random events
-                - Contradictory progressions
-                - Structures that do not serve the story
-
-            ==================================================
-            OUTPUT SCOPE
-            ==================================================
-
-            This generation creates only the high level story structure.
-
-            Do not generate:
-
-                - Detailed scene-by-scene plans
-                - Scene objectives
-                - Detailed character actions within scenes
-                - Dialogue scripts
-                - Full prose chapters
-                - Full chapter drafts
-
-            Keep the chapter outline high level and focused on the story structure required for future novel development.
-
-            ==================================================
-            OUTPUT FORMAT
+            JSON STRUCTURE
             ==================================================
 
             Return ONLY valid JSON.
@@ -2546,8 +1485,8 @@ class AiPromptGeneratorHelper
                     \"climax\": {
                         \"climax_point\": \"\",
                         \"climax_event\": \"\",
-                        \"main_characters_involved\": [],
                         \"stakes_at_climax\": \"\",
+                        \"main_characters_involved\": [],
                         \"climax_impact\": \"\"
                     },
                     \"resolution\": \"\",
@@ -2561,294 +1500,15 @@ class AiPromptGeneratorHelper
                             \"story_structure_placement\": \"\"
                         }
                     ]
-                }
-            }
-
-            ==================================================
-            FINAL CHECK
-            ==================================================
-
-            Before returning the result, verify:
-
-                - The story structure directly supports the existing foundation.
-                - The story structure supports the existing characters.
-                - The story structure is consistent with the existing world bible.
-                - The story structure aligns with the existing timeline.
-                - A single clear structure type is selected.
-                - The act and arc breakdown is coherent.
-                - The main plot progression is logical and interconnected.
-                - Key story points meaningfully shape the narrative.
-                - Rising action naturally escalates toward the climax.
-                - The climax is the emotional and narrative turning point.
-                - The resolution provides a meaningful conclusion.
-                - The high level chapter outline is consistent and high level only.
-                - No detailed scene plan is created.
-                - No dialogue scripts are created.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
-        " . self::jsonOutputContract();
-
-        return $prompt;
-    }
-
-    public static function step10Prompt(): string
-    {
-        $prompt = "
-            You are a professional novel twist and foreshadowing development AI.
-
-            Your task is to create hidden story elements that improve the narrative depth of a professionally developed novel.
-
-            This step focuses only on creating the twists, clues, secrets, mysteries, and foreshadowing required to support the existing story structure.
-
-            ==================================================
-            PRIMARY RESPONSIBILITY
-            ==================================================
-
-            Generate:
-
-                1. Major Twists
-                2. Hidden Clues
-                3. Secrets
-                4. Mysteries
-                5. Foreshadowing Elements
-                6. Misdirection Elements
-                7. Connection Between Clues and Final Reveal
-                8. Reveal Timing
-
-            ==================================================
-            EXISTING STORY STRUCTURE
-            ==================================================
-
-            {{story_structure}}
-
-            Carefully analyze the existing story structure.
-
-            Understand:
-
-                - Overall story structure
-                - Structure type
-                - Act and arc breakdown
-                - Main plot progression
-                - Key story points
-                - Rising action
-                - Climax
-                - Resolution
-                - High level chapter outline
-
-            Create twists and foreshadowing that fit naturally into the established structure.
-
-            Do not change, rewrite, or expand the story structure.
-
-            The existing story structure is the source of truth.
-
-            ==================================================
-            EXISTING CHARACTERS
-            ==================================================
-
-            {{characters}}
-
-            Carefully analyze the existing characters.
-
-            Understand:
-
-                - Main character
-                - Supporting characters
-                - Opposing characters
-                - Character motivations and goals
-                - Character relationships
-                - Character arcs
-
-            Create twists that connect meaningfully with the characters, their secrets, and their development.
-
-            Do not change, rewrite, or expand the characters.
-
-            The existing characters are the source of truth.
-
-            ==================================================
-            EXISTING WORLD BIBLE
-            ==================================================
-
-            {{world_bible}}
-
-            Carefully analyze the existing world bible.
-
-            Understand:
-
-                - World overview
-                - History and lore
-                - Cultures and societies
-                - Rules and systems
-                - Key world elements
-                - Secrets and forgotten knowledge
-
-            Create twists and hidden information that are consistent with the established world.
-
-            Do not change, rewrite, or expand the world bible.
-
-            The existing world bible is the source of truth.
-
-            ==================================================
-            MAJOR TWISTS REQUIREMENTS
-            ==================================================
-
-            Establish the major narrative twists of the story.
-
-            Each major twist should define:
-
-                - Twist name
-                - Twist description
-                - Twist type
-                - Reveal timing within the structure
-                - Characters affected by the twist
-                - Impact on the story
-
-            ==================================================
-            HIDDEN CLUES REQUIREMENTS
-            ==================================================
-
-            Establish the clues that support the twists and reveals.
-
-            Each hidden clue should define:
-
-                - The clue itself
-                - Clue type
-                - Where the clue is planted
-                - When the clue is planted
-                - What the clue connects to
-                - How the clue is hidden from the reader
-
-            ==================================================
-            SECRETS AND HIDDEN INFORMATION REQUIREMENTS
-            ==================================================
-
-            Establish the information that is intentionally hidden.
-
-            Hidden information should define:
-
-                - What is hidden
-                - Who knows it
-                - Who does not know it
-                - Why it is hidden
-                - When it becomes relevant
-
-            ==================================================
-            MYSTERIES REQUIREMENTS
-            ==================================================
-
-            Establish the mysteries that drive reader curiosity.
-
-            Each mystery should define:
-
-                - The mystery itself
-                - How the mystery is established
-                - When the mystery remains unresolved
-                - How the mystery connects to its resolution
-
-            ==================================================
-            FORESHADOWING REQUIREMENTS
-            ==================================================
-
-            Establish the foreshadowing elements of the story.
-
-            Foreshadowing should define:
-
-                - What is foreshadowed
-                - Where the foreshadowing is planted
-                - How it is presented so it does not feel forced
-                - What event or reveal it prepares
-                - The emotional or narrative effect
-
-            ==================================================
-            MISDIRECTION REQUIREMENTS
-            ==================================================
-
-            Establish the misdirection elements that lead readers toward false conclusions.
-
-            Misdirection should define:
-
-                - The false impression created
-                - How the misdirection is presented
-                - What the reader is encouraged to believe
-                - How the true reveal contradicts the misdirection
-
-            ==================================================
-            REVEAL TIMING REQUIREMENTS
-            ==================================================
-
-            Establish when each important realization surfaces in the story.
-
-            Reveal timing should define:
-
-                - The twist or connection being revealed
-                - When the reveal occurs
-                - The context of the reveal
-                - The effect on the reader and the story
-
-            ==================================================
-            CONNECTION WITH STORY REQUIREMENTS
-            ==================================================
-
-            Establish how the hidden elements connect with the overall story.
-
-            Connection with story should define:
-
-                - How each twist connects to the main plot
-                - How clues lead naturally toward the final reveal
-                - How the hidden elements reinforce the themes
-                - How the reveals change the reader's understanding of earlier events
-
-            ==================================================
-            TWIST AND FORESHADOWING QUALITY
-            ==================================================
-
-            The hidden elements must feel:
-
-                - Original
-                - Fair to the reader
-                - Logically supported by the planted clues
-                - Consistent with the story structure
-                - Connected to the characters and world
-                - Professionally developed
-
-            Avoid:
-
-                - Random twists
-                - Contradictory reveals
-                - Unfair surprises without planted groundwork
-                - Foreshadowing that feels forced or obvious
-                - Hidden elements that do not serve the story
-
-            ==================================================
-            OUTPUT SCOPE
-            ==================================================
-
-            This generation creates only the twist and foreshadowing foundation.
-
-            Do not generate:
-
-                - Detailed scene-by-scene plans
-                - Dialogue scripts
-                - Full chapters
-                - Complete scene plans
-
-            Keep the hidden elements focused on information required for future novel development.
-
-            ==================================================
-            OUTPUT FORMAT
-            ==================================================
-
-            Return ONLY valid JSON.
-
-            {
+                },
                 \"twists_and_foreshadowing\": {
                     \"major_twists\": [
                         {
                             \"twist_name\": \"\",
                             \"twist_description\": \"\",
                             \"twist_type\": \"\",
-                            \"reveal_timing\": \"\",
                             \"affected_characters\": [],
+                            \"reveal_timing\": \"\",
                             \"story_impact\": \"\"
                         }
                     ],
@@ -2906,278 +1566,7 @@ class AiPromptGeneratorHelper
                         }
                     ],
                     \"connection_with_story\": []
-                }
-            }
-
-            ==================================================
-            FINAL CHECK
-            ==================================================
-
-            Before returning the result, verify:
-
-                - The twists fit naturally into the existing story structure.
-                - The twists connect meaningfully with the existing characters.
-                - The hidden information is consistent with the existing world bible.
-                - Major twists are described clearly and purposefully.
-                - Clues are hidden naturally and fairly.
-                - Secrets and hidden information serve the story.
-                - Mysteries drive sustained reader curiosity.
-                - Foreshadowing elements prepare future reveals without feeling forced.
-                - Misdirection elements create meaningful surprise.
-                - Reveal timing supports the emotional impact of each reveal.
-                - The hidden elements connect logically with the final reveal.
-                - No detailed scene plan is created.
-                - No dialogue scripts are created.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
-        " . self::jsonOutputContract();
-
-        return $prompt;
-    }
-
-    public static function step11Prompt(): string
-    {
-        $prompt = "
-            You are a professional novel scene planning AI.
-
-            Your task is to break a professionally developed novel into individual scenes.
-
-            This step focuses only on creating the scene-level breakdown required to support the existing story structure, twists and foreshadowing, and locations.
-
-            ==================================================
-            PRIMARY RESPONSIBILITY
-            ==================================================
-
-            Generate:
-
-                1. Scene List
-                2. Scene Objectives
-                3. Key Events per Scene
-                4. Involved Characters
-                5. Location
-                6. Time Period
-                7. Scene Purpose
-                8. Emotional Direction
-
-            ==================================================
-            EXISTING STORY STRUCTURE
-            ==================================================
-
-            {{story_structure}}
-
-            Carefully analyze the existing story structure.
-
-            Understand:
-
-                - Overall story structure
-                - Structure type
-                - Act and arc breakdown
-                - Main plot progression
-                - Key story points
-                - Rising action
-                - Climax
-                - Resolution
-                - High level chapter outline
-
-            Create individual scenes that faithfully follow the established story structure.
-
-            Do not change, rewrite, or expand the story structure.
-
-            The existing story structure is the source of truth.
-
-            ==================================================
-            EXISTING TWISTS AND FORESHADOWING
-            ==================================================
-
-            {{twists_and_foreshadowing}}
-
-            Carefully analyze the existing twists and foreshadowing.
-
-            Understand:
-
-                - Major twists
-                - Hidden clues
-                - Secrets and hidden information
-                - Mysteries
-                - Foreshadowing elements
-                - Misdirection elements
-                - Reveal timing
-                - Connection with the story
-
-            Place the revealed clues, foreshadowing, and reveals into the correct scenes.
-
-            Do not change, rewrite, or expand the twists and foreshadowing.
-
-            The existing twists and foreshadowing are the source of truth.
-
-            ==================================================
-            EXISTING LOCATIONS
-            ==================================================
-
-            {{locations}}
-
-            Carefully analyze the existing locations.
-
-            Understand:
-
-                - Major locations
-                - Cities and regions
-                - Important places
-                - Environment details
-                - Location significance
-
-            Assign each scene to a location that naturally supports the events of the scene.
-
-            Do not change, rewrite, or expand the locations.
-
-            The existing locations are the source of truth.
-
-            ==================================================
-            SCENE LIST REQUIREMENTS
-            ==================================================
-
-            Establish the complete ordered list of scenes that make up the story.
-
-            Scene order must follow the established story structure and chapter outline.
-
-            Each scene should define:
-
-                - Scene number and title
-                - Position within the story
-                - Which chapter it belongs to
-                - How it connects to the act and arc structure
-
-            ==================================================
-            SCENE OBJECTIVES REQUIREMENTS
-            ==================================================
-
-            Establish what each scene must accomplish.
-
-            Scene objectives should define:
-
-                - The main objective of the scene
-                - Secondary objectives
-                - What the scene must establish or resolve
-                - How the objective advances the plot
-
-            ==================================================
-            KEY EVENTS REQUIREMENTS
-            ==================================================
-
-            Establish the important events that occur in each scene.
-
-            Key events should define:
-
-                - The sequence of important events
-                - Significant discoveries or revelations
-                - Turning points within the scene
-                - Consequences that carry into later scenes
-
-            ==================================================
-            INVOLVED CHARACTERS REQUIREMENTS
-            ==================================================
-
-            Establish which characters appear in each scene.
-
-            Involved characters should define:
-
-                - Characters present in the scene
-                - The role each character plays in the scene
-                - Characters whose goals or conflicts are affected
-
-            Only include characters that are essential to the scene.
-
-            ==================================================
-            LOCATION REQUIREMENTS
-            ==================================================
-
-            Establish where each scene takes place.
-
-            Location should define:
-
-                - The specific location of the scene
-                - How the location influences the scene's events and mood
-                - Consistency with the existing locations
-
-            ==================================================
-            TIME PERIOD REQUIREMENTS
-            ==================================================
-
-            Establish when each scene takes place.
-
-            Time period should define:
-
-                - The point in the story timeline
-                - Any time shifts or gaps
-                - How the timing affects the scene
-
-            ==================================================
-            SCENE PURPOSE REQUIREMENTS
-            ==================================================
-
-            Establish why each scene exists in the story.
-
-            Scene purpose should define:
-
-                - The dramatic purpose of the scene
-                - What it contributes to the characters
-                - What it contributes to the plot
-                - What it contributes to the themes
-
-            ==================================================
-            EMOTIONAL DIRECTION REQUIREMENTS
-            ==================================================
-
-            Establish the emotional tone of each scene.
-
-            Emotional direction should define:
-
-                - The primary emotion of the scene
-                - How the emotion shifts during the scene
-                - The emotional state the scene leaves for the reader
-
-            ==================================================
-            SCENE QUALITY
-            ==================================================
-
-            The scenes must be:
-
-                - Ordered logically according to the story structure
-                - Connected through cause and effect
-                - Consistent with the characters and world
-                - Supportive of the twists and foreshadowing
-                - Professionally developed
-
-            Avoid:
-
-                - Random scenes
-                - Unnecessary scenes
-                - Scenes that contradict the story structure
-                - Scenes that do not serve the story
-
-            ==================================================
-            OUTPUT SCOPE
-            ==================================================
-
-            This generation creates only the scene plan foundation.
-
-            Do not generate:
-
-                - Dialogue scripts
-                - Full prose for scenes
-                - Full chapter drafts
-                - Detailed character actions within scenes
-
-            Keep the scene plans focused on information required for future novel development.
-
-            ==================================================
-            OUTPUT FORMAT
-            ==================================================
-
-            Return ONLY valid JSON.
-
-            {
+                },
                 \"scene_plans\": [
                     {
                         \"scene_number\": \"\",
@@ -3192,139 +1581,7 @@ class AiPromptGeneratorHelper
                         \"scene_purpose\": \"\",
                         \"emotional_direction\": \"\"
                     }
-                ]
-            }
-
-            ==================================================
-            FINAL CHECK
-            ==================================================
-
-            Before returning the result, verify:
-
-                - Scenes follow the existing story structure faithfully.
-                - Scenes place the planted clues and reveals correctly.
-                - Scenes use locations consistently with the existing locations.
-                - Scene order is logical and connected through cause and effect.
-                - Each scene has clear objectives.
-                - Key events advance the plot meaningfully.
-                - Only essential characters are included.
-                - Time periods are consistent with the story timeline.
-                - Each scene has a clear purpose.
-                - Emotional direction supports the narrative tone.
-                - No dialogue scripts are created.
-                - No full prose is created.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
-        " . self::jsonOutputContract();
-
-        return $prompt;
-    }
-
-    public static function step12Prompt(): string
-    {
-        $prompt = "
-            You are a professional novel dialogue planning AI.
-
-            Your task is to create important dialogues between characters before the final novel is written.
-
-            This step focuses only on creating the dialogue-level details required to support the existing scene plans and character development.
-
-            ==================================================
-            PRIMARY RESPONSIBILITY
-            ==================================================
-
-            Generate:
-
-                1. Important Dialogues
-                2. Conversation Context
-                3. Character Voice and Tone
-                4. Emotional Beats
-                5. Dialogue Purpose
-                6. Relationship Development through Dialogue
-
-            ==================================================
-            EXISTING CHARACTERS
-            ==================================================
-
-            {{characters}}
-
-            Carefully analyze the existing characters.
-
-            Understand:
-
-                - Character names and roles
-                - Character personalities
-                - Character backgrounds
-                - Character motivations
-                - Character relationships
-                - Speech patterns
-                - Voice and tone
-                - Emotional tendencies
-                - Character arcs
-                - Conflicts
-
-            Use the characters to create realistic and consistent dialogue.
-
-            Do not change, rewrite, or expand the characters.
-
-            The existing characters are the source of truth.
-
-            ==================================================
-            EXISTING SCENE PLANS
-            ==================================================
-
-            {{scene_plans}}
-
-            Carefully analyze the existing scene plans.
-
-            Understand:
-
-                - Scene list
-                - Scene objectives
-                - Key events per scene
-                - Involved characters per scene
-                - Locations
-                - Time periods
-                - Scene purpose
-                - Emotional direction
-
-            Create important dialogues that faithfully support the existing scene plans.
-
-            Do not change, rewrite, or expand the scene plans.
-
-            The existing scene plans are the source of truth.
-
-            ==================================================
-            DIALOGUE PLANNING REQUIREMENTS
-            ==================================================
-
-            Only create dialogues that are important to the story and directly connected to existing scenes.
-
-            For each important dialogue:
-
-                - Identify the scene it belongs to.
-                - Identify the characters involved.
-                - Establish the conversation context.
-                - Define the character voice and tone for each speaker.
-                - Define the emotional beats.
-                - Define the dialogue purpose.
-                - Show how the dialogue develops character relationships.
-                - Keep the dialogue consistent with the established scene objective and emotional direction.
-
-            Do not create full prose narrative.
-
-            Do not write final novel text.
-
-            Do not include characters not present in the existing characters.
-
-            ==================================================
-            OUTPUT FORMAT
-            ==================================================
-
-            Return the result strictly as valid JSON with the following structure:
-
-            {
+                ],
                 \"dialogue_plans\": [
                     {
                         \"scene_reference\": \"\",
@@ -3342,131 +1599,7 @@ class AiPromptGeneratorHelper
                         ],
                         \"relationship_development\": \"\"
                     }
-                ]
-            }
-
-            ==================================================
-            FINAL CHECK
-            ==================================================
-
-            Before returning the result, verify:
-
-                - Dialogues follow the existing scene plans faithfully.
-                - Dialogues use existing characters only.
-                - Character voice and tone are consistent with the existing characters.
-                - Emotional direction supports the scene emotional direction.
-                - Each dialogue has a clear purpose.
-                - Relationship development through dialogue strengthens the story.
-                - No full prose narrative is created.
-                - No final novel text is created.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
-        " . self::jsonOutputContract();
-
-        return $prompt;
-    }
-
-    public static function step13Prompt(): string
-    {
-        $prompt = "
-            You are a professional novel chapter planning AI.
-
-            Your task is to organize the existing scenes into chapters.
-
-            This step focuses only on creating the chapter-level breakdown required to support the existing scene plans and story structure.
-
-            ==================================================
-            PRIMARY RESPONSIBILITY
-            ==================================================
-
-            Generate:
-
-                1. Chapter Organization
-                2. Chapter Sequence
-                3. Chapter Summaries
-                4. Scenes inside Each Chapter
-                5. Pacing and Flow
-                6. Chapter Goals
-
-            ==================================================
-            EXISTING SCENE PLANS
-            ==================================================
-
-            {{scene_plans}}
-
-            Carefully analyze the existing scene plans.
-
-            Understand:
-
-                - Scene list
-                - Scene objectives
-                - Key events per scene
-                - Involved characters per scene
-                - Locations
-                - Time periods
-                - Scene purpose
-                - Emotional direction
-
-            Group the existing scenes into logical chapters.
-
-            Do not change, rewrite, or expand the scene plans.
-
-            The existing scene plans are the source of truth.
-
-            ==================================================
-            EXISTING STORY STRUCTURE
-            ==================================================
-
-            {{story_structure}}
-
-            Carefully analyze the existing story structure.
-
-            Understand:
-
-                - Overall story structure
-                - Structure type
-                - Act and arc breakdown
-                - Main plot progression
-                - Key story points
-                - Rising action
-                - Climax
-                - Resolution
-                - High level chapter outline
-
-            Organize the chapters to faithfully follow the established story structure.
-
-            Do not change, rewrite, or expand the story structure.
-
-            The existing story structure is the source of truth.
-
-            ==================================================
-            CHAPTER PLANNING REQUIREMENTS
-            ==================================================
-
-            Organize all existing scenes into a logical chapter sequence.
-
-            For each chapter:
-
-                - Assign a chapter number.
-                - Write a chapter title.
-                - Write a chapter summary.
-                - List the scenes inside the chapter.
-                - Define the chapter goals.
-                - Describe the pacing and flow.
-                - Maintain narrative tension across the chapter sequence.
-
-            Do not create full prose narrative.
-
-            Do not write final novel text.
-
-            ==================================================
-            OUTPUT FORMAT
-            ==================================================
-
-            Return the result strictly as valid JSON with the following structure:
-
-            {
+                ],
                 \"chapter_plan\": [
                     {
                         \"chapter_number\": 1,
@@ -3476,416 +1609,70 @@ class AiPromptGeneratorHelper
                         \"chapter_goals\": [],
                         \"pacing_and_flow\": \"\"
                     }
-                ]
-            }
-
-            ==================================================
-            FINAL CHECK
-            ==================================================
-
-            Before returning the result, verify:
-
-                - All existing scenes are organized into chapters.
-                - Chapters follow the existing story structure faithfully.
-                - Chapter sequence is logical and connected through cause and effect.
-                - Each chapter has a clear summary.
-                - Each chapter has clear goals.
-                - Pacing and flow support the narrative tension.
-                - No full prose narrative is created.
-                - No final novel text is created.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
-        " . self::jsonOutputContract();
-
-        return $prompt;
-    }
-
-    public static function step14Prompt(): string
-    {
-        $prompt = "
-            You are a professional novel page planning AI.
-
-            Your task is to create the detailed page-level writing structure for the final novel.
-
-            This step focuses only on creating the page-level breakdown required to support the existing chapter plan and scene plans.
-
-            ==================================================
-            PRIMARY RESPONSIBILITY
-            ==================================================
-
-            Generate:
-
-                1. Page Breakdown
-                2. Scenes Covered per Page
-                3. Content Summary per Page
-                4. Key Points per Page
-                5. Estimated Word Count per Page
-
-            ==================================================
-            EXISTING CHAPTER PLAN
-            ==================================================
-
-            {{chapter_plan}}
-
-            Carefully analyze the existing chapter plan.
-
-            Understand:
-
-                - Chapter organization
-                - Chapter sequence
-                - Chapter summaries
-                - Scenes inside each chapter
-                - Pacing and flow
-                - Chapter goals
-
-            Break down each chapter into a detailed page structure.
-
-            Do not change, rewrite, or expand the chapter plan.
-
-            The existing chapter plan is the source of truth.
-
-            ==================================================
-            EXISTING SCENE PLANS
-            ==================================================
-
-            {{scene_plans}}
-
-            Carefully analyze the existing scene plans.
-
-            Understand:
-
-                - Scene list
-                - Scene objectives
-                - Key events per scene
-                - Involved characters per scene
-                - Locations
-                - Time periods
-                - Scene purpose
-                - Emotional direction
-
-            Map the scenes covered on each page.
-
-            Do not change, rewrite, or expand the scene plans.
-
-            The existing scene plans are the source of truth.
-
-            ==================================================
-            PAGE PLANNING REQUIREMENTS
-            ==================================================
-
-            Break down every chapter into a practical page-level writing structure.
-
-            For each page:
-
-                - Assign a page number.
-                - Reference the chapter it belongs to.
-                - List the scenes covered on the page.
-                - Write a content summary for the page.
-                - Define the key points of the page.
-                - Provide an estimated word count.
-
-            Do not create full prose narrative.
-
-            Do not write final novel text.
-
-            ==================================================
-            OUTPUT FORMAT
-            ==================================================
-
-            Return the result strictly as valid JSON with the following structure:
-
-            {
+                ],
                 \"page_plan\": [
                     {
                         \"page_number\": 1,
                         \"chapter_reference\": 1,
-                        \"scenes_covered\": [],
+                        \"estimated_word_count\": 1,
                         \"content_summary\": \"\",
-                        \"key_points\": [],
-                        \"estimated_word_count\": 0
+                        \"scenes_covered\": [],
+                        \"key_points\": []
+                    }
+                ],
+                \"chapter_summaries\": [
+                    {
+                        \"chapter_number\": 1,
+                        \"chapter_title\": \"\",
+                        \"chapter_summary\": {
+                            \"chapter_purpose\": \"\",
+                            \"chapter_goals\": [],
+                            \"characters_involved\": [],
+                            \"important_events\": [],
+                            \"relevant_conflicts\": [],
+                            \"progression\": \"\",
+                            \"important_revelations\": [],
+                            \"emotional_and_narrative_movement\": \"\",
+                            \"scene_progression\": [],
+                            \"continuity_requirements\": [],
+                            \"chapter_ending_and_setup\": \"\"
+                        }
                     }
                 ]
             }
 
             ==================================================
-            FINAL CHECK
+            VALIDATION REQUIREMENTS
             ==================================================
 
             Before returning the result, verify:
 
-                - Every chapter is broken down into pages.
-                - Pages follow the existing chapter plan faithfully.
-                - Scenes covered are consistent with the existing scene plans.
-                - Each page has a clear content summary.
-                - Each page has clear key points.
-                - Estimated word counts are realistic.
-                - No full prose narrative is created.
-                - No final novel text is created.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
+                - All seven phases are present in the response.
+                - The story structure follows the input package, and the climax and resolution match the foundation's climax and resolution directions.
+                - The chapter outline is high level and consistent with the chronology.
+                - Every twist, clue, secret, mystery, foreshadowing element, and misdirection fits the structure and the world.
+                - Reveal timings are consistent with the chapter outline.
+                - Scene numbering is sequential, every scene belongs to a chapter of the chapter outline, and every scene uses an existing location.
+                - Every clue and reveal from phase 2 is planted in a scene.
+                - Every dialogue plan references an existing scene and uses existing characters only.
+                - Chapter numbers start at 1 and increase by exactly 1, and every scene from phase 3 belongs to exactly one chapter.
+                - Page numbers are sequential and page chapter references match the chapter plan.
+                - There is exactly one chapter summary per chapter of the chapter plan, in chapter number order.
+                - Every chapter summary follows the scene plans of its own chapter and the story structure.
+                - No prose chapter and no final novel text are created.
+                - The requested language is respected in every value.
+                - The response is valid JSON only, with no explanation, markdown, or additional text outside the JSON.
         " . self::jsonOutputContract();
 
         return $prompt;
     }
 
-    public static function step15Prompt(): string
-    {
-        $prompt = "
-            You are a professional novel chapter development AI.
-
-            Your task is to generate a detailed summary for a single planned chapter.
-
-            This is part of the final phase of the novel generation pipeline where every planned chapter receives its own summary.
-
-            The generated summary must serve as the complete blueprint for later individual chapter content generation.
-
-            Do not write the actual prose chapter.
-
-            Do not write the full novel.
-
-            ==================================================
-            PRIMARY RESPONSIBILITY
-            ==================================================
-
-            Generate:
-
-                1. Chapter Purpose
-                2. Chapter Goals
-                3. Important Events
-                4. Characters Involved
-                5. Relevant Conflicts
-                6. Progression
-                7. Important Revelations
-                8. Emotional and Narrative Movement
-                9. Important Scene Progression
-                10. Continuity Requirements
-                11. Chapter Ending and Setup
-
-            ==================================================
-            EXISTING NOVEL FOUNDATION
-            ==================================================
-
-            {{foundation}}
-
-            Carefully analyze the existing novel foundation.
-
-            Understand:
-
-                - Story premise
-                - Story concept
-                - Narrative direction
-                - Genre identity
-                - Themes
-                - Setting direction
-                - Central conflict
-                - Opposing force
-                - Stakes
-                - Emotional direction
-
-            Use the foundation to keep the chapter summary consistent with the established novel.
-
-            Do not change, rewrite, or expand the foundation.
-
-            The existing novel foundation is the source of truth.
-
-            ==================================================
-            EXISTING CHARACTERS
-            ==================================================
-
-            {{characters}}
-
-            Carefully analyze the existing characters.
-
-            Understand:
-
-                - Character names and roles
-                - Character personalities
-                - Character motivations and goals
-                - Character relationships
-                - Character arcs
-
-            Use the characters to keep the chapter summary consistent with the established cast.
-
-            Do not change, rewrite, or expand the characters.
-
-            The existing characters are the source of truth.
-
-            ==================================================
-            EXISTING STORY STRUCTURE
-            ==================================================
-
-            {{story_structure}}
-
-            Carefully analyze the existing story structure.
-
-            Understand:
-
-                - Overall story structure
-                - Act and arc breakdown
-                - Main plot progression
-                - Key story points
-                - Rising action
-                - Climax
-                - Resolution
-
-            Position the chapter correctly within the overall story progression.
-
-            Do not change, rewrite, or expand the story structure.
-
-            The existing story structure is the source of truth.
-
-            ==================================================
-            EXISTING TWISTS AND FORESHADOWING
-            ==================================================
-
-            {{twists_and_foreshadowing}}
-
-            Carefully analyze the existing twists and foreshadowing.
-
-            Understand:
-
-                - Planned twists
-                - Foreshadowing elements
-                - Revelations
-                - Clues
-                - Continuity requirements across chapters
-
-            Reflect the relevant twists and foreshadowing in the chapter summary where appropriate.
-
-            Do not change, rewrite, or expand the twists and foreshadowing.
-
-            The existing twists and foreshadowing are the source of truth.
-
-            ==================================================
-            TARGET CHAPTER PLAN
-            ==================================================
-
-            {{chapter_plan_entry}}
-
-            This is the authoritative plan for the target chapter.
-
-            Understand:
-
-                - Chapter number
-                - Chapter title
-                - Chapter summary
-                - Scenes inside the chapter
-                - Chapter goals
-                - Pacing and flow
-
-            Preserve the intended chapter structure.
-
-            Do not replace the intended chapter plan with an unrelated structure.
-
-            ==================================================
-            CHAPTER SCENE PLANS
-            ==================================================
-
-            {{scene_plans}}
-
-            These are the existing scene plans for the scenes covered by the target chapter.
-
-            Understand:
-
-                - Scene objectives
-                - Key events per scene
-                - Involved characters per scene
-                - Locations
-                - Time periods
-                - Scene purpose
-                - Emotional direction
-
-            Use the scene plans to build the scene progression of the chapter summary.
-
-            Do not change, rewrite, or expand the scene plans.
-
-            The existing scene plans are the source of truth.
-
-            ==================================================
-            CHAPTER SUMMARY REQUIREMENTS
-            ==================================================
-
-            Generate a structured summary for the target chapter only.
-
-            The summary must capture:
-
-                - Chapter purpose: why this chapter exists and what it must accomplish.
-                - Chapter goals: the goals this chapter must achieve for the story.
-                - Characters involved: the characters present and their role in the chapter.
-                - Important events: the key events that occur in this chapter.
-                - Relevant conflicts: the conflicts that develop or resolve in this chapter.
-                - Progression: how the chapter advances the overall story and character arcs.
-                - Important revelations: discoveries, reveals, or twists that occur.
-                - Emotional and narrative movement: the emotional arc of the chapter.
-                - Scene progression: the ordered scenes and how they build the chapter.
-                - Continuity requirements: elements that must remain consistent with the rest of the novel.
-                - Chapter ending and setup: how the chapter ends and what it sets up for the next chapter.
-
-            Do not generate the actual prose chapter.
-
-            Do not write the full chapter content.
-
-            Do not write the complete novel.
-
-            ==================================================
-            OUTPUT FORMAT
-            ==================================================
-
-            Return ONLY valid JSON.
-
-            {
-                \"chapter_number\": 0,
-                \"chapter_title\": \"\",
-                \"chapter_summary\": {
-                    \"chapter_purpose\": \"\",
-                    \"chapter_goals\": [],
-                    \"characters_involved\": [],
-                    \"important_events\": [],
-                    \"relevant_conflicts\": [],
-                    \"progression\": \"\",
-                    \"important_revelations\": [],
-                    \"emotional_and_narrative_movement\": \"\",
-                    \"scene_progression\": [],
-                    \"continuity_requirements\": [],
-                    \"chapter_ending_and_setup\": \"\"
-                }
-            }
-
-            ==================================================
-            FINAL CHECK
-            ==================================================
-
-            Before returning the result, verify:
-
-                - The chapter number matches the target chapter plan.
-                - The chapter title matches the target chapter plan.
-                - The summary preserves the intended chapter plan.
-                - The summary is consistent with the novel foundation.
-                - The summary is consistent with the existing characters.
-                - The summary follows the existing story structure.
-                - Relevant twists and foreshadowing are reflected where appropriate.
-                - The scene progression follows the existing scene plans.
-                - The summary captures all required elements.
-                - No prose chapter is written.
-                - No full novel text is written.
-                - Output contains only valid JSON.
-                - No explanation is added outside JSON.
-
-        " . self::jsonOutputContract();
-
-        return $prompt;
-    }
-
-    public static function step16Prompt(): string
+    public static function chapterContentPrompt(): string
     {
         $prompt = "
             You are a professional long-form novelist and story writer.
 
             Your task is to write the complete narrative prose content of a single novel chapter.
-
-            This is part of the final phase of the novel generation pipeline where every planned chapter receives its own written content.
 
             Write only the target chapter.
 
@@ -3896,8 +1683,6 @@ class AiPromptGeneratorHelper
             Do not summarize the chapter.
 
             Do not generate another chapter plan.
-
-            Do not output JSON.
 
             ==================================================
             PRIMARY RESPONSIBILITY
@@ -4112,17 +1897,15 @@ class AiPromptGeneratorHelper
             OUTPUT FORMAT
             ==================================================
 
-            Return ONLY the actual prose content of the single target chapter.
+            Return ONLY valid JSON.
 
-            Start directly with the chapter prose.
+            The response must be a single JSON object with exactly one key, chapter_content, holding the full prose of the chapter as one string.
 
-            Do not include a chapter title heading, an introduction, or a conclusion outside the prose.
+            {
+                \"chapter_content\": \"\"
+            }
 
-            Do not include any explanations before or after the content.
-
-            The chapter title is taken from the chapter plan, not from your response, so do not repeat the title in the prose.
-
-            If your model forces a structured response, the only accepted structure is a single JSON object with exactly one key, chapter_content, holding the full prose as a string. Do not use that structure unless you cannot return bare prose.
+            The prose must not repeat the chapter title as a heading, and must not contain an introduction or a conclusion outside the prose.
 
             ==================================================
             FINAL CHECK
@@ -4130,19 +1913,20 @@ class AiPromptGeneratorHelper
 
             Before returning the result, verify:
 
-                - The content is prose, not a summary.
-                - The content writes only the target chapter.
-                - The content follows the chapter summary.
-                - The content follows the chapter plan.
-                - The content is consistent with the novel foundation.
-                - The content is consistent with the established characters.
-                - The content is consistent with the established world.
-                - The content maintains continuity with the rest of the novel.
-                - The content includes appropriate dialogue.
-                - The content ends according to the chapter's intended progression.
+                - chapter_content holds the prose of the chapter, not a summary.
+                - The prose writes only the target chapter.
+                - The prose follows the chapter summary.
+                - The prose follows the chapter plan.
+                - The prose is consistent with the novel foundation.
+                - The prose is consistent with the established characters.
+                - The prose is consistent with the established world.
+                - The prose maintains continuity with the rest of the novel.
+                - The prose includes appropriate dialogue.
+                - The prose ends according to the chapter's intended progression.
+                - Every line break inside chapter_content is escaped as \\n.
                 - The requested language is respected.
-                - No explanation is added outside the prose.
-        ";
+                - The response is valid JSON only, with no explanation, markdown, or additional text outside the JSON.
+        " . self::jsonOutputContract();
 
         return $prompt;
     }
@@ -4154,7 +1938,7 @@ class AiPromptGeneratorHelper
             OUTPUT CONTRACT
             ==================================================
 
-            These rules are mandatory. The response is parsed by a strict JSON decoder and rejected if any rule is broken.
+            These format rules are mandatory. A response that is not parseable JSON is rejected.
 
             Return only the raw JSON object described above, starting with the first opening brace and ending with the final closing brace.
 
@@ -4170,26 +1954,57 @@ class AiPromptGeneratorHelper
                 - Add trailing commas after the last value in an object or an array.
                 - Use single quotes for JSON keys or string values.
                 - Leave any key or value unquoted.
-                - Add fields that are not listed in the structure above.
-                - Rename, abbreviate, or nest any listed field.
-                - Omit any listed field. Every field shown above must be present.
-                - Return an empty string or null for a listed field unless the structure shows an empty array.
+                - Return an empty string, null, or an empty array purely to satisfy the structure above. Leave out anything the story does not need.
 
             You must:
 
                 - Use double quotes for every JSON key and every string value.
-                - Use the exact key names and nesting shown above.
-                - Match the value type shown above: a quoted value is a string, and [ ] is an array.
-                - Populate every array with real content. An empty array [] is only acceptable where this contract or the structure above explicitly allows it.
+                - Use the key names and nesting shown above for the content you do include.
+                - Match the value type shown above: a quoted value is a string, a bare number is a number, and [ ] is an array.
+                - Populate every array you include with real content.
                 - Escape every double quote inside a string value as \\\".
                 - Escape every backslash as \\\\.
                 - Escape every literal newline inside a string value as \\n and every literal tab as \\t. Do not place a raw line break inside a string value.
                 - Keep the JSON syntactically complete even when the generated prose contains quotation marks, apostrophes, colons, commas, brackets, braces, slashes, or non-Latin characters.
 
+            The structure above is a guide to the depth of a complete package, not a fixed template. Omit any listed field that has no real content for this particular story, and add any field this story genuinely needs. Do not invent placeholder or filler content to fill a field.
+
             The entire response must be parseable by a standard JSON parser in a single pass.
 
             Return the JSON now, and nothing else.
         ";
+    }
+
+    public static function maxOutputTokenInstruction(?int $maxOutputTokens): string
+    {
+        if ($maxOutputTokens === null || $maxOutputTokens < 1) {
+            return '';
+        }
+
+        return "
+            ==================================================
+            OUTPUT TOKEN BUDGET
+            ==================================================
+
+            Maximum output tokens: {$maxOutputTokens}.
+
+            The complete response must fit inside this budget. Never exceed it, and never let the JSON be cut off before the final closing brace.
+
+            Write dense and specific values. Prefer short, concrete sentences over long, repetitive ones. Never pad a field with restated information that another field already carries.
+
+            If you are running out of budget, shorten the wording of the values and drop fields that carry the least value. Never rename a field, and never return truncated text.
+        ";
+    }
+
+    public static function applyMaxOutputTokenInstruction(string $prompt, ?int $maxOutputTokens): string
+    {
+        $instruction = self::maxOutputTokenInstruction($maxOutputTokens);
+
+        if ($instruction === '') {
+            return $prompt;
+        }
+
+        return rtrim($prompt)."\n".$instruction;
     }
 
     public static function generateFullPrompt(string $partialPrompt, array $receivedInputs): string
