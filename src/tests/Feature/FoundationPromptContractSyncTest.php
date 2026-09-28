@@ -15,7 +15,8 @@ class FoundationPromptContractSyncTest extends TestCase
         $skeleton = self::skeletonOf(AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION);
 
         $this->assertNotSame([], $skeleton, 'The Foundation prompt must contain a decodable JSON skeleton.');
-        $this->assertArrayHasKey('novel_title', $skeleton);
+        $this->assertArrayHasKey('title', $skeleton);
+        $this->assertArrayHasKey('sub_title', $skeleton);
         $this->assertArrayHasKey('world_bible', $skeleton);
     }
 

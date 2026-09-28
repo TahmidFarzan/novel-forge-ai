@@ -610,8 +610,8 @@ class AiPromptGeneratorHelper
             Return ONLY valid JSON.
 
             {
-                \"novel_title\": \"\",
-                \"novel_subtitle\": \"\",
+                \"title\": \"\",
+                \"sub_title\": \"\",
                 \"novel_foundation\": {
                     \"premise\": \"\",
                     \"story_concept\": \"\",

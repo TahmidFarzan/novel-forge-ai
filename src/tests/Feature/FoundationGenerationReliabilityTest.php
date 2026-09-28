@@ -107,7 +107,7 @@ class FoundationGenerationReliabilityTest extends TestCase
 
     public function test_a_response_without_a_title_fails_after_exactly_one_request_without_an_automatic_correction(): void
     {
-        $unusable = ['novel_subtitle' => 'A subtitle with no title'];
+        $unusable = ['sub_title' => 'A subtitle with no title'];
 
         Http::fake([
             self::URL => Http::sequence()
@@ -129,7 +129,7 @@ class FoundationGenerationReliabilityTest extends TestCase
 
     public function test_an_explicit_second_click_can_generate_after_a_first_failure(): void
     {
-        $unusable = ['novel_subtitle' => 'A subtitle with no title'];
+        $unusable = ['sub_title' => 'A subtitle with no title'];
 
         Http::fake([
             self::URL => Http::sequence()
@@ -155,7 +155,7 @@ class FoundationGenerationReliabilityTest extends TestCase
     public function test_a_malformed_response_persists_nothing_and_never_reaches_the_database(): void
     {
         Http::fake([
-            self::URL => Http::response($this->completion('{"novel_title": "Truncated'), 200),
+            self::URL => Http::response($this->completion('{"title": "Truncated'), 200),
         ]);
 
         $this->createNovel()->assertRedirect(route('back-office.novels.create'));
@@ -318,7 +318,7 @@ class FoundationGenerationReliabilityTest extends TestCase
         $this->reopenFoundation($novel);
 
         Http::fake([
-            self::URL => Http::response($this->completion('{"novel_title": "partial"'), 200),
+            self::URL => Http::response($this->completion('{"title": "partial"'), 200),
         ]);
 
         $this->continueGeneration($novel);
@@ -538,8 +538,8 @@ class FoundationGenerationReliabilityTest extends TestCase
 
         $novel = new Novel;
 
-        $novel->title = $foundation['novel_title'];
-        $novel->sub_title = $foundation['novel_subtitle'];
+        $novel->title = $foundation['title'];
+        $novel->sub_title = $foundation['sub_title'];
         $novel->language_id = DB::table('languages')->value('id');
         $novel->novel_type_id = DB::table('novel_types')->value('id');
         $novel->audience_id = DB::table('audiences')->value('id');

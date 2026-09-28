@@ -495,7 +495,7 @@ class HuggingFaceApiService
 
     private function foundationResponseFormat(array $decoded, string $stepName): array
     {
-        $title = $decoded['novel_title'] ?? null;
+        $title = $decoded['title'] ?? null;
 
         if (! is_string($title) || trim($title) === '') {
             throw new Exception('The AI response was not usable for this step. It contained no novel title. Retry.');
@@ -503,7 +503,7 @@ class HuggingFaceApiService
 
         return [
             'title' => trim($title),
-            'subtitle' => trim((string) ($decoded['novel_subtitle'] ?? '')),
+            'sub_title' => trim((string) ($decoded['sub_title'] ?? '')),
             'foundation' => $this->formatAsObject($decoded['novel_foundation'] ?? []),
             'characters' => [
                 'characters' => $this->formatAsList($decoded['characters']['characters'] ?? []),

@@ -53,7 +53,7 @@ class HuggingFaceApiServiceRequestTest extends TestCase
 
         Http::assertSentCount(1);
 
-        $this->assertSame($this->foundation()['novel_title'], $result['title']);
+        $this->assertSame($this->foundation()['title'], $result['title']);
         $this->assertSame($this->foundation()['characters']['characters'][0]['name'], $result['characters']['characters'][0]['name']);
     }
 
@@ -77,13 +77,13 @@ class HuggingFaceApiServiceRequestTest extends TestCase
 
         Http::assertSentCount(1);
 
-        $this->assertSame($this->foundation()['novel_title'], $result['title']);
+        $this->assertSame($this->foundation()['title'], $result['title']);
     }
 
     public function test_malformed_json_fails_after_exactly_one_request(): void
     {
         Http::fake([
-            self::URL => Http::response($this->completion('Here is the JSON: {"novel_title": '), 200),
+            self::URL => Http::response($this->completion('Here is the JSON: {"title": '), 200),
         ]);
 
         try {
@@ -108,7 +108,7 @@ class HuggingFaceApiServiceRequestTest extends TestCase
         Log::spy();
 
         Http::fake([
-            self::URL => Http::response($this->completion('{"novel_title": "Cut off before the end', 'length'), 200),
+            self::URL => Http::response($this->completion('{"title": "Cut off before the end', 'length'), 200),
         ]);
 
         try {
@@ -184,7 +184,7 @@ class HuggingFaceApiServiceRequestTest extends TestCase
 
     public function test_a_partial_structure_is_accepted_and_never_replaced_by_a_second_request(): void
     {
-        $sparse = ['novel_title' => 'The Salt Archive'];
+        $sparse = ['title' => 'The Salt Archive'];
 
         Http::fake([
             self::URL => Http::sequence()
@@ -210,7 +210,7 @@ class HuggingFaceApiServiceRequestTest extends TestCase
     {
         Http::fake([
             self::URL => Http::sequence()
-                ->push($this->completion('{"novel_subtitle":"Only a subtitle"}'), 200)
+                ->push($this->completion('{"sub_title":"Only a subtitle"}'), 200)
                 ->push($this->foundationResponse(), 200),
         ]);
 
@@ -428,7 +428,7 @@ class HuggingFaceApiServiceRequestTest extends TestCase
     public function test_it_rejects_malformed_json_after_exactly_one_request(): void
     {
         Http::fake([
-            self::URL => Http::response($this->completion('{"novel_title": "Broken"'), 200),
+            self::URL => Http::response($this->completion('{"title": "Broken"'), 200),
         ]);
 
         try {

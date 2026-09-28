@@ -290,7 +290,7 @@ class NovelGeneratorService
     private function applyFoundation(Novel $novel, array $foundation): void
     {
         $novel->title = $foundation['title'];
-        $novel->sub_title = $foundation['subtitle'];
+        $novel->sub_title = $foundation['sub_title'];
         $novel->foundation = $foundation['foundation'];
         $novel->characters = $foundation['characters'];
         $novel->world_bible = $foundation['world_bible'];

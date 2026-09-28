@@ -37,7 +37,7 @@ class HuggingFaceApiServiceResponseFormatTest extends TestCase
 
         $this->assertSame([
             'title',
-            'subtitle',
+            'sub_title',
             'foundation',
             'characters',
             'world_bible',
@@ -48,8 +48,8 @@ class HuggingFaceApiServiceResponseFormatTest extends TestCase
             'timeline',
         ], array_keys($result));
 
-        $this->assertSame($payload['novel_title'], $result['title']);
-        $this->assertSame($payload['novel_subtitle'], $result['subtitle']);
+        $this->assertSame($payload['title'], $result['title']);
+        $this->assertSame($payload['sub_title'], $result['sub_title']);
         $this->assertSame($payload['novel_foundation'], $result['foundation']);
         $this->assertSame(['characters', 'relationships'], array_keys($result['characters']));
         $this->assertSame($payload['world_bible'], $result['world_bible']);
@@ -71,7 +71,7 @@ class HuggingFaceApiServiceResponseFormatTest extends TestCase
             $this->completion((string) json_encode($payload)),
         );
 
-        $this->assertSame($payload['novel_title'], $result['title']);
+        $this->assertSame($payload['title'], $result['title']);
         $this->assertSame([], $result['world_bible']);
         $this->assertSame([], $result['locations']);
         $this->assertSame([], $result['factions']);
@@ -79,7 +79,7 @@ class HuggingFaceApiServiceResponseFormatTest extends TestCase
 
     public function test_the_foundation_accepts_genre_specific_content_the_prompt_never_mentioned(): void
     {
-        $payload = ['novel_title' => 'The Salt Archive'];
+        $payload = ['title' => 'The Salt Archive'];
 
         $result = $this->service()->aiResponseFormats(
             AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
@@ -87,7 +87,7 @@ class HuggingFaceApiServiceResponseFormatTest extends TestCase
         );
 
         $this->assertSame('The Salt Archive', $result['title']);
-        $this->assertSame('', $result['subtitle']);
+        $this->assertSame('', $result['sub_title']);
         $this->assertSame([], $result['foundation']);
         $this->assertSame([], $result['world_bible']);
     }
@@ -98,7 +98,7 @@ class HuggingFaceApiServiceResponseFormatTest extends TestCase
 
         $this->service()->aiResponseFormats(
             AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
-            $this->completion((string) json_encode(['novel_subtitle' => 'No title here'])),
+            $this->completion((string) json_encode(['sub_title' => 'No title here'])),
         );
     }
 
@@ -108,7 +108,7 @@ class HuggingFaceApiServiceResponseFormatTest extends TestCase
 
         $this->service()->aiResponseFormats(
             AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
-            $this->completion('{"novel_title":"   "}'),
+            $this->completion('{"title":"   "}'),
         );
     }
 
