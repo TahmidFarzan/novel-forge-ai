@@ -26,6 +26,7 @@ const pageTitle = computed(() => {
 const saveForm = useForm({
     name: aiBrain?.name || null,
     model: aiBrain?.model || null,
+    provider: aiBrain?.provider || 'Ollama',
     api_url: aiBrain?.api_url || null,
     api_key: aiBrain?.api_key || null,
     brief: aiBrain?.brief || null,
@@ -60,10 +61,7 @@ function validateForm() {
         valid = false;
     }
 
-    if (!saveForm.api_key) {
-        saveForm.setError("api_key", "API key is required");
-        valid = false;
-    }
+    // API key is optional for local Ollama
 
     if (!saveForm.context_window) {
         saveForm.setError("context_window", "Context window is required");
@@ -244,13 +242,13 @@ onMounted(async () => {
 
                         <div>
                             <label class="block text-sm font-medium mb-1">
-                                API Key <span class="text-red-500">*</span>
+                                API Key
                             </label>
 
                             <input
                                 v-model="saveForm.api_key"
                                 type="password"
-                                placeholder="Enter API key"
+                                placeholder="Enter API key (optional)"
                                 class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 :class="
                                     saveForm.errors.api_key
@@ -264,6 +262,22 @@ onMounted(async () => {
                                 class="text-red-500 text-sm mt-1"
                             >
                                 {{ saveForm.errors.api_key }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">
+                                Provider
+                            </label>
+
+                            <input
+                                v-model="saveForm.provider"
+                                placeholder="Ollama"
+                                class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                :class="saveForm.errors.provider ? 'border-red-500' : 'border-gray-300'" readonly/>
+
+                            <p v-if="saveForm.errors.provider" class="text-red-500 text-sm mt-1">
+                                {{ saveForm.errors.provider }}
                             </p>
                         </div>
 

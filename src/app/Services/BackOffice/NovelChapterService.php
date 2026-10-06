@@ -14,11 +14,11 @@ use Illuminate\Support\Facades\Log;
 
 class NovelChapterService
 {
-    protected HuggingFaceApiService $huggingFaceApiService;
+    protected AiService $aiService;
 
-    public function __construct(HuggingFaceApiService $huggingFaceApiService)
+    public function __construct(AiService $aiService)
     {
-        $this->huggingFaceApiService = $huggingFaceApiService;
+        $this->aiService = $aiService;
     }
 
     public function new(): NovelChapter
@@ -145,13 +145,13 @@ class NovelChapterService
 
     public function generateChapterContent(Novel $novel, NovelChapter $novelChapter, string $stepName, AiPrompt $aiPrompt, AiBrain $aiBrain): void
     {
-        $stepData = $this->huggingFaceApiService->generate(
+        $stepData = $this->aiService->generate(
             $stepName,
             $aiBrain->api_url,
             $aiBrain->api_key,
             $aiBrain->model,
             $aiPrompt->prompt,
-            $this->huggingFaceApiService->chapterContentInputs($novel, $novelChapter),
+            $this->aiService->chapterContentInputs($novel, $novelChapter),
             $aiBrain->max_output_tokens,
             $aiBrain->timeout_seconds,
         );

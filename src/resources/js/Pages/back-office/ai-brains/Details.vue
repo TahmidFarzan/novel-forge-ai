@@ -133,6 +133,13 @@ onMounted(async () => {
                         </span>
                     </div>
 
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Provider</span>
+                        <span class="font-medium break-all">
+                            {{ aiBrain?.provider || "N/A" }}
+                        </span>
+                    </div>
+
                     <div class="flex justify-between items-center">
                         <span class="text-gray-500">API Key</span>
                         <span

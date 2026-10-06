@@ -94,6 +94,7 @@ class AiBrainService
             DB::transaction(function () use ($request, $aiBrain, $isNew) {
                 $aiBrain->name              = $request->input('name');
                 $aiBrain->model              = $request->input('model');
+                $aiBrain->provider           = $request->input('provider');
                 $aiBrain->api_url           = $request->input('api_url');
                 $aiBrain->api_key           = $request->input('api_key');
                 $aiBrain->brief             = $request->input('brief');

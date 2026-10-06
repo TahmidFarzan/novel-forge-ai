@@ -28,18 +28,18 @@ class NovelGeneratorService
     protected AudienceService $audienceService;
     protected GenreService $genreService;
     protected NovelTypeService $novelTypeService;
-    protected HuggingFaceApiService $huggingFaceApiService;
+    protected AiService $aiService;
     protected LanguageService $languageService;
     protected NovelChapterService $novelChapterService;
     protected NovelGeneratorStepService $novelGeneratorStepService;
 
-    public function __construct(AiBrainService $aiBrainService, AudienceService $audienceService, GenreService $genreService, NovelTypeService $novelTypeService, HuggingFaceApiService $huggingFaceApiService, LanguageService $languageService, NovelChapterService $novelChapterService, NovelGeneratorStepService $novelGeneratorStepService)
+    public function __construct(AiBrainService $aiBrainService, AudienceService $audienceService, GenreService $genreService, NovelTypeService $novelTypeService, AiService $aiService, LanguageService $languageService, NovelChapterService $novelChapterService, NovelGeneratorStepService $novelGeneratorStepService)
     {
         $this->aiBrainService            = $aiBrainService;
         $this->audienceService           = $audienceService;
         $this->genreService              = $genreService;
         $this->novelTypeService          = $novelTypeService;
-        $this->huggingFaceApiService     = $huggingFaceApiService;
+        $this->aiService                 = $aiService;
         $this->languageService           = $languageService;
         $this->novelChapterService       = $novelChapterService;
         $this->novelGeneratorStepService = $novelGeneratorStepService;
@@ -229,13 +229,13 @@ class NovelGeneratorService
 
     private function runPlanChapterStep(Novel $novel, NovelGeneratorStep $step, AiBrain $aiBrain): string
     {
-        $plan = $this->huggingFaceApiService->generate(
+        $plan = $this->aiService->generate(
             $step->name,
             $aiBrain->api_url,
             $aiBrain->api_key,
             $aiBrain->model,
             $step->aiPrompt->prompt,
-            $this->huggingFaceApiService->planChapterInputs($novel),
+            $this->aiService->planChapterInputs($novel),
             $aiBrain->max_output_tokens,
             $aiBrain->timeout_seconds,
         );
@@ -275,13 +275,13 @@ class NovelGeneratorService
             throw new Exception('The Foundation AI prompt is not configured.');
         }
 
-        return $this->huggingFaceApiService->generate(
+        return $this->aiService->generate(
             $step->name,
             $aiBrain->api_url,
             $aiBrain->api_key,
             $aiBrain->model,
             $step->aiPrompt->prompt,
-            $this->huggingFaceApiService->foundationInputs($context),
+            $this->aiService->foundationInputs($context),
             $aiBrain->max_output_tokens,
             $aiBrain->timeout_seconds,
         );

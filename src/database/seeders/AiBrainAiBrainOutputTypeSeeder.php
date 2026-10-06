@@ -28,13 +28,7 @@ class AiBrainAiBrainOutputTypeSeeder extends Seeder
         }
 
         $mapping = [
-            'google/gemma-4-26B-A4B-it' => [
-                'text',
-            ],
-            'Qwen/Qwen3-8B' => [
-                'text',
-            ],
-            'mistralai/Mistral-Small-3.2-24B-Instruct-2506' => [
+            'qwen3:4b' => [
                 'text',
             ],
         ];
