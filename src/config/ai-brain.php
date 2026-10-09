@@ -18,9 +18,11 @@ return [
 
             'model' => 'qwen3:4b',
 
-            'api_url' => env('AI_BRAIN_URL','http://localhost:11434'),
+            'api_url' => env('AI_BRAIN_URL', env('OLLAMA_URL', 'http://localhost:11434')),
 
-            'api_key' => null,
+            // AI Brains require a non-empty API key value. Local Ollama ignores
+            // the Authorization header, so any placeholder works.
+            'api_key' => env('AI_BRAIN_API_KEY', 'ollama'),
 
             'brief' => 'Local Ollama writing model for story generation, chapter writing and structured generation.',
 

@@ -7,8 +7,8 @@ import 'vue-sonner/style.css'
 
 createInertiaApp({
     resolve: async (name) => {
-        const pages = import.meta.glob('./pages/**/*.vue')
-        const importPage = pages[`./pages/${name}.vue`]
+        const pages = import.meta.glob('./Pages/**/*.vue')
+        const importPage = pages[`./Pages/${name}.vue`]
 
         if (!importPage) {
             throw new Error(`Unknown page ${name}`)

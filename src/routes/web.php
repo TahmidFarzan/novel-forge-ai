@@ -262,8 +262,6 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
     });
 });
 
-Route::get('/', function () {
-    return redirect()->route('home');
-});
+Route::redirect('/', '/home');
 
 Route::get('home', [PageController::class, 'home'])->name('home');

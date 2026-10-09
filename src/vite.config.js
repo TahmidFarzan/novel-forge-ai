@@ -25,8 +25,22 @@ export default defineConfig({
         },
     },
     server: {
+        host: '0.0.0.0',
+        port: 5173,
+        strictPort: true,
+        allowedHosts: true,
+        cors: true,
+        origin:
+            process.env.VITE_DEV_SERVER_ORIGIN ||
+            'http://novel-forge-ai.localhost',
         watch: {
             ignored: ['**/storage/framework/views/**'],
+        },
+        ws: {
+            host: process.env.VITE_HMR_HOST || 'novel-forge-ai.localhost',
+            protocol: 'ws',
+            clientPort: Number(process.env.VITE_HMR_CLIENT_PORT || 80),
+            path: '/vite-hmr',
         },
     },
 });

@@ -6,40 +6,37 @@ ENV OLLAMA_MODEL=qwen3:4b \
 
 EXPOSE 11434
 
-RUN <<'EOF'
-cat > /usr/local/bin/entrypoint.sh <<'SCRIPT'
-#!/bin/sh
-set -eu
-
-echo "Ollama started"
-
-ollama serve &
-server_pid=$!
-
-trap 'kill "$server_pid" 2>/dev/null' TERM INT
-
-until ollama list >/dev/null 2>&1; do
-  if ! kill -0 "$server_pid" 2>/dev/null; then
-    echo "Ollama server failed to start"
-    exit 1
-  fi
-  sleep 1
-done
-
-echo "Checking model..."
-if ollama show "$OLLAMA_MODEL" >/dev/null 2>&1; then
-  echo "$OLLAMA_MODEL found"
-else
-  echo "Downloading $OLLAMA_MODEL..."
-  ollama pull "$OLLAMA_MODEL"
-  echo "$OLLAMA_MODEL found"
-fi
-
-echo "Ollama ready"
-
-wait "$server_pid"
-SCRIPT
-chmod +x /usr/local/bin/entrypoint.sh
-EOF
+RUN printf '%s\n' \
+    '#!/bin/sh' \
+    'set -eu' \
+    '' \
+    'echo "Starting Ollama server..."' \
+    'ollama serve &' \
+    'server_pid=$!' \
+    '' \
+    'trap "kill $server_pid 2>/dev/null" TERM INT' \
+    '' \
+    'until ollama list >/dev/null 2>&1; do' \
+    '  if ! kill -0 "$server_pid" 2>/dev/null; then' \
+    '    echo "Ollama server failed to start" >&2' \
+    '    exit 1' \
+    '  fi' \
+    '  sleep 1' \
+    'done' \
+    '' \
+    'echo "Ollama server is ready"' \
+    '' \
+    'if ollama show "$OLLAMA_MODEL" >/dev/null 2>&1; then' \
+    '  echo "Model $OLLAMA_MODEL is already available"' \
+    'else' \
+    '  echo "Pulling model $OLLAMA_MODEL..."' \
+    '  ollama pull "$OLLAMA_MODEL"' \
+    'fi' \
+    '' \
+    'echo "Ollama is ready with model $OLLAMA_MODEL"' \
+    '' \
+    'wait "$server_pid"' \
+    > /usr/local/bin/entrypoint.sh \
+    && chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

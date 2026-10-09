@@ -1,0 +1,115 @@
+name: novel-forge-ai
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  app:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    image: novel-forge-ai/app
+    container_name: novel-forge-ai-app
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    working_dir: /var/www/html/novel-forge-ai
+    environment:
+      APP_URL: "${APP_URL:-http://novel-forge-ai.localhost/}"
+      AI_BRAIN_URL: "${AI_BRAIN_URL:-http://ollama:11434}"
+      AI_BRAIN_API_KEY: "${AI_BRAIN_API_KEY:-ollama}"
+      OLLAMA_URL: "${OLLAMA_URL:-http://ollama:11434}"
+      OLLAMA_HOST: "${OLLAMA_HOST:-http://ollama:11434}"
+    volumes:
+      - ../src:/var/www/html/novel-forge-ai
+      - novel-forge-ai-vendor:/var/www/html/novel-forge-ai/vendor
+      - novel-forge-ai-node-modules:/var/www/html/novel-forge-ai/node_modules
+      - novel-forge-ai-storage:/var/www/html/novel-forge-ai/storage
+    depends_on:
+      ollama:
+        condition: service_started
+    networks:
+      - novel-forge-ai-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1', 9000) ? 0 : 1);"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 900s
+    logging: *default-logging
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: novel-forge-ai/nginx
+    container_name: novel-forge-ai-nginx
+    restart: unless-stopped
+    stop_grace_period: 30s
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+    volumes:
+      - ../src:/var/www/html/novel-forge-ai:ro
+      - novel-forge-ai-storage:/var/www/html/novel-forge-ai/storage:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - novel-forge-ai-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up >/dev/null 2>&1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    logging: *default-logging
+
+  ollama:
+    build:
+      context: ./ollama
+      dockerfile: Dockerfile
+      args:
+        OLLAMA_VERSION: "${OLLAMA_VERSION:-0.35.1}"
+    image: novel-forge-ai/ollama
+    container_name: novel-forge-ai-ollama
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    environment:
+      OLLAMA_MODEL: "${OLLAMA_MODEL:-qwen3:4b}"
+      OLLAMA_KEEP_ALIVE: "${OLLAMA_KEEP_ALIVE:-5m}"
+      OLLAMA_NUM_PARALLEL: "${OLLAMA_NUM_PARALLEL:-1}"
+      OLLAMA_MAX_LOADED_MODELS: "${OLLAMA_MAX_LOADED_MODELS:-1}"
+      OLLAMA_FLASH_ATTENTION: "${OLLAMA_FLASH_ATTENTION:-1}"
+      OLLAMA_CONTEXT_LENGTH: "${OLLAMA_CONTEXT_LENGTH:-8192}"
+    volumes:
+      - novel-forge-ai-ollama-models:/root/.ollama
+    networks:
+      - novel-forge-ai-network
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    logging: *default-logging
+
+networks:
+  novel-forge-ai-network:
+    name: novel-forge-ai-network
+    driver: bridge
+
+volumes:
+  novel-forge-ai-vendor:
+    name: novel-forge-ai-vendor
+  novel-forge-ai-node-modules:
+    name: novel-forge-ai-node-modules
+  novel-forge-ai-storage:
+    name: novel-forge-ai-storage
+  novel-forge-ai-ollama-models:
+    name: novel-forge-ai-ollama-models
