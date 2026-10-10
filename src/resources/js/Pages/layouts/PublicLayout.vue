@@ -11,6 +11,7 @@ import {
     faUserGear,
 } from '@fortawesome/free-solid-svg-icons'
 import FlashMessageToaster from '@/components/common/layout/FlashMessageToaster.vue'
+import AiBrainStatusSlider from '@/components/common/layout/AiBrainStatusSlider.vue'
 
 library.add(
     faChevronDown,
@@ -74,6 +75,10 @@ onBeforeUnmount(() => {
                         {{ appName }}
                     </span>
                 </a>
+
+                <div class="hidden min-w-0 flex-1 items-center justify-center px-3 md:flex">
+                    <AiBrainStatusSlider />
+                </div>
 
                 <div class="flex shrink-0 items-center">
                     <a

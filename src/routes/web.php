@@ -15,6 +15,7 @@ use App\Http\Controllers\BackOffice\NovelController;
 use App\Http\Controllers\BackOffice\NovelGeneratorStepController;
 use App\Http\Controllers\BackOffice\NovelTypeController;
 use App\Http\Controllers\BackOffice\UserController;
+use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
@@ -260,6 +261,10 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
     Route::prefix('queue-monitor')->name('queue-monitor.')->middleware(['is.super.admin'])->group(function () {
         Route::get('/', ShowQueueMonitorController::class)->name('index');
     });
+});
+
+Route::prefix('layout')->name('layout.')->group(function () {
+    Route::get('ai-brains', [LayoutController::class, 'aiBrains'])->name('ai-brains');
 });
 
 Route::redirect('/', '/home');

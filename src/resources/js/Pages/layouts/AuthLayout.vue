@@ -2,6 +2,7 @@
 import OffCanvasMenu from '@/components/common/layout/auth-layout/OffCanvasMenu.vue'
 import Breadcrumbs from '@/components/common/layout/auth-layout/Breadcrumbs.vue'
 import AuthTopbarDropdownMenu from '@/components/common/layout/auth-layout/AuthTopbarDropdownMenu.vue'
+import AiBrainStatusSlider from '@/components/common/layout/AiBrainStatusSlider.vue'
 import FlashMessageToaster from '@/components/common/layout/FlashMessageToaster.vue'
 
 import { usePage } from '@inertiajs/vue3'
@@ -36,6 +37,10 @@ provide('authUser', authUser)
                         {{ appName }}
                     </span>
                 </a>
+
+                <div class="hidden min-w-0 flex-1 items-center justify-center px-3 sm:flex">
+                    <AiBrainStatusSlider />
+                </div>
 
                 <div class="flex items-center gap-2.5">
 

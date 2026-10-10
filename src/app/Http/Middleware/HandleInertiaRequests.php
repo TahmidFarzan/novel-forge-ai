@@ -2,6 +2,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use App\Services\LayoutService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
@@ -52,6 +53,8 @@ class HandleInertiaRequests extends Middleware
             ],
 
             'flashMessage' => $request->session()->get('flash_message') ?? null,
+
+            'aiBrains' => app(LayoutService::class)->getAvailableAiBrains($request),
         ]);
 
         return $requestData;
