@@ -172,3 +172,22 @@ docker compose up
        key, storage:link, migrate, seed, optimize) -> exec php-fpm
   -> nginx starts and proxies PHP to app:9000
 ```
+
+## Development override
+
+`docker/docker-compose.dev.yml` layers on top of this file for local
+development without changing the production services:
+
+- `app` runs `startup.dev.sh` instead of `startup.sh`, so it installs
+  dependencies, generates the key, links storage, and migrates/seeds, but does
+  not build assets or cache the framework. It receives `APP_ENV=local` and
+  `APP_DEBUG=true`.
+- `storage/` is bind-mounted from the host instead of the named volume, so logs
+  and uploads are visible and editable on the host.
+- A `queue` service runs `php artisan queue:listen`, feeding the queue-monitor
+  dashboard.
+- A `vite` service serves assets with HMR; `nginx.dev.conf` proxies Vite and the
+  `/vite-hmr` websocket through the single nginx origin.
+
+The `vendor` and `node_modules` named volumes are kept in both modes for
+performance. See [docker-development.md](docker-development.md).

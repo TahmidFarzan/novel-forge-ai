@@ -12,6 +12,19 @@ separate Ollama container provides local AI inference.
 - At least 8 GB RAM free (16 GB+ recommended for AI generation)
 - ~6 GB free disk for the container images and the `qwen3:4b` model
 
+## Local development
+
+For day-to-day development use the development override instead of the plain
+production compose file. It bind-mounts the source, serves assets with Vite HMR,
+runs a queue worker, and makes `storage/` visible on the host:
+
+```sh
+cd docker
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+```
+
+See [docker-development.md](docker-development.md) for the full workflow.
+
 ## 1. Configure the environment
 
 ```sh

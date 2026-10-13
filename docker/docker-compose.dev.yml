@@ -1,0 +1,81 @@
+name: novel-forge-ai
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  app:
+    environment:
+      APP_ENV: "${APP_ENV:-local}"
+      APP_DEBUG: "${APP_DEBUG:-true}"
+      LOG_LEVEL: "${LOG_LEVEL:-debug}"
+      STARTUP_SCRIPT: "/usr/local/bin/startup.dev.sh"
+    volumes:
+      - ../src:/var/www/html/novel-forge-ai
+      - novel-forge-ai-vendor:/var/www/html/novel-forge-ai/vendor
+      - novel-forge-ai-node-modules:/var/www/html/novel-forge-ai/node_modules
+      - ../src/storage:/var/www/html/novel-forge-ai/storage
+
+  nginx:
+    depends_on:
+      vite:
+        condition: service_started
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../src:/var/www/html/novel-forge-ai:ro
+      - ../src/storage:/var/www/html/novel-forge-ai/storage:ro
+
+  queue:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    image: novel-forge-ai/app
+    container_name: novel-forge-ai-queue
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    working_dir: /var/www/html/novel-forge-ai
+    command: ["php", "artisan", "queue:listen", "--tries=1", "--timeout=0"]
+    environment:
+      APP_ENV: "${APP_ENV:-local}"
+      APP_DEBUG: "${APP_DEBUG:-true}"
+      LOG_LEVEL: "${LOG_LEVEL:-debug}"
+      APP_URL: "${APP_URL:-http://novel-forge-ai.localhost/}"
+      AI_BRAIN_URL: "${AI_BRAIN_URL:-http://ollama:11434}"
+      AI_BRAIN_API_KEY: "${AI_BRAIN_API_KEY:-ollama}"
+      OLLAMA_URL: "${OLLAMA_URL:-http://ollama:11434}"
+      OLLAMA_HOST: "${OLLAMA_HOST:-http://ollama:11434}"
+      STARTUP_SCRIPT: "/usr/local/bin/startup.dev.sh"
+    volumes:
+      - ../src:/var/www/html/novel-forge-ai
+      - novel-forge-ai-vendor:/var/www/html/novel-forge-ai/vendor
+      - novel-forge-ai-node-modules:/var/www/html/novel-forge-ai/node_modules
+      - ../src/storage:/var/www/html/novel-forge-ai/storage
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - novel-forge-ai-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging: *default-logging
+
+  vite:
+    image: node:22-alpine
+    container_name: novel-forge-ai-vite
+    restart: unless-stopped
+    init: true
+    working_dir: /var/www/html/novel-forge-ai
+    command: ["sh", "-c", "npm run dev -- --host 0.0.0.0"]
+    volumes:
+      - ../src:/var/www/html/novel-forge-ai
+      - novel-forge-ai-node-modules:/var/www/html/novel-forge-ai/node_modules
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - novel-forge-ai-network
+    logging: *default-logging

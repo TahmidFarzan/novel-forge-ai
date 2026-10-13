@@ -4,6 +4,19 @@ Common commands for developing Novel Forge AI. Docker commands are run from the
 `docker/` directory; application commands are run through `docker compose exec`
 against the `app` service.
 
+For the live-reload development workflow, prefix the Compose commands with the
+development override:
+
+```sh
+cd docker
+alias nfdocker='docker compose -f docker-compose.yml -f docker-compose.dev.yml'
+nfdocker up -d --build
+nfdocker logs -f app
+nfdocker exec app php artisan test
+```
+
+See [docker-development.md](docker-development.md).
+
 ## Docker Compose
 
 | Command | Description |

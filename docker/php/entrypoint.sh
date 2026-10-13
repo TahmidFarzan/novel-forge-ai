@@ -52,7 +52,7 @@ ensure_writable node_modules
 
 log "Running application provisioning as www-data"
 
-if ! su-exec www-data /usr/local/bin/startup.sh; then
+if ! su-exec www-data "${STARTUP_SCRIPT:-/usr/local/bin/startup.sh}"; then
     fail "application provisioning failed, php-fpm will not start"
 fi
 

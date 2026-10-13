@@ -18,6 +18,8 @@ services:
     stop_grace_period: 30s
     working_dir: /var/www/html/novel-forge-ai
     environment:
+      APP_ENV: "${APP_ENV:-production}"
+      APP_DEBUG: "${APP_DEBUG:-false}"
       APP_URL: "${APP_URL:-http://novel-forge-ai.localhost/}"
       AI_BRAIN_URL: "${AI_BRAIN_URL:-http://ollama:11434}"
       AI_BRAIN_API_KEY: "${AI_BRAIN_API_KEY:-ollama}"

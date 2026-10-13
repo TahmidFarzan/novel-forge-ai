@@ -154,8 +154,42 @@ the host/VM filesystem bridge. To get the best performance:
 - Keep the repository inside the Linux filesystem. On Windows, clone it into the
   WSL2 filesystem (for example `\\wsl$\Ubuntu\home\<user>\novel-forge-ai`)
   instead of `C:\`.
-- Do not run a Vite watcher inside the container. The stack builds assets with
-  `npm run build` during provisioning; use a local `npm run dev` outside Docker
-  if you need HMR.
+- Use the development override for HMR. It runs Vite in the dedicated `vite`
+  service; the production stack builds assets with `npm run build` during
+  provisioning and serves them statically.
 - Only the Nginx and Ollama service ports are published, and Nginx mounts the
   project read-only.
+
+## Development stack issues
+
+The development workflow uses
+`docker compose -f docker-compose.yml -f docker-compose.dev.yml`. If PHP changes
+do not appear, confirm `app` is using the dev entrypoint:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.dev.yml exec app env | grep STARTUP_SCRIPT
+```
+
+Expected value: `STARTUP_SCRIPT=/usr/local/bin/startup.dev.sh`. The dev
+provisioning intentionally skips `php artisan optimize`; if a cached
+configuration is suspected, clear it:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.dev.yml exec app php artisan optimize:clear
+```
+
+If Vite assets or HMR do not load, check the `vite` service and open the app on
+the same origin the Vite config uses (`http://novel-forge-ai.localhost/` by
+default):
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f vite
+docker compose -f docker-compose.yml -f docker-compose.dev.yml exec app cat public/hot
+```
+
+The `public/hot` file must contain `http://novel-forge-ai.localhost`. If the app
+is opened on a different host, set `VITE_DEV_SERVER_ORIGIN` and `VITE_HMR_HOST`
+for the `vite` service and `APP_URL` for `app` to the same origin.
+
+Laravel logs for the development stack are written to `src/storage/logs` on the
+host because `storage` is bind-mounted (not a named volume) in dev mode.

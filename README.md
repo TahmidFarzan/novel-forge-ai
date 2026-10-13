@@ -56,6 +56,20 @@ idempotent.
 
 See [Docker deployment](docs/docker-installation.md) for details.
 
+## Development (Docker)
+
+For a live-reload development environment (bind-mounted source, Vite HMR, a
+queue worker, and host-visible logs), layer the development override on top of
+the production stack:
+
+```sh
+cd docker
+cp .env.example .env
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+```
+
+See [Docker development](docs/docker-development.md) for details.
+
 ## Quick start (manual)
 
 Requires PHP 8.4+, Composer, Node.js 22+, and Ollama.
@@ -75,6 +89,7 @@ See [Manual installation](docs/manual-installation.md) for details.
 ## Documentation
 
 - [Docker deployment](docs/docker-installation.md) — deployment flow and configuration
+- [Docker development](docs/docker-development.md) — live-reload development workflow
 - [Docker architecture](docs/docker-architecture.md) — containers, volumes, startup scripts
 - [Docker script description](docs/docker-script-description.md) — entrypoint and startup steps
 - [Troubleshooting](docs/troubleshooting.md) — common problems and fixes

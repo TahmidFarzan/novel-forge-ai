@@ -28,6 +28,15 @@ docker compose up -d --build
 
 Open <http://novel-forge-ai.localhost/> (or <http://localhost/>).
 
+For development (bind-mounted source, Vite HMR, queue worker, host-visible
+logs), layer the development override instead:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+```
+
+See [../docs/docker-development.md](../docs/docker-development.md).
+
 The first boot pulls the Ollama model, installs Composer and npm dependencies,
 builds the production frontend into `public/build`, migrates and seeds SQLite,
 and caches the framework. Later boots skip everything that already exists.
