@@ -44,9 +44,12 @@ It declares four named volumes: the two persistent data volumes
 (`novel-forge-ai-storage` and `novel-forge-ai-ollama-models`) plus
 `novel-forge-ai-vendor` and `novel-forge-ai-node-modules`, which keep the
 Linux-native Composer and npm dependencies out of the Windows/macOS bind mount
-for file-sync performance. It publishes only the Nginx port and defines a health
-check for every service. The `app` service depends on `ollama` starting;
-`nginx` depends on `app` becoming healthy.
+for file-sync performance. Both `app` and `queue` additionally bind-mount
+`../src/storage/logs` over the storage volume, so Laravel log files are written
+to the host project directory and survive container recreation. It publishes
+only the Nginx port and defines a health check for every service. The `app`
+service depends on `ollama` starting; `nginx` depends on `app` becoming
+healthy.
 
 ## `docker/.env.example`
 
@@ -90,9 +93,9 @@ The root entrypoint. It prepares writable paths before handing off to PHP-FPM:
 2. Creates `src/.env` from `src/.env.example` when missing (never overwrites an
    existing `.env`, so `APP_KEY` persists).
 3. Creates `database/database.sqlite` if it does not exist.
-4. Ensures `storage/`, `bootstrap/cache/`, and the SQLite file are owned by
-   `www-data`, so PHP-FPM workers can write logs, cache, sessions, and the
-   database.
+4. Ensures `storage/`, `storage/logs/`, `bootstrap/cache/`, and the SQLite file
+   are owned by `www-data`, so PHP-FPM workers can write logs, cache, sessions,
+   and the database.
 5. Runs `startup.sh` as `www-data`.
 6. `exec`s the container command (`php-fpm`), so the real process receives stop
    signals directly.

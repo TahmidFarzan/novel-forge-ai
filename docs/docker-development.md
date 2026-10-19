@@ -44,7 +44,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml down
 | `APP_ENV` / `APP_DEBUG` | `production` / `false` | `local` / `true` |
 | Laravel config/routes/views | cached (`php artisan optimize`) | not cached (`optimize:clear` only) |
 | Frontend assets | built into `public/build` | served by the `vite` service (HMR) |
-| `storage/` | named volume | bind-mounted from host `src/storage` |
+| `storage/` | named volume, `storage/logs` bind-mounted to host | bind-mounted from host `src/storage` |
 | Queue worker | none (sync dispatch) | `novel-forge-ai-queue` runs `queue:listen` |
 | Vite | not running | `novel-forge-ai-vite` on `:5173`, proxied by nginx |
 
@@ -90,8 +90,9 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f ollama
 ```
 
 Because `storage/` is bind-mounted, Laravel logs are also written to
-`src/storage/logs/laravel.log` on the host and are readable with any local tool,
-or through the in-app log viewer (`opcodesio/log-viewer`).
+`src/storage/logs` on the host (the `daily` channel creates
+`laravel-YYYY-MM-DD.log` files) and are readable with any local tool, or through
+the in-app log viewer (`opcodesio/log-viewer`).
 
 ## Queue monitoring and AI debugging
 
@@ -99,8 +100,8 @@ The `queue` service consumes the `database` queue and reports to the
 `romanzipp/laravel-queue-monitor` dashboard at
 `/back-office/queue-monitor` (super-admin only). AI generation itself runs
 synchronously inside the web request; its failures are written to
-`storage/logs/laravel.log` with the step name, model, and reason. Ollama traffic
-is logged by `docker compose ... logs -f ollama`.
+`storage/logs/laravel-YYYY-MM-DD.log` with the step name, model, and reason.
+Ollama traffic is logged by `docker compose ... logs -f ollama`.
 
 ## Environment configuration
 
@@ -121,7 +122,7 @@ $DEV exec app php artisan db:seed --force
 $DEV exec app php artisan tinker
 $DEV exec app php artisan test
 $DEV exec app sh
-$DEV exec app tail -f storage/logs/laravel.log
+$DEV exec app sh -c 'tail -f storage/logs/laravel-$(date +%F).log'
 $DEV exec ollama ollama list
 $DEV restart app
 $DEV down

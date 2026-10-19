@@ -109,6 +109,6 @@ docker compose exec app php artisan optimize:clear
 # Rebuild assets after editing Vue/CSS
 docker compose exec app npm run build
 
-# Tail the Laravel log (stored in the storage volume)
-docker compose exec app tail -f storage/logs/laravel.log
+# Tail today's Laravel log (visible on the host at src/storage/logs)
+docker compose exec app sh -c 'tail -f storage/logs/laravel-$(date +%F).log'
 ```

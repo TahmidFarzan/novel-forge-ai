@@ -67,7 +67,7 @@ docker/
 | --- | --- | --- |
 | `novel-forge-ai-vendor` | `app:/var/www/html/novel-forge-ai/vendor` | Composer dependencies (Linux-native, kept off the host filesystem) |
 | `novel-forge-ai-node-modules` | `app:/var/www/html/novel-forge-ai/node_modules` | npm dependencies (Linux-native) |
-| `novel-forge-ai-storage` | `app:/var/www/html/novel-forge-ai/storage`, `nginx:.../storage:ro` | Laravel storage: logs, cache, sessions, uploads |
+| `novel-forge-ai-storage` | `app:/var/www/html/novel-forge-ai/storage`, `nginx:.../storage:ro` | Laravel storage: cache, sessions, uploads (`storage/logs` is bind-mounted from the host) |
 | `novel-forge-ai-ollama-models` | `/root/.ollama` | Downloaded Ollama models |
 
 Only `../src` is bind-mounted into the `app` container, at the multi-site path
@@ -76,7 +76,9 @@ mounts the same project read-only and points its document root at
 `/var/www/html/novel-forge-ai/public`; additional projects can be added as
 sibling folders under `/var/www/html`. The `vendor`, `node_modules`, and
 `storage` directories inside the bind mount are shadowed by named volumes, so
-they are never synced over the host/VM boundary. `public/build` and
+they are never synced over the host/VM boundary, except for `storage/logs`,
+which is bind-mounted back to the host so Laravel logs appear in
+`src/storage/logs`. `public/build` and
 `database/database.sqlite` stay in `src/` so they are visible to Nginx and
 survive restarts.
 

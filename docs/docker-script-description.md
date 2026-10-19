@@ -23,10 +23,10 @@ Runs as PID 1 on every container start, before PHP-FPM:
    existing `.env` is never overwritten, so `APP_KEY` and user settings persist
    across restarts.
 4. Creates `database/database.sqlite` when it does not exist.
-5. Repairs ownership on any of `storage`, `bootstrap/cache`, `database`,
-   `public`, `vendor`, and `node_modules` that `www-data` cannot write to. This
-   handles bind mounts created on Linux hosts and named volumes created by an
-   older image.
+5. Repairs ownership on any of `storage`, `storage/logs`, `bootstrap/cache`,
+   `database`, `public`, `vendor`, and `node_modules` that `www-data` cannot
+   write to. This handles bind mounts created on Linux hosts and named volumes
+   created by an older image.
 6. Runs `startup.sh` as `www-data` via `su-exec`.
 7. `exec "$@"` replaces the shell with the container command (`php-fpm`), so
    `SIGTERM`/`SIGINT` from `docker stop` reach PHP-FPM directly. No supervisor or

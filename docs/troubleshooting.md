@@ -97,17 +97,20 @@ docker compose exec app sh -c "rm -f node_modules/.novel-forge-ai-container && n
 docker compose restart app
 ```
 
-## Uploaded media or logs are missing after the upgrade
+## Uploaded media is missing after the upgrade
 
-Because `storage/` now lives in the `novel-forge-ai-storage` volume, existing
-files kept in `src/storage` are shadowed. Copy them into the volume once, as
-described in
+Because everything in `storage/` except `storage/logs` lives in the
+`novel-forge-ai-storage` volume, existing files kept in `src/storage` are
+shadowed. Copy them into the volume once, as described in
 [docker-installation.md](docker-installation.md#migrating-existing-storage).
+Laravel logs are not affected: `storage/logs` is bind-mounted to
+`src/storage/logs` on the host in both stacks.
 
 ## Permission errors on logs, cache, or the SQLite database
 
-The entrypoint makes `storage/`, `bootstrap/cache/`, `public/build/`, and
-`database/database.sqlite` writable by `www-data` on every boot. If a file was
+The entrypoint makes `storage/`, `storage/logs/`, `bootstrap/cache/`,
+`public/build/`, and `database/database.sqlite` writable by `www-data` on every
+boot. If a file was
 created by a manual `docker compose exec` command running as root, restart the
 app container to re-apply ownership:
 
@@ -140,10 +143,11 @@ next boot.
 
 ## Windows and macOS performance
 
-Only the application source is bind-mounted, and only for editing. Everything
-that is written at runtime lives in Linux-native named volumes:
+Only the application source and the Laravel log directory are bind-mounted.
+Everything else that is written at runtime lives in Linux-native named volumes:
 
 - `../src` -> `/var/www/html/novel-forge-ai` (bind mount, live edits)
+- `../src/storage/logs` -> `.../storage/logs` (bind mount, host-visible logs)
 - `novel-forge-ai-vendor` -> `.../vendor` (named volume)
 - `novel-forge-ai-node-modules` -> `.../node_modules` (named volume)
 - `novel-forge-ai-storage` -> `.../storage` (named volume)
@@ -191,5 +195,6 @@ The `public/hot` file must contain `http://novel-forge-ai.localhost`. If the app
 is opened on a different host, set `VITE_DEV_SERVER_ORIGIN` and `VITE_HMR_HOST`
 for the `vite` service and `APP_URL` for `app` to the same origin.
 
-Laravel logs for the development stack are written to `src/storage/logs` on the
-host because `storage` is bind-mounted (not a named volume) in dev mode.
+Laravel logs are written to `src/storage/logs` on the host in both stacks: the
+development override bind-mounts all of `storage/`, and the base stack
+bind-mounts `storage/logs` over the named storage volume.

@@ -43,6 +43,7 @@ ensure_writable() {
 }
 
 ensure_writable storage
+ensure_writable storage/logs
 ensure_writable bootstrap/cache
 ensure_writable database
 ensure_writable public

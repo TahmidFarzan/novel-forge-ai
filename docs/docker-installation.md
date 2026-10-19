@@ -144,7 +144,8 @@ If a new seeder must run, add
 
 The stack stores `storage/` in the `novel-forge-ai-storage` volume. If you are
 upgrading from a setup that kept `storage/` inside `src/` and want to carry the
-existing logs or uploaded media across, copy them into the volume once:
+existing uploaded media across, copy them into the volume once (Laravel logs do
+not need this: `storage/logs` stays on the host via its bind mount):
 
 ```sh
 cd docker
