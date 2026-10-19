@@ -1,0 +1,12 @@
+.git
+.github
+docs
+docker/.env
+src/.env
+src/node_modules
+src/vendor
+src/storage
+src/bootstrap/cache
+src/public/build
+src/public/storage
+src/database/*.sqlite*

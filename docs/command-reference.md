@@ -10,10 +10,14 @@ development override:
 ```sh
 cd docker
 alias nfdocker='docker compose -f docker-compose.yml -f docker-compose.dev.yml'
-nfdocker up -d --build
+nfdocker up --build --watch
 nfdocker logs -f app
 nfdocker exec app php artisan test
 ```
+
+Watch runs in the foreground. To keep the stack detached, run
+`nfdocker up -d --build` and `nfdocker watch` in separate terminals; Compose
+rejects `up -d --watch`.
 
 See [docker-development.md](docker-development.md).
 
@@ -23,8 +27,10 @@ See [docker-development.md](docker-development.md).
 | --- | --- |
 | `docker compose up -d --build` | Build images and start the stack in the background |
 | `docker compose up` | Start the stack in the foreground (logs streamed) |
+| `docker compose up --build --watch` | Build, start, and sync source with Compose Watch (foreground) |
+| `docker compose watch` | Sync source into an already-running stack |
 | `docker compose ps` | Show container status and health |
-| `docker compose logs -f <service>` | Follow logs (`app`, `nginx`, `ollama`) |
+| `docker compose logs -f <service>` | Follow logs (`app`, `queue`, `nginx`, `vite`, `ollama`) |
 | `docker compose restart app` | Restart the application container |
 | `docker compose stop` | Stop containers, keep volumes |
 | `docker compose start` | Start previously stopped containers |
@@ -52,15 +58,17 @@ See [docker-development.md](docker-development.md).
 | `docker compose exec app php artisan tinker` | Open an interactive REPL |
 | `docker compose exec app sh` | Open a shell in the container |
 
-## Frontend (inside `app`)
+## Frontend
 
-Vite runs inside the application container; there is no separate frontend
-service.
+Production assets are built inside `app`. Development uses the dedicated `vite`
+service with HMR.
 
 | Command | Description |
 | --- | --- |
 | `docker compose exec app npm run build` | Build production assets into `public/build` |
 | `docker compose exec app npm install` | Install/refresh dependencies |
+| `nfdocker logs -f vite` | Follow the Vite dev server |
+| `nfdocker exec app cat public/hot` | Check the Vite dev server URL used by Laravel |
 
 ## Composer (inside `app`)
 

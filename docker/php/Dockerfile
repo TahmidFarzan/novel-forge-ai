@@ -51,16 +51,18 @@ RUN mkdir -p \
         /var/www/html/novel-forge-ai/node_modules \
     && chown -R www-data:www-data /var/www/html
 
-COPY php.ini /usr/local/etc/php/conf.d/99-novel-forge-ai.ini
-COPY www.conf /usr/local/etc/php-fpm.d/www.conf
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY startup.sh /usr/local/bin/startup.sh
-COPY startup.dev.sh /usr/local/bin/startup.dev.sh
+COPY docker/php/php.ini /usr/local/etc/php/conf.d/99-novel-forge-ai.ini
+COPY docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY docker/php/startup.sh /usr/local/bin/startup.sh
+COPY docker/php/startup.dev.sh /usr/local/bin/startup.dev.sh
 
 RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh /usr/local/bin/startup.sh /usr/local/bin/startup.dev.sh \
     && chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/startup.sh /usr/local/bin/startup.dev.sh
 
 WORKDIR /var/www/html/novel-forge-ai
+
+COPY --chown=www-data:www-data src/ /var/www/html/novel-forge-ai/
 
 EXPOSE 9000
 

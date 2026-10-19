@@ -9,8 +9,8 @@ x-logging: &default-logging
 services:
   app:
     build:
-      context: ./php
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/php/Dockerfile
     image: novel-forge-ai/app
     container_name: novel-forge-ai-app
     restart: unless-stopped
@@ -48,8 +48,8 @@ services:
 
   queue:
     build:
-      context: ./php
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/php/Dockerfile
     image: novel-forge-ai/app
     container_name: novel-forge-ai-queue
     restart: unless-stopped

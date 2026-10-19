@@ -67,15 +67,19 @@ docker compose exec ollama ollama list
 
 ## Assets are missing or stale (`404` on `/build/...`)
 
-The production build output must exist in `public/build`:
+In production the build output must exist in `public/build`:
 
 ```sh
 docker compose exec app npm run build
 ```
 
-If a previous dev run left a `public/hot` file, Laravel tries to load assets
-from a dev server. The startup script removes it automatically; remove it
-manually if needed:
+In development Vite serves assets and writes `public/hot`; Watch syncs that file
+into `app`. If assets still look stale, check the `vite` service and `public/hot`
+as described in [Development stack issues](#development-stack-issues).
+
+If a previous production run left a `public/hot` file, Laravel tries to load
+assets from a dev server. The production startup script removes it
+automatically; remove it manually if needed:
 
 ```sh
 docker compose exec app rm -f public/hot
@@ -141,19 +145,51 @@ docker compose up -d --build
 This deletes the storage and model volumes. The model is re-downloaded on the
 next boot.
 
+## Compose Watch is not syncing
+
+- Confirm the watcher is running:
+  `docker compose -f docker-compose.yml -f docker-compose.dev.yml watch`.
+  `up -d --watch` is rejected; start detached and run `watch` separately.
+- Watch only runs while the process is alive. Edits made while it is stopped are
+  picked up by the next start; after a branch switch or `git pull`, rebuild the
+  app image so the baked snapshot matches:
+  `docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build`.
+- `app` has no source bind in development. Do not add `../src` back to its
+  volumes; that shadows the Watch target.
+- `vendor/`, `node_modules/`, `storage/`, `database/`, `bootstrap/cache/`,
+  `public/build/`, `public/storage`, and `.env` are intentionally ignored.
+  Those paths are mounts, volumes, or runtime output.
+- The dev `app` binds `src/.env` as a file. If `src/.env` did not exist before
+  the first start, Docker may have created a directory at that path. Stop the
+  stack, remove that directory, create the file with
+  `cp src/.env.example src/.env`, then start again.
+- If `.env` changes do not appear, the editor may have replaced the file
+  atomically and broken the bind. Recreate `app`:
+  `docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --force-recreate app`.
+- If Vite's URL is stale in `app`, check that Watch is running and that
+  `public/hot` is not ignored:
+  `docker compose -f docker-compose.yml -f docker-compose.dev.yml exec app cat public/hot`.
+
 ## Windows and macOS performance
 
-Only the application source and the Laravel log directory are bind-mounted.
-Everything else that is written at runtime lives in Linux-native named volumes:
+Production bind-mounts the source into `app` and `queue`, and read-only into
+`nginx`. Development syncs `app` with Compose Watch instead of a source bind;
+`queue`, `vite`, and `nginx` still bind-mount the source. Everything else that
+is written at runtime lives in Linux-native named volumes or focused binds:
 
-- `../src` -> `/var/www/html/novel-forge-ai` (bind mount, live edits)
-- `../src/storage/logs` -> `.../storage/logs` (bind mount, host-visible logs)
+- production: `../src` -> `/var/www/html/novel-forge-ai` (bind, live edits)
+- development: `../src` -> `app` via Compose Watch (no source bind)
+- development: `../src/storage`, `../src/database`, `../src/.env` -> `app`
+- `../src/storage/logs` -> `.../storage/logs` (bind, host-visible logs)
 - `novel-forge-ai-vendor` -> `.../vendor` (named volume)
 - `novel-forge-ai-node-modules` -> `.../node_modules` (named volume)
-- `novel-forge-ai-storage` -> `.../storage` (named volume)
+- `novel-forge-ai-storage` -> `.../storage` (named volume, production)
 
-This keeps the tens of thousands of files in `vendor/` and `node_modules/` off
-the host/VM filesystem bridge. To get the best performance:
+Watch ignores `vendor/`, `node_modules/`, `storage/`, `database/`,
+`bootstrap/cache/`, `public/build/`, `public/storage`, and `.env`, so those are
+handled by mounts or kept in the container. This keeps the tens of thousands of
+files in `vendor/` and `node_modules/` off the host/VM filesystem bridge. To get
+the best performance:
 
 - Keep the repository inside the Linux filesystem. On Windows, clone it into the
   WSL2 filesystem (for example `\\wsl$\Ubuntu\home\<user>\novel-forge-ai`)

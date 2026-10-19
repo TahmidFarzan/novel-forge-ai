@@ -8,6 +8,7 @@ separate Ollama container provides local AI inference.
 ## Requirements
 
 - Docker Engine 24+ with the Compose v2 plugin (`docker compose version`)
+- Compose 2.24.4+ for the development override (`volumes: !override`)
 - On Windows and macOS: Docker Desktop
 - At least 8 GB RAM free (16 GB+ recommended for AI generation)
 - ~6 GB free disk for the container images and the `qwen3:4b` model
@@ -15,13 +16,19 @@ separate Ollama container provides local AI inference.
 ## Local development
 
 For day-to-day development use the development override instead of the plain
-production compose file. It bind-mounts the source, serves assets with Vite HMR,
-runs a queue worker, and makes `storage/` visible on the host:
+production compose file. It runs `app` from the image's source snapshot, syncs
+host edits with one Compose Watch rule, serves assets with Vite HMR, runs a queue
+worker, and makes `storage/` visible on the host:
 
 ```sh
 cd docker
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+[ -f ../src/.env ] || cp ../src/.env.example ../src/.env   # required before the first dev start
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build --watch
 ```
+
+Watch must run in the foreground; `up -d --watch` is not supported. For a
+detached stack, run `up -d --build` and then
+`docker compose -f docker-compose.yml -f docker-compose.dev.yml watch`.
 
 See [docker-development.md](docker-development.md) for the full workflow.
 

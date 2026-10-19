@@ -13,11 +13,27 @@ services:
       APP_DEBUG: "${APP_DEBUG:-true}"
       LOG_LEVEL: "${LOG_LEVEL:-debug}"
       STARTUP_SCRIPT: "/usr/local/bin/startup.dev.sh"
-    volumes:
-      - ../src:/var/www/html/novel-forge-ai
+    volumes: !override
       - novel-forge-ai-vendor:/var/www/html/novel-forge-ai/vendor
       - novel-forge-ai-node-modules:/var/www/html/novel-forge-ai/node_modules
       - ../src/storage:/var/www/html/novel-forge-ai/storage
+      - ../src/database:/var/www/html/novel-forge-ai/database
+      - ../src/.env:/var/www/html/novel-forge-ai/.env
+    develop:
+      watch:
+        - action: sync
+          path: ../src
+          target: /var/www/html/novel-forge-ai
+          initial_sync: true
+          ignore:
+            - .env
+            - vendor/
+            - node_modules/
+            - storage/
+            - database/
+            - bootstrap/cache/
+            - public/build/
+            - public/storage
 
   nginx:
     depends_on:
@@ -30,8 +46,8 @@ services:
 
   queue:
     build:
-      context: ./php
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/php/Dockerfile
     image: novel-forge-ai/app
     container_name: novel-forge-ai-queue
     restart: unless-stopped

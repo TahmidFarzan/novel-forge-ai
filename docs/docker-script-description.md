@@ -5,10 +5,13 @@ copied into the image by `docker/php/Dockerfile`:
 
 | Script | Runs as | Responsibility |
 | --- | --- | --- |
-| `docker/php/entrypoint.sh` | `root` | Prepare writable paths, create the missing environment/database files, then hand off to `startup.sh` |
-| `docker/php/startup.sh` | `www-data` | Idempotent application provisioning (the 11 deployment steps) |
+| `docker/php/entrypoint.sh` | `root` | Prepare writable paths, create the missing environment/database files, then hand off to the selected startup script |
+| `docker/php/startup.sh` | `www-data` | Idempotent production provisioning (the 11 deployment steps) |
+| `docker/php/startup.dev.sh` | `www-data` | Development provisioning without asset build or framework cache |
 
-Both scripts start with `set -eu`, so any unexpected command failure aborts the
+`entrypoint.sh` selects the script from `${STARTUP_SCRIPT:-/usr/local/bin/startup.sh}`;
+the development override sets `STARTUP_SCRIPT=/usr/local/bin/startup.dev.sh`.
+All scripts start with `set -eu`, so any unexpected command failure aborts the
 boot instead of silently starting a half-configured container.
 
 ## `entrypoint.sh`
@@ -27,7 +30,8 @@ Runs as PID 1 on every container start, before PHP-FPM:
    `database`, `public`, `vendor`, and `node_modules` that `www-data` cannot
    write to. This handles bind mounts created on Linux hosts and named volumes
    created by an older image.
-6. Runs `startup.sh` as `www-data` via `su-exec`.
+6. Runs the selected startup script (`startup.sh`, or `startup.dev.sh` in
+   development) as `www-data` via `su-exec`.
 7. `exec "$@"` replaces the shell with the container command (`php-fpm`), so
    `SIGTERM`/`SIGINT` from `docker stop` reach PHP-FPM directly. No supervisor or
    extra process manager is needed.
@@ -114,6 +118,24 @@ config, routes, events, and views for production performance.
 
 `startup.sh` exits successfully and `entrypoint.sh` `exec`s PHP-FPM. The
 container stays running in the foreground.
+
+## `startup.dev.sh`
+
+Runs instead of `startup.sh` in development. It requires `src/.env` to exist
+(it is bind-mounted into `app`), then:
+
+1. Runs `composer install` when `vendor/autoload.php` is missing.
+2. Generates `APP_KEY` when the `.env` file has no key.
+3. Runs `npm install` when `node_modules/` is missing or lacks the container
+   marker.
+4. Creates the `public/storage` link when missing.
+5. Clears cached configuration, routes, events, and views.
+6. Runs pending migrations and seeds only when the database has no users.
+7. Skips the production asset build and `php artisan optimize`; Vite serves the
+   frontend in development.
+
+The script does not update the source tree. Source changes reach `app` through
+Compose Watch, while `queue` and `vite` read the host bind mount directly.
 
 ## APP_URL normalization in Laravel
 

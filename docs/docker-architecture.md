@@ -9,18 +9,19 @@ The deployment models a Laravel application on a production Linux server, not a
 microservice platform:
 
 - One application container owns PHP, Composer, the build toolchain, and the
-  Laravel codebase.
+  Laravel codebase. A queue worker uses the same image.
 - Nginx is a thin web tier: it serves `public/` and proxies PHP. It does not run
   application code.
 - Ollama is an independent service reachable over the internal network.
-- Frontend assets are built by Vite into `public/build` at boot and served
-  statically. There is no Node runtime service and no database container.
+- Frontend assets are built into `public/build` at boot and served statically.
+  There is no Node runtime service in production and no database container.
+  Development adds a dedicated Vite container.
 
 ## Naming convention
 
 | Kind | Pattern | Examples |
 | --- | --- | --- |
-| Compose service | `<service>` | `app`, `nginx`, `ollama` |
+| Compose service | `<service>` | `app`, `queue`, `nginx`, `ollama`, `vite` (dev) |
 | Container | `novel-forge-ai-<service>` | `novel-forge-ai-app` |
 | Image | `novel-forge-ai/<service>` | `novel-forge-ai/nginx` |
 | Volume | `novel-forge-ai-<purpose>` | `novel-forge-ai-storage` |
@@ -31,12 +32,13 @@ Internal traffic always uses Compose service names (`app:9000`,
 
 ## `docker-compose.yml`
 
-Defines the `novel-forge-ai` project with three services on the
+Defines the `novel-forge-ai` project with four services on the
 `novel-forge-ai-network` bridge network:
 
 | Service | Container | Image | Notes |
 | --- | --- | --- | --- |
 | `app` | `novel-forge-ai-app` | `novel-forge-ai/app` | PHP-FPM running Laravel; bind-mounts `../src` |
+| `queue` | `novel-forge-ai-queue` | `novel-forge-ai/app` | Queue worker; bind-mounts `../src` |
 | `nginx` | `novel-forge-ai-nginx` | `novel-forge-ai/nginx` | Publishes `${NGINX_HTTP_PORT:-80}`; serves `../src/public` |
 | `ollama` | `novel-forge-ai-ollama` | `novel-forge-ai/ollama` | Ollama server and model download |
 
@@ -47,9 +49,14 @@ Linux-native Composer and npm dependencies out of the Windows/macOS bind mount
 for file-sync performance. Both `app` and `queue` additionally bind-mount
 `../src/storage/logs` over the storage volume, so Laravel log files are written
 to the host project directory and survive container recreation. It publishes
-only the Nginx port and defines a health check for every service. The `app`
-service depends on `ollama` starting; `nginx` depends on `app` becoming
-healthy.
+only the Nginx port and defines a health check for the long-running services.
+The `queue` service depends on `app` becoming healthy; `nginx` depends on `app`
+becoming healthy.
+
+The application build context is the repository root, so the image contains a
+snapshot of `src/`. In production the source bind mount remains authoritative.
+In development the `app` source bind is removed and Compose Watch syncs the host
+tree into the container.
 
 ## `docker/.env.example`
 
@@ -69,8 +76,13 @@ Builds the application runtime image:
   `exif`, `gd`, `intl`, `mbstring`, `opcache`, `pcntl`, `pdo_sqlite`, `zip`.
 - Creates the `storage/` skeleton owned by `www-data`, so the named volume is
   initialized with the correct directories and ownership on first use.
-- Copies `php.ini`, `www.conf`, `entrypoint.sh`, and `startup.sh`; normalizes
-  CRLF line endings and marks the scripts executable.
+- Copies `php.ini`, `www.conf`, `entrypoint.sh`, `startup.sh`, and
+  `startup.dev.sh`; normalizes CRLF line endings and marks the scripts
+  executable.
+- Copies `src/` into the image after `WORKDIR` as `www-data`, so the layer is
+  reused until the source changes and the image is complete without a bind
+  mount. The root `.dockerignore` excludes host secrets, dependencies,
+  runtime storage, SQLite files, and built assets from the build context.
 - Runs `entrypoint.sh` as `ENTRYPOINT` and `php-fpm` as `CMD`.
 
 ## `docker/php/php.ini`
@@ -96,7 +108,8 @@ The root entrypoint. It prepares writable paths before handing off to PHP-FPM:
 4. Ensures `storage/`, `storage/logs/`, `bootstrap/cache/`, and the SQLite file
    are owned by `www-data`, so PHP-FPM workers can write logs, cache, sessions,
    and the database.
-5. Runs `startup.sh` as `www-data`.
+5. Runs `${STARTUP_SCRIPT:-/usr/local/bin/startup.sh}` as `www-data`; the
+   development override selects `startup.dev.sh`.
 6. `exec`s the container command (`php-fpm`), so the real process receives stop
    signals directly.
 
@@ -173,6 +186,7 @@ docker compose up
   -> ollama starts, pulls model, stays healthy
   -> app entrypoint: prepare storage/db -> startup.sh (composer, npm, build,
        key, storage:link, migrate, seed, optimize) -> exec php-fpm
+  -> queue starts after app is healthy and consumes the database queue
   -> nginx starts and proxies PHP to app:9000
 ```
 
@@ -185,12 +199,20 @@ development without changing the production services:
   dependencies, generates the key, links storage, and migrates/seeds, but does
   not build assets or cache the framework. It receives `APP_ENV=local` and
   `APP_DEBUG=true`.
-- `storage/` is bind-mounted from the host instead of the named volume, so logs
-  and uploads are visible and editable on the host.
-- A `queue` service runs `php artisan queue:listen`, feeding the queue-monitor
-  dashboard.
-- A `vite` service serves assets with HMR; `nginx.dev.conf` proxies Vite and the
-  `/vite-hmr` websocket through the single nginx origin.
+- The `app` source bind is replaced with `volumes: !override`, so the container
+  runs from the baked source snapshot. One Compose Watch rule syncs `../src`
+  into `/var/www/html/novel-forge-ai`, ignoring `.env`, `vendor/`,
+  `node_modules/`, `storage/`, `database/`, `bootstrap/cache/`, `public/build/`,
+  and `public/storage`.
+- `storage/`, `database/`, and `.env` are bind-mounted from the host into
+  `app`, so logs, uploads, SQLite, and secrets stay on the host.
+- `queue` runs `php artisan queue:listen`, feeding the queue-monitor dashboard;
+  it keeps the source bind mount.
+- A `vite` service serves assets with HMR from the source bind; `nginx.dev.conf`
+  proxies Vite and the `/vite-hmr` websocket through the single nginx origin,
+  and serves `/storage/` from the host storage bind.
+- `nginx` keeps its read-only source and storage binds.
 
-The `vendor` and `node_modules` named volumes are kept in both modes for
-performance. See [docker-development.md](docker-development.md).
+`volumes: !override` requires Compose 2.24.4 or newer. The `vendor` and
+`node_modules` named volumes are kept in both modes for performance. See
+[docker-development.md](docker-development.md).

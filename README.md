@@ -13,11 +13,11 @@ machine.
 | Frontend | Vue 3, Inertia.js, Ziggy, Tailwind CSS 4, Vite 8 |
 | Database | SQLite |
 | AI runtime | Ollama (`qwen3:4b`) |
-| Deployment | Docker Compose (Nginx, PHP-FPM, Ollama) |
+| Deployment | Docker Compose (Nginx, PHP-FPM, queue worker, Ollama) |
 
 ## Architecture
 
-The production stack is a standard Laravel layout with three containers on one
+The production stack is a standard Laravel layout with four containers on one
 bridge network (`novel-forge-ai-network`):
 
 ```
@@ -28,18 +28,21 @@ Browser -> nginx (novel-forge-ai-nginx, :80)
              |  Laravel + Composer + Vite build, SQLite
              v
           ollama (novel-forge-ai-ollama, :11434)  qwen3:4b
+
+          queue (novel-forge-ai-queue) -> database queue
 ```
 
 - `novel-forge-ai/app` - PHP-FPM, Composer, Node build tooling, and the Laravel
   project at `/var/www/html/novel-forge-ai`.
+- `novel-forge-ai/queue` - Laravel queue worker using the same image.
 - `novel-forge-ai/nginx` - reverse proxy that serves `public/` and forwards PHP
   to `app:9000`.
 - `novel-forge-ai/ollama` - local inference with a persistent model volume.
 
 Vue/Inertia/Ziggy assets are compiled inside the app container into
-`public/build`; there is no frontend or database container. `APP_URL` (in
-`src/.env`) is the single source of truth for the public URL, including
-sub-folder deployments.
+`public/build`; there is no frontend or database container. Development adds a
+Vite HMR container and Compose Watch. `APP_URL` (in `src/.env`) is the single
+source of truth for the public URL, including sub-folder deployments.
 
 ## Quick start (Docker)
 
@@ -58,15 +61,19 @@ See [Docker deployment](docs/docker-installation.md) for details.
 
 ## Development (Docker)
 
-For a live-reload development environment (bind-mounted source, Vite HMR, a
-queue worker, and host-visible logs), layer the development override on top of
-the production stack:
+For a live-reload development environment (Compose Watch, Vite HMR, a queue
+worker, and host-visible logs), layer the development override on top of the
+production stack:
 
 ```sh
 cd docker
 cp .env.example .env
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+[ -f ../src/.env ] || cp ../src/.env.example ../src/.env   # required before the first dev start
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build --watch
 ```
+
+Watch runs in the foreground. `up -d --watch` is not supported; use
+`up -d --build` plus a separate `docker compose ... watch` to stay detached.
 
 See [Docker development](docs/docker-development.md) for details.
 

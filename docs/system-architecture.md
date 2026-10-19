@@ -16,11 +16,12 @@ Nginx ─────────────► PHP-FPM (Laravel app)
 public/build assets       Ollama server (qwen3:4b)
 ```
 
-The Docker environment runs three containers on the `novel-forge-ai-network`
-bridge network. Nginx is the only public HTTP entrypoint: it serves the
+The Docker environment runs four containers on the `novel-forge-ai-network`
+bridge network: Nginx, PHP-FPM, the queue worker, and Ollama. Development adds a
+Vite HMR container. Nginx is the only public HTTP entrypoint: it serves the
 application's `public/` directory (including the Vite production build in
-`public/build`) and forwards PHP requests to `app:9000`. The application
-container reaches Ollama at `http://ollama:11434`.
+`public/build`) and forwards PHP requests to `app:9000`. The application and
+queue containers reach Ollama at `http://ollama:11434`.
 
 ## Request lifecycle
 
@@ -43,8 +44,8 @@ container reaches Ollama at `http://ollama:11434`.
 - Styling uses Tailwind CSS 4 via the `@tailwindcss/vite` plugin.
 - Vite is configured with the `@` alias pointing at `resources/js`.
 - The production asset build is written to `public/build` and served statically
-  by Nginx. In development, `npm run dev` serves assets directly and marks
-  `public/hot`.
+  by Nginx. In development, the `vite` Compose service runs `npm run dev`, serves
+  assets over HMR, and writes `public/hot`.
 
 ## Domain model
 
