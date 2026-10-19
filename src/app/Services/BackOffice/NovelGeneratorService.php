@@ -19,38 +19,47 @@ use Illuminate\Support\Facades\Log;
 class NovelGeneratorService
 {
     public const STATUS_SUCCESS = 'success';
-    public const STATUS_ERROR   = 'error';
-    public const STATUS_BUSY    = 'busy';
 
-    protected const GENERATION_LOCK_SECONDS = 900;
+    public const STATUS_ERROR = 'error';
+
+    public const STATUS_BUSY = 'busy';
+
+    protected const GENERATION_LOCK_BUFFER_SECONDS = 300;
 
     protected AiBrainService $aiBrainService;
+
     protected AudienceService $audienceService;
+
     protected GenreService $genreService;
+
     protected NovelTypeService $novelTypeService;
+
     protected AiService $aiService;
+
     protected LanguageService $languageService;
+
     protected NovelChapterService $novelChapterService;
+
     protected NovelGeneratorStepService $novelGeneratorStepService;
 
     public function __construct(AiBrainService $aiBrainService, AudienceService $audienceService, GenreService $genreService, NovelTypeService $novelTypeService, AiService $aiService, LanguageService $languageService, NovelChapterService $novelChapterService, NovelGeneratorStepService $novelGeneratorStepService)
     {
-        $this->aiBrainService            = $aiBrainService;
-        $this->audienceService           = $audienceService;
-        $this->genreService              = $genreService;
-        $this->novelTypeService          = $novelTypeService;
-        $this->aiService                 = $aiService;
-        $this->languageService           = $languageService;
-        $this->novelChapterService       = $novelChapterService;
+        $this->aiBrainService = $aiBrainService;
+        $this->audienceService = $audienceService;
+        $this->genreService = $genreService;
+        $this->novelTypeService = $novelTypeService;
+        $this->aiService = $aiService;
+        $this->languageService = $languageService;
+        $this->novelChapterService = $novelChapterService;
         $this->novelGeneratorStepService = $novelGeneratorStepService;
     }
 
     public function createNovel(NovelGenerationRequest $request): array
     {
         try {
-            $step        = $this->stepByName(AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION);
-            $aiBrain     = $this->aiBrainService->findById($request->input('ai_brain_id'));
-            $foundation  = $this->generateFoundation($step, $aiBrain, $this->foundationContext($request->only([
+            $step = $this->stepByName(AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION);
+            $aiBrain = $this->aiBrainService->findById($request->input('ai_brain_id'));
+            $foundation = $this->generateFoundation($step, $aiBrain, $this->foundationContext($request->only([
                 'language_id',
                 'audience_id',
                 'novel_type_id',
@@ -86,9 +95,9 @@ class NovelGeneratorService
             return $this->result(self::STATUS_SUCCESS, 'Foundation generated successfully.', $novel);
         } catch (Exception $exception) {
             Log::error('Failed to generate novel foundation.', [
-                'step'      => AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
+                'step' => AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
                 'exception' => $exception::class,
-                'reason'    => $exception->getMessage(),
+                'reason' => $exception->getMessage(),
             ]);
 
             return $this->result(self::STATUS_ERROR, 'Failed to generate novel foundation. Please try again.', null);
@@ -97,7 +106,7 @@ class NovelGeneratorService
 
     public function continueGeneration(Novel $novel): array
     {
-        $lock = Cache::lock($this->generationLockKey($novel), self::GENERATION_LOCK_SECONDS);
+        $lock = Cache::lock($this->generationLockKey($novel), $this->generationLockSeconds($novel));
 
         if (! $lock->get()) {
             return $this->result(self::STATUS_BUSY, 'Generation is already running for this novel.', $novel);
@@ -164,9 +173,9 @@ class NovelGeneratorService
             return $this->result(self::STATUS_SUCCESS, $message, $novel);
         } catch (Exception $exception) {
             Log::error('Novel generation failed.', [
-                'step'      => $activeStep?->name,
+                'step' => $activeStep?->name,
                 'exception' => $exception::class,
-                'reason'    => $exception->getMessage(),
+                'reason' => $exception->getMessage(),
             ]);
 
             if ($activeStep) {
@@ -201,10 +210,10 @@ class NovelGeneratorService
         $aiBrain = $this->aiBrainService->findById($novel->ai_brain_id);
 
         return match ($step->name) {
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION       => $this->runFoundationStep($novel, $step, $aiBrain),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_PLAN_CHAPTER     => $this->runPlanChapterStep($novel, $step, $aiBrain),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT  => $this->runChapterContentStep($novel, $step, $aiBrain),
-            default                                                 => throw new Exception(sprintf('Unsupported novel generator step [%s].', $step->name)),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION => $this->runFoundationStep($novel, $step, $aiBrain),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_PLAN_CHAPTER => $this->runPlanChapterStep($novel, $step, $aiBrain),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT => $this->runChapterContentStep($novel, $step, $aiBrain),
+            default => throw new Exception(sprintf('Unsupported novel generator step [%s].', $step->name)),
         };
     }
 
@@ -337,7 +346,7 @@ class NovelGeneratorService
         $findings = $this->reviewFindings($novel);
 
         if ($findings !== []) {
-            throw new Exception('Novel review incomplete. ' . implode(' ', $findings));
+            throw new Exception('Novel review incomplete. '.implode(' ', $findings));
         }
 
         $novel->status = NovelHelper::STATUS_COMPLETE;
@@ -405,19 +414,19 @@ class NovelGeneratorService
         }
 
         if ($missingChapters->isNotEmpty()) {
-            $findings[] = 'Missing chapters: ' . $missingChapters->implode(', ') . '.';
+            $findings[] = 'Missing chapters: '.$missingChapters->implode(', ').'.';
         }
 
         if ($missingContents->isNotEmpty()) {
-            $findings[] = 'Missing contents: ' . $missingContents->implode(', ') . '.';
+            $findings[] = 'Missing contents: '.$missingContents->implode(', ').'.';
         }
 
         if ($duplicateChapters->isNotEmpty()) {
-            $findings[] = 'Duplicate chapters: ' . $duplicateChapters->implode(', ') . '.';
+            $findings[] = 'Duplicate chapters: '.$duplicateChapters->implode(', ').'.';
         }
 
         if ($extraChapters->isNotEmpty()) {
-            $findings[] = 'Unexpected chapters: ' . $extraChapters->implode(', ') . '.';
+            $findings[] = 'Unexpected chapters: '.$extraChapters->implode(', ').'.';
         }
 
         return $findings;
@@ -435,6 +444,17 @@ class NovelGeneratorService
         return sprintf('novel:%s:generation', $novel->getKey());
     }
 
+    private function generationLockSeconds(Novel $novel): int
+    {
+        $timeout = (int) ($novel->aiBrain?->timeout_seconds ?? 0);
+
+        if ($timeout <= 0) {
+            $timeout = (int) config('ai-brain.request.timeout', 600);
+        }
+
+        return $timeout + self::GENERATION_LOCK_BUFFER_SECONDS;
+    }
+
     private function userFacingStepError(Exception $exception): string
     {
         return $exception->getMessage();
@@ -443,9 +463,9 @@ class NovelGeneratorService
     private function result(string $status, string $message, ?Novel $novel): array
     {
         return [
-            'status'  => $status,
+            'status' => $status,
             'message' => $message,
-            'novel'   => $novel,
+            'novel' => $novel,
         ];
     }
 }

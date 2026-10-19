@@ -58,19 +58,19 @@ class LayoutService
 
         foreach ($aiBrains as $aiBrain) {
             $availability[$aiBrain->id] = Cache::get(
-                $this->availabilityCacheKey($aiBrain->id),
+                self::availabilityCacheKey($aiBrain->id),
                 false
             );
         }
 
         $uncached = collect($aiBrains)
-            ->reject(fn (AiBrain $aiBrain) => Cache::has($this->availabilityCacheKey($aiBrain->id)))
+            ->reject(fn (AiBrain $aiBrain) => Cache::has(self::availabilityCacheKey($aiBrain->id)))
             ->values();
 
         if ($uncached->isNotEmpty()) {
             foreach ($this->resolveBatchAvailability($uncached->all()) as $id => $isActive) {
                 Cache::put(
-                    $this->availabilityCacheKey($id),
+                    self::availabilityCacheKey($id),
                     $isActive,
                     now()->addSeconds(self::AVAILABILITY_CACHE_TTL_SECONDS)
                 );
@@ -126,7 +126,7 @@ class LayoutService
         return $availability;
     }
 
-    private function availabilityCacheKey(int $id): string
+    public static function availabilityCacheKey(int $id): string
     {
         return "ai_brain_availability_{$id}";
     }

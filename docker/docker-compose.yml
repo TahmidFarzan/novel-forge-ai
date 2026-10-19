@@ -45,6 +45,41 @@ services:
       start_period: 900s
     logging: *default-logging
 
+  queue:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    image: novel-forge-ai/app
+    container_name: novel-forge-ai-queue
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    working_dir: /var/www/html/novel-forge-ai
+    command: ["php", "artisan", "queue:work", "--tries=3", "--timeout=1700", "--sleep=1"]
+    environment:
+      APP_ENV: "${APP_ENV:-production}"
+      APP_DEBUG: "${APP_DEBUG:-false}"
+      APP_URL: "${APP_URL:-http://novel-forge-ai.localhost/}"
+      AI_BRAIN_URL: "${AI_BRAIN_URL:-http://ollama:11434}"
+      AI_BRAIN_API_KEY: "${AI_BRAIN_API_KEY:-ollama}"
+      OLLAMA_URL: "${OLLAMA_URL:-http://ollama:11434}"
+      OLLAMA_HOST: "${OLLAMA_HOST:-http://ollama:11434}"
+    volumes:
+      - ../src:/var/www/html/novel-forge-ai
+      - novel-forge-ai-vendor:/var/www/html/novel-forge-ai/vendor
+      - novel-forge-ai-node-modules:/var/www/html/novel-forge-ai/node_modules
+      - novel-forge-ai-storage:/var/www/html/novel-forge-ai/storage
+    depends_on:
+      app:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    networks:
+      - novel-forge-ai-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging: *default-logging
+
   nginx:
     build:
       context: ./nginx
@@ -84,11 +119,11 @@ services:
     stop_grace_period: 30s
     environment:
       OLLAMA_MODEL: "${OLLAMA_MODEL:-qwen3:4b}"
-      OLLAMA_KEEP_ALIVE: "${OLLAMA_KEEP_ALIVE:-5m}"
+      OLLAMA_KEEP_ALIVE: "${OLLAMA_KEEP_ALIVE:-30m}"
       OLLAMA_NUM_PARALLEL: "${OLLAMA_NUM_PARALLEL:-1}"
       OLLAMA_MAX_LOADED_MODELS: "${OLLAMA_MAX_LOADED_MODELS:-1}"
       OLLAMA_FLASH_ATTENTION: "${OLLAMA_FLASH_ATTENTION:-1}"
-      OLLAMA_CONTEXT_LENGTH: "${OLLAMA_CONTEXT_LENGTH:-8192}"
+      OLLAMA_CONTEXT_LENGTH: "${OLLAMA_CONTEXT_LENGTH:-16384}"
     volumes:
       - novel-forge-ai-ollama-models:/root/.ollama
     networks:

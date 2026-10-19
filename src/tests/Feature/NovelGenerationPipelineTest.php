@@ -53,7 +53,9 @@ class NovelGenerationPipelineTest extends TestCase
             NovelGeneratorStepSeeder::class,
         ]);
 
-        DB::table('ai_brains')->update(['api_key' => 'test-key']);
+        DB::table('ai_brains')->update(['api_key' => 'test-key', 'api_url' => self::URL]);
+
+        $this->primeAiBrainAvailability();
     }
 
     public function test_a_novel_is_generated_with_three_ai_requests(): void

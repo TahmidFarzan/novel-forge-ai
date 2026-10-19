@@ -7,18 +7,36 @@ use App\Models\Novel;
 use App\Models\NovelChapter;
 use App\Support\PromptContextEncoder;
 use Exception;
+use Throwable;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class AiService
 {
-    protected int $defaultTimeout = 120;
-    protected int $minTimeout = 300;
-    protected int $maxTimeout = 300;
+    protected int $defaultTimeout = 600;
+
+    protected int $connectTimeout = 10;
+
+    protected bool $think = false;
+
+    protected string $keepAlive = '5m';
 
     protected const PREVIEW_LENGTH = 200;
 
     protected const MAX_FENCE_UNWRAP_DEPTH = 2;
+
+    protected const EXECUTION_TIME_MARGIN = 30;
+
+    public function __construct()
+    {
+        $request = (array) config('ai-brain.request', []);
+
+        $this->connectTimeout = (int) ($request['connect_timeout'] ?? $this->connectTimeout);
+        $this->defaultTimeout = (int) ($request['timeout'] ?? $this->defaultTimeout);
+        $this->think = (bool) config('ai-brain.ollama.think', $this->think);
+        $this->keepAlive = (string) config('ai-brain.ollama.keep_alive', $this->keepAlive);
+    }
 
     public function generate(string $stepName, string $url, ?string $apiKey, string $model, string $partialPrompt, array $inputs, ?int $maxOutputTokens = null, ?int $timeout = null): array
     {
@@ -48,7 +66,7 @@ class AiService
     {
         $requestTimeout = $this->resolveTimeout($timeout);
 
-        set_time_limit($requestTimeout + 30);
+        set_time_limit($requestTimeout + self::EXECUTION_TIME_MARGIN);
 
         $payload = $this->buildPayload($model, $data, $maxOutputTokens);
 
@@ -56,11 +74,11 @@ class AiService
             $response = $this->post($stepName, rtrim($url, '/'), $apiKey, $payload, $requestTimeout);
         } catch (Exception $exception) {
             Log::error('AI generation request failed.', [
-                'step'      => $stepName,
-                'model'     => $model,
-                'timeout'   => $requestTimeout,
+                'step' => $stepName,
+                'model' => $model,
+                'timeout' => $requestTimeout,
                 'exception' => $exception::class,
-                'reason'    => $exception->getMessage(),
+                'reason' => $exception->getMessage(),
             ]);
 
             throw $exception;
@@ -71,12 +89,7 @@ class AiService
 
     public function resolveTimeout(?int $timeout): int
     {
-        $minimum = $this->minTimeout;
-        $maximum = $this->maxTimeout;
-
-        $requested = $timeout ?? $this->defaultTimeout;
-
-        return min($maximum, max($minimum, $requested));
+        return max(1, $timeout ?? $this->defaultTimeout);
     }
 
     public function sendGetRequest(string $url, string $apiKey, array $params = [], ?int $timeout = null): array
@@ -102,10 +115,10 @@ class AiService
 
     public function foundationInputs(array $inputs): array
     {
-        $language               = $inputs['language'] ?? null;
-        $audience               = $inputs['audience'] ?? null;
-        $novelType              = $inputs['novel_type'] ?? null;
-        $genres                 = collect($inputs['genres'] ?? []);
+        $language = $inputs['language'] ?? null;
+        $audience = $inputs['audience'] ?? null;
+        $novelType = $inputs['novel_type'] ?? null;
+        $genres = collect($inputs['genres'] ?? []);
         $genrePromptInstruction = '';
 
         foreach ($genres as $genre) {
@@ -128,45 +141,45 @@ class AiService
         }
 
         return [
-            "language"                 => $language?->name,
-            "additional_information"   => $inputs['additional_information'] ?? 'Auto',
-            "genre_prompt_instruction" => $genrePromptInstruction,
-            "audience_instruction"     => $audience?->prompt_instruction,
-            "novel_type_instruction"   => $novelType?->prompt_instruction,
+            'language' => $language?->name,
+            'additional_information' => $inputs['additional_information'] ?? 'Auto',
+            'genre_prompt_instruction' => $genrePromptInstruction,
+            'audience_instruction' => $audience?->prompt_instruction,
+            'novel_type_instruction' => $novelType?->prompt_instruction,
         ];
     }
 
     public function planChapterInputs(Novel $novel): array
     {
         return [
-            "foundation" => PromptContextEncoder::encode($novel->foundation ?? []),
-            "characters" => PromptContextEncoder::encode($novel->characters ?? []),
-            "world_bible" => PromptContextEncoder::encode($novel->world_bible ?? []),
-            "locations" => PromptContextEncoder::encode($novel->locations ?? []),
-            "factions" => PromptContextEncoder::encode($novel->factions ?? []),
-            "creatures" => PromptContextEncoder::encode($novel->creatures ?? []),
-            "systems" => PromptContextEncoder::encode($novel->systems ?? []),
-            "timeline" => PromptContextEncoder::encode($novel->timeline ?? []),
+            'foundation' => PromptContextEncoder::encode($novel->foundation ?? []),
+            'characters' => PromptContextEncoder::encode($novel->characters ?? []),
+            'world_bible' => PromptContextEncoder::encode($novel->world_bible ?? []),
+            'locations' => PromptContextEncoder::encode($novel->locations ?? []),
+            'factions' => PromptContextEncoder::encode($novel->factions ?? []),
+            'creatures' => PromptContextEncoder::encode($novel->creatures ?? []),
+            'systems' => PromptContextEncoder::encode($novel->systems ?? []),
+            'timeline' => PromptContextEncoder::encode($novel->timeline ?? []),
         ];
     }
 
     public function chapterContentInputs(Novel $novel, NovelChapter $novelChapter): array
     {
         $chapterPlanEntry = $this->findChapterPlanEntry($novel, $novelChapter);
-        $scenePlans       = $this->chapterScenePlans($novel, $chapterPlanEntry);
-        $dialoguePlans    = $this->chapterDialoguePlans($novel, $scenePlans);
+        $scenePlans = $this->chapterScenePlans($novel, $chapterPlanEntry);
+        $dialoguePlans = $this->chapterDialoguePlans($novel, $scenePlans);
 
         return [
-            "language" => $novel->language?->name ?? '',
-            "foundation" => PromptContextEncoder::encode($novel->foundation ?? []),
-            "characters" => PromptContextEncoder::encode($novel->characters ?? []),
-            "world_bible" => PromptContextEncoder::encode($novel->world_bible ?? []),
-            "story_structure" => PromptContextEncoder::encode($novel->story_structure ?? []),
-            "twists_and_foreshadowing" => PromptContextEncoder::encode($novel->twists_and_foreshadowing ?? []),
-            "chapter_summary" => (string) ($novelChapter->summery ?? ''),
-            "chapter_plan_entry" => PromptContextEncoder::encode($chapterPlanEntry ?? []),
-            "scene_plans" => PromptContextEncoder::encode($scenePlans ?? []),
-            "dialogue_plans" => PromptContextEncoder::encode($dialoguePlans ?? []),
+            'language' => $novel->language?->name ?? '',
+            'foundation' => PromptContextEncoder::encode($novel->foundation ?? []),
+            'characters' => PromptContextEncoder::encode($novel->characters ?? []),
+            'world_bible' => PromptContextEncoder::encode($novel->world_bible ?? []),
+            'story_structure' => PromptContextEncoder::encode($novel->story_structure ?? []),
+            'twists_and_foreshadowing' => PromptContextEncoder::encode($novel->twists_and_foreshadowing ?? []),
+            'chapter_summary' => (string) ($novelChapter->summery ?? ''),
+            'chapter_plan_entry' => PromptContextEncoder::encode($chapterPlanEntry ?? []),
+            'scene_plans' => PromptContextEncoder::encode($scenePlans ?? []),
+            'dialogue_plans' => PromptContextEncoder::encode($dialoguePlans ?? []),
         ];
     }
 
@@ -176,10 +189,10 @@ class AiService
         $decoded = $this->decodeJsonObject($content, $stepName);
 
         return match ($stepName) {
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION       => $this->foundationResponseFormat($decoded, $stepName),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_PLAN_CHAPTER     => $this->planChapterResponseFormat($decoded, $stepName),
-            AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT  => $this->chapterContentResponseFormat($decoded, $stepName),
-            default                                                 => throw new Exception("Unknown AI step name [{$stepName}]."),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION => $this->foundationResponseFormat($decoded, $stepName),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_PLAN_CHAPTER => $this->planChapterResponseFormat($decoded, $stepName),
+            AiPromptGeneratorHelper::AI_PROMPT_NAME_CHAPTER_CONTENT => $this->chapterContentResponseFormat($decoded, $stepName),
+            default => throw new Exception("Unknown AI step name [{$stepName}]."),
         };
     }
 
@@ -205,9 +218,9 @@ class AiService
 
         if (in_array($finishReason, ['length', 'max_tokens', 'limit'], true)) {
             Log::error('AI response was truncated by the provider.', [
-                'step'            => $stepName,
-                'finish_reason'   => $finishReason,
-                'content_length'  => strlen($content),
+                'step' => $stepName,
+                'finish_reason' => $finishReason,
+                'content_length' => strlen($content),
                 'content_preview' => $this->preview($content),
             ]);
 
@@ -220,7 +233,7 @@ class AiService
     private function decodeJsonObject(string $content, string $stepName): array
     {
         $normalized = $this->normalizeJsonText($content);
-        $decoded    = json_decode($normalized, true);
+        $decoded = json_decode($normalized, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             Log::error('AI response was not valid JSON.', array_merge(
@@ -228,7 +241,7 @@ class AiService
                 $this->responseDiagnostics($normalized),
             ));
 
-            throw new Exception('The AI response was not valid JSON. ' . json_last_error_msg());
+            throw new Exception('The AI response was not valid JSON. '.json_last_error_msg());
         }
 
         if (! is_array($decoded)) {
@@ -321,10 +334,10 @@ class AiService
 
     private function readBalanced(string $content, int $start): ?string
     {
-        $length    = strlen($content);
-        $depth     = 0;
-        $inString  = false;
-        $escaped   = false;
+        $length = strlen($content);
+        $depth = 0;
+        $inString = false;
+        $escaped = false;
 
         for ($index = $start; $index < $length; $index++) {
             $char = $content[$index];
@@ -368,9 +381,9 @@ class AiService
     private function responseDiagnostics(string $content): array
     {
         return [
-            'content_length'  => strlen($content),
-            'starts_with'     => substr($content, 0, 40),
-            'ends_with'       => substr($content, -40),
+            'content_length' => strlen($content),
+            'starts_with' => substr($content, 0, 40),
+            'ends_with' => substr($content, -40),
             'content_preview' => $this->preview($content),
         ];
     }
@@ -388,48 +401,64 @@ class AiService
 
     private function post(string $stepName, string $endpoint, string $apiKey, array $payload, int $timeout): mixed
     {
+        $requestEndpoint = rtrim($endpoint, '/');
+
+        if (! str_ends_with($requestEndpoint, '/api/generate') && ! str_ends_with($requestEndpoint, '/v1/chat/completions')) {
+            $requestEndpoint = rtrim($requestEndpoint, '/').'/api/generate';
+        }
+
+        $http = Http::connectTimeout($this->connectTimeout)
+            ->timeout($timeout)
+            ->acceptJson();
+
+        if ($apiKey && trim($apiKey) !== '') {
+            $http->withToken($apiKey);
+        }
+
         try {
-            $http = Http::timeout($timeout)->acceptJson();
-            if ($apiKey && trim($apiKey) !== '') {
-                $http->withToken($apiKey);
-            }
-
-            $requestEndpoint = rtrim($endpoint, '/');
-            if (! str_ends_with($requestEndpoint, '/api/generate') && ! str_ends_with($requestEndpoint, '/v1/chat/completions')) {
-                $requestEndpoint = rtrim($requestEndpoint, '/') . '/api/generate';
-            }
-
             $response = $http->post($requestEndpoint, $payload);
-        } catch (\Throwable $exception) {
+        } catch (ConnectionException $exception) {
+            throw $this->transportFailure($stepName, $exception);
+        } catch (Exception $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
             throw $this->transportFailure($stepName, $exception);
         }
 
         if (! $response->successful()) {
-            $status  = $response->status();
-            $message = match (true) {
-                $status === 429 => 'The AI provider rate limit was reached. Wait a moment and retry.',
-                $status >= 500  => sprintf('The AI provider returned a server error (HTTP %d). Retry later.', $status),
-                default         => sprintf('The AI provider rejected the request (HTTP %d). Check the model name and API key.', $status),
-            };
-
-            Log::error('AI provider responded with an error.', [
-                'step'         => $stepName,
-                'status'       => $status,
-                'body_excerpt' => mb_substr((string) $response->body(), 0, 300),
-            ]);
-
-            throw new Exception($message);
+            throw $this->providerFailure($stepName, $response->status(), (string) $response->body());
         }
 
-        $json = $response->json();
+        return $this->normalizeProviderResponse($response->json());
+    }
 
+    private function providerFailure(string $stepName, int $status, string $body): Exception
+    {
+        $message = match (true) {
+            $status === 429 => 'The AI provider rate limit was reached. Wait a moment and retry.',
+            $status >= 500 => sprintf('The AI provider returned a server error (HTTP %d). Retry later.', $status),
+            default => sprintf('The AI provider rejected the request (HTTP %d). Check the model name and API key.', $status),
+        };
+
+        Log::error('AI provider responded with an error.', [
+            'step' => $stepName,
+            'status' => $status,
+            'body_excerpt' => mb_substr($body, 0, 300),
+        ]);
+
+        return new Exception($message);
+    }
+
+    private function normalizeProviderResponse(mixed $json): mixed
+    {
         if (is_array($json) && array_key_exists('response', $json) && ! array_key_exists('choices', $json)) {
             $content = (string) ($json['response'] ?? '');
-            $json = [
+
+            return [
                 'choices' => [
                     [
                         'message' => ['content' => $content],
-                        'finish_reason' => $json['done'] ? 'stop' : null,
+                        'finish_reason' => ($json['done'] ?? false) ? 'stop' : null,
                     ],
                 ],
             ];
@@ -441,9 +470,9 @@ class AiService
     private function transportFailure(string $stepName, \Throwable $exception): Exception
     {
         Log::error('AI transport failure.', [
-            'step'      => $stepName,
+            'step' => $stepName,
             'exception' => $exception::class,
-            'detail'    => $this->safeMessage($exception),
+            'detail' => $this->safeMessage($exception),
         ]);
 
         if ($this->isTimeoutException($exception)) {
@@ -480,22 +509,25 @@ class AiService
         $content = $this->buildContent($data);
 
         $payload = [
-            'model'    => $model,
-            'prompt'   => $content,
+            'model' => $model,
+            'prompt' => $content,
             'messages' => [
                 [
-                    'role'    => 'user',
+                    'role' => 'user',
                     'content' => $content,
                 ],
             ],
+            'stream' => false,
+            'think' => $this->think,
+            'keep_alive' => $this->keepAlive,
         ];
 
         if ($maxOutputTokens !== null && $maxOutputTokens > 0) {
+            $payload['options'] = [
+                'num_predict' => $maxOutputTokens,
+            ];
             $payload['max_tokens'] = $maxOutputTokens;
-            $payload['num_predict'] = $maxOutputTokens;
         }
-
-        $payload['stream'] = false;
 
         return $payload;
     }

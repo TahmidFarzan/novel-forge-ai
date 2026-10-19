@@ -58,7 +58,9 @@ class FoundationGenerationReliabilityTest extends TestCase
             NovelGeneratorStepSeeder::class,
         ]);
 
-        DB::table('ai_brains')->update(['api_key' => 'test-key']);
+        DB::table('ai_brains')->update(['api_key' => 'test-key', 'api_url' => self::URL]);
+
+        $this->primeAiBrainAvailability();
     }
 
     public function test_a_valid_foundation_is_persisted_without_a_retry(): void

@@ -53,7 +53,9 @@ class NovelGenerationStateTest extends TestCase
             NovelGeneratorStepSeeder::class,
         ]);
 
-        DB::table('ai_brains')->update(['api_key' => 'test-key']);
+        DB::table('ai_brains')->update(['api_key' => 'test-key', 'api_url' => self::URL]);
+
+        $this->primeAiBrainAvailability();
     }
 
     public function test_the_edit_page_publishes_the_generation_state_used_by_the_frontend(): void
