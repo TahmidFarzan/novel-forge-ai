@@ -44,8 +44,8 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml watch
 ```
 
 Open <http://novel-forge-ai.localhost/> (or add `127.0.0.1 novel-forge-ai.localhost`
-to your hosts file). The first boot installs Composer/npm dependencies, migrates,
-and seeds; later boots are fast.
+to your hosts file). The image build ships Composer/npm dependencies; the first
+boot migrates and seeds, and later boots are fast.
 
 To stop the stack while keeping volumes:
 

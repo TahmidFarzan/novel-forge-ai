@@ -62,6 +62,13 @@ RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh /usr/local/bin/startup.sh /usr
 
 WORKDIR /var/www/html/novel-forge-ai
 
+COPY src/composer.json src/composer.lock ./
+RUN composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+COPY src/package.json src/package-lock.json ./
+RUN npm ci --no-audit --no-fund \
+    && touch node_modules/.novel-forge-ai-container
+
 COPY --chown=www-data:www-data src/ /var/www/html/novel-forge-ai/
 
 EXPOSE 9000

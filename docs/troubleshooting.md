@@ -5,13 +5,13 @@ Common problems when running Novel Forge AI with Docker, and how to fix them.
 ## 502 Bad Gateway
 
 Nginx returns `502` when it cannot reach PHP-FPM on `app:9000`. The most common
-cause is that the application container is still provisioning (Composer install
-or the first asset build) and PHP-FPM is not listening yet; Nginx logs show
+cause is that the application container is still provisioning (migrations or
+caching) and PHP-FPM is not listening yet; Nginx logs show
 `connect() failed (111: Connection refused)`.
 
-The stack prevents this: the `app` entrypoint finishes installing dependencies,
-building assets, migrating, and caching before PHP-FPM starts, and Nginx only
-starts after the `app` health check succeeds. If you still see a `502`:
+The stack prevents this: the `app` entrypoint finishes migrating and caching
+before PHP-FPM starts, and Nginx only starts after the `app` health check
+succeeds. If you still see a `502`:
 
 ```sh
 docker compose ps
@@ -49,11 +49,11 @@ Then open <http://localhost:8080/>.
 
 ## The app container stays unhealthy for a long time
 
-The first boot runs a Composer install into the `novel-forge-ai-vendor` volume,
-an npm install into `novel-forge-ai-node-modules`, and the Vite production
-build, all before PHP-FPM starts. The health check allows a 15-minute start
-period for this. Follow progress with `docker compose logs -f app`. Later boots
-skip the install steps and are fast.
+Dependencies are installed at image build time (`docker compose up -d --build`),
+so a first boot only migrates and seeds the database and caches the framework —
+normally well inside the health check's 15-minute start period. If it takes
+longer, the usual cause is a slow machine or a concurrent Ollama model pull.
+Follow progress with `docker compose logs -f app`. Later boots are fast.
 
 ## Ollama is still downloading the model
 

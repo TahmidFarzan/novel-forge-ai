@@ -54,17 +54,21 @@ docker compose up -d --build
 
 The order of operations on first boot:
 
-1. `novel-forge-ai-ollama` starts and downloads `qwen3:4b`.
-2. `novel-forge-ai-app` runs its entrypoint and startup script:
+1. `docker compose up -d --build` builds the `app` image with Composer and npm
+   dependencies and the production frontend baked in.
+2. `novel-forge-ai-ollama` starts and downloads `qwen3:4b`.
+3. `novel-forge-ai-app` runs its entrypoint and startup script:
    1. normalizes `APP_URL` in `src/.env` (adds the trailing slash),
    2. generates the application key when missing,
-   3. installs Composer dependencies when `vendor/` is missing,
-   4. installs npm dependencies and builds the frontend into `public/build`,
+   3. installs Composer dependencies only when the image did not provide
+      `vendor/` (e.g. an empty volume was mounted over it),
+   4. installs npm dependencies and builds the frontend only under the same
+      condition,
    5. creates the `public/storage` link when missing,
    6. migrates and seeds the database when the schema is missing,
    7. runs `php artisan optimize` to cache config, routes, events, and views,
    8. starts PHP-FPM and reports `healthy`.
-3. `novel-forge-ai-nginx` starts only after `novel-forge-ai-app` is healthy and
+4. `novel-forge-ai-nginx` starts only after `novel-forge-ai-app` is healthy and
    serves the application on port `80`, forwarding PHP requests to `app:9000`.
 
 The project is mounted as a named site directory, `novel-forge-ai/`, underneath

@@ -131,11 +131,11 @@ services:
     networks:
       - novel-forge-ai-network
     healthcheck:
-      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1"]
+      test: ["CMD-SHELL", "ollama show \"$$OLLAMA_MODEL\" >/dev/null 2>&1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 60s
+      start_period: 300s
     logging: *default-logging
 
 networks:

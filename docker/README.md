@@ -43,9 +43,10 @@ background, start it with `up -d --build` and run
 `docker compose -f docker-compose.yml -f docker-compose.dev.yml watch` in a
 separate terminal. See [../docs/docker-development.md](../docs/docker-development.md).
 
-The first boot pulls the Ollama model, installs Composer and npm dependencies,
-builds the production frontend into `public/build`, migrates and seeds SQLite,
-and caches the framework. Later boots skip everything that already exists.
+The image build installs Composer and npm dependencies and builds the production
+frontend into `public/build`. The first boot pulls the Ollama model, migrates and
+seeds SQLite, and caches the framework. Later boots skip everything that already
+exists.
 
 ## Directory layout
 
