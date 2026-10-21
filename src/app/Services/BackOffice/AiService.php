@@ -417,37 +417,29 @@ class AiService
 
         try {
             $response = $http->post($requestEndpoint, $payload);
-        } catch (ConnectionException $exception) {
-            throw $this->transportFailure($stepName, $exception);
-        } catch (Exception $exception) {
-            throw $exception;
-        } catch (Throwable $exception) {
-            throw $this->transportFailure($stepName, $exception);
+        }catch (Exception $exception) {
+             Log::error('AI transport failure.', [
+               'step' => $stepName,
+               'status' =>  $exception->getCode(),
+               'excerpt' => (string) $exception->getMessage(),
+            ]);
+           throw $exception;
         }
 
         if (! $response->successful()) {
-            throw $this->providerFailure($stepName, $response->status(), (string) $response->body());
+
+           Log::error('AI provider responded with an error.', [
+               'step' => $stepName,
+               'status' =>  $response->status(),
+               'excerpt' => (string) $response->body(),
+            ]);
+
+            return new Exception("{$stepName}. {$response->body()}",$response->status());
         }
 
         return $this->normalizeProviderResponse($response->json());
     }
 
-    private function providerFailure(string $stepName, int $status, string $body): Exception
-    {
-        $message = match (true) {
-            $status === 429 => 'The AI provider rate limit was reached. Wait a moment and retry.',
-            $status >= 500 => sprintf('The AI provider returned a server error (HTTP %d). Retry later.', $status),
-            default => sprintf('The AI provider rejected the request (HTTP %d). Check the model name and API key.', $status),
-        };
-
-        Log::error('AI provider responded with an error.', [
-            'step' => $stepName,
-            'status' => $status,
-            'body_excerpt' => mb_substr($body, 0, 300),
-        ]);
-
-        return new Exception($message);
-    }
 
     private function normalizeProviderResponse(mixed $json): mixed
     {
@@ -465,43 +457,6 @@ class AiService
         }
 
         return $json;
-    }
-
-    private function transportFailure(string $stepName, \Throwable $exception): Exception
-    {
-        Log::error('AI transport failure.', [
-            'step' => $stepName,
-            'exception' => $exception::class,
-            'detail' => $this->safeMessage($exception),
-        ]);
-
-        if ($this->isTimeoutException($exception)) {
-            return new Exception('The AI Brain did not finish in time. Retry, or choose an AI Brain with a longer timeout.', 0, $exception);
-        }
-
-        return new Exception('The AI provider could not be reached. Check the AI Brain URL, network, and API key.', 0, $exception);
-    }
-
-    private function isTimeoutException(\Throwable $exception): bool
-    {
-        if (! method_exists($exception, 'getCode')) {
-            return false;
-        }
-
-        if ((int) $exception->getCode() === 28) {
-            return true;
-        }
-
-        $message = $exception->getMessage();
-
-        return stripos($message, 'timed out') !== false
-            || stripos($message, 'timeout') !== false
-            || stripos($message, 'timedout') !== false;
-    }
-
-    private function safeMessage(\Throwable $exception): string
-    {
-        return mb_substr(preg_replace('/\s+/', ' ', $exception->getMessage()) ?: 'connection error', 0, 200);
     }
 
     private function buildPayload(string $model, mixed $data = null, ?int $maxOutputTokens = null): array
