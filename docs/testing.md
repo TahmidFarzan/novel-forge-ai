@@ -54,7 +54,6 @@ src/tests/
 │   └── InteractsWithPromptSkeleton.php Reusable prompt assertions
 ├── Unit/
 │   ├── PromptContextEncoderTest.php            Prompt context encoding
-│   ├── HuggingFaceApiServiceResponseFormatTest.php  Response parsing
 │   └── ExampleTest.php
 └── Feature/
     ├── NovelGenerationPipelineTest.php          End-to-end generation pipeline
@@ -63,7 +62,6 @@ src/tests/
     ├── FoundationPromptContractSyncTest.php     Prompt/contract consistency
     ├── AiPromptSyncSeederTest.php               Seeder expectations
     ├── RenameNovelGeneratorStagesMigrationTest.php
-    ├── HuggingFaceApiServiceRequestTest.php
     └── ExampleTest.php
 ```
 

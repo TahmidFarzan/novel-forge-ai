@@ -7,7 +7,7 @@ use App\Helpers\NovelHelper;
 use App\Models\Novel;
 use App\Models\NovelGeneratorStep;
 use App\Models\User;
-use App\Services\BackOffice\HuggingFaceApiService;
+use App\Services\BackOffice\AiService;
 use App\Services\BackOffice\NovelGeneratorStepService;
 use Database\Seeders\AiBrainAiBrainOutputTypeSeeder;
 use Database\Seeders\AiBrainOutputTypeSeeder;
@@ -271,7 +271,7 @@ class FoundationGenerationReliabilityTest extends TestCase
 
             $this->fail('Expected an Exception.');
         } catch (Exception $exception) {
-            $this->assertStringContainsString('rejected the request (HTTP 401)', $exception->getMessage());
+            $this->assertStringContainsString('rejected the API key (HTTP 401)', $exception->getMessage());
         }
 
         Http::assertSentCount(1);
@@ -466,9 +466,9 @@ class FoundationGenerationReliabilityTest extends TestCase
         }
     }
 
-    private function service(): HuggingFaceApiService
+    private function service(): AiService
     {
-        return app(HuggingFaceApiService::class);
+        return app(AiService::class);
     }
 
     private function fakeSuccessfulGeneration(): void

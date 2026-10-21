@@ -90,7 +90,7 @@ with `/api/generate` or `/v1/chat/completions`, it appends `/api/generate`, the
 native Ollama generation endpoint. Responses in Ollama's native shape
 (`{ "response": ..., "done": ... }`) are normalised to the OpenAI
 `choices[].message.content` shape, so both Ollama native and
-OpenAI-compatible/HuggingFace providers work through the same code path.
+OpenAI-compatible providers work through the same code path.
 
 Every AI Brain must have a non-empty `api_key`; `AiService` rejects requests
 without one. Ollama ignores the key, so a placeholder value such as `ollama` is
