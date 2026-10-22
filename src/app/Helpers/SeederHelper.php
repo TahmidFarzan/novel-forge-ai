@@ -61,18 +61,6 @@ class SeederHelper
             ],
 
             (object) [
-                'name'               => 'Dark Fantasy',
-                'brief'              => 'Dark and mysterious fantasy stories',
-                'prompt_instruction' => 'Focus on creating a grim and morally complex world where supernatural forces, magic, corruption, and horror exist together. Planning should consider the cost of power, the consequences of using forbidden forces, oppressive environments, decaying societies, supernatural threats, and how the world itself creates conflict. Character planning should consider morally complex protagonists, flawed heroes, understandable but dangerous antagonists, internal struggles, corruption, sacrifice, and the personal cost of survival. Story structure should consider escalating darkness, meaningful suffering, difficult choices, fragile hope, and resolutions where victory carries emotional or moral consequences. When combined with other genres, integrate these dark fantasy and moral-conflict elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Historical Fiction',
-                'brief'              => 'Stories based on historical events and periods',
-                'prompt_instruction' => 'Focus on creating an authentic historical setting where real social conditions, events, and cultural realities influence the characters and conflict. Setting planning should consider the time period, geography, politics, class structures, customs, technology, economy, and historical events that shape the world. Character planning should consider believable behaviour within the chosen era, limitations created by society, personal motivations, and how historical circumstances influence individual choices. Story structure should consider how larger historical events intersect with personal experiences, how historical changes create tension, and how the conclusion remains consistent with the period while delivering emotional impact. When combined with other genres, integrate these historical authenticity elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
                 'name'               => 'Family Drama',
                 'brief'              => 'Stories about family relationships and emotions',
                 'prompt_instruction' => 'Focus on developing realistic family relationships, emotional conflicts, hidden tensions, and long-term bonds between family members. Planning should consider family structure, shared history, unresolved conflicts, generational differences, secrets, loyalty, resentment, and emotional expectations. Character planning should consider individual personalities, personal wounds, motivations, family roles, and how love and conflict exist together within relationships. Story structure should consider gradual emotional escalation, realistic conversations, meaningful turning points, and resolutions that address deeper family issues rather than only surface conflicts. When combined with other genres, integrate these family and emotional relationship elements with the requirements of the additional genres while avoiding duplicate planning elements.',
@@ -114,33 +102,9 @@ class SeederHelper
             ],
 
             (object) [
-                'name'               => 'Biography',
-                'brief'              => 'Life stories of real people',
-                'prompt_instruction' => 'Focus on presenting the life of a real person through important experiences, achievements, struggles, relationships, and lasting influence. Planning should consider the subject’s background, historical context, defining moments, personal qualities, challenges, successes, failures, and impact on others. Character planning should consider the subject’s motivations, decisions, beliefs, relationships, and how external circumstances shaped their life. Story structure should create a meaningful life narrative rather than a simple timeline by highlighting turning points, major transformations, and significant periods. The narrative should prioritize factual accuracy, context, depth, and a balanced understanding of the subject. When combined with other genres, integrate these life-story and subject-development elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Autobiography',
-                'brief'              => 'Life story written by the person themselves',
-                'prompt_instruction' => 'Focus on creating a personal first-person reflection where the individual explores their experiences, choices, growth, struggles, and understanding of their own life. Planning should consider personal voice, memory, important life stages, achievements, regrets, relationships, values, and moments that shaped identity. Character planning should consider how the narrator views themselves, how their perspective changes over time, and how personal experiences influence their decisions. Story structure should create a clear emotional journey showing transformation, self-discovery, challenges faced, and lessons learned. The narrative should prioritize honesty, self-awareness, reflection, and a meaningful understanding of the person behind the events. When combined with other genres, integrate these autobiographical and self-reflection elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
                 'name'               => 'History',
                 'brief'              => 'Historical books and events',
                 'prompt_instruction' => 'Focus on presenting real events, their causes, consequences, and the people and systems involved in a clear and evidence-based manner. Planning should consider the historical period, key figures, institutions, geography, political conditions, social structures, causes, sequence of events, and long-term impact. Content planning should consider available sources, competing interpretations, important details, and how information is organized into a meaningful explanation rather than a simple list of events. Structure should create understanding of why events happened, how they developed, and why they continue to matter. When combined with other genres, integrate these historical analysis and evidence-based elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Philosophy',
-                'brief'              => 'Books about ideas and philosophy',
-                'prompt_instruction' => 'Focus on exploring central ideas, questions, arguments, and concepts through logical reasoning and meaningful analysis. Planning should consider the main philosophical question, key concepts, assumptions, arguments, counterarguments, examples, and practical implications of the ideas. Content planning should prioritize clarity, structured reasoning, understandable explanations, thought experiments, and connections between abstract ideas and human experience. Structure should develop ideas progressively, address opposing views, and guide readers toward deeper understanding. When combined with other genres, integrate these philosophical and conceptual elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Self Help',
-                'brief'              => 'Personal development and improvement books',
-                'prompt_instruction' => 'Focus on providing practical guidance that helps readers understand a problem, develop useful habits, and achieve personal improvement. Planning should consider the target audience, their challenges, goals, obstacles, and realistic methods for progress. Content planning should include clear principles, actionable steps, examples, exercises, ways to measure improvement, and strategies for overcoming difficulties. Structure should move logically from understanding the problem to applying solutions while maintaining clarity and practical value. When combined with other genres, integrate these personal-development and practical-guidance elements with the requirements of the additional genres while avoiding duplicate planning elements.',
             ],
 
             (object) [
@@ -160,11 +124,6 @@ class SeederHelper
                 'brief'              => 'Crime related fiction stories',
                 'prompt_instruction' => 'Focus on developing the criminal act, its motives, consequences, investigation, and the people affected by it. Planning should consider the nature of the crime, methods used, evidence, timeline, suspects, motives, investigation process, and social consequences. Character planning should consider criminals with believable psychology, investigators with strengths and limitations, victims, witnesses, and the relationships between those involved. Story structure should consider discovery of the crime, investigation progression, obstacles, pursuit, revelations, and a resolution that addresses both the crime and its consequences. When combined with other genres, integrate these crime and investigation elements with the requirements of the additional genres while avoiding duplicate planning elements.',
             ],
-            (object) [
-                'name'               => 'Political Fiction',
-                'brief'              => 'Stories involving politics and society',
-                'prompt_instruction' => 'Focus on exploring power structures, political systems, ideology, institutions, and how social forces influence individuals and communities. Planning should consider the government structure, political factions, laws, economy, media, public opinion, conflicts of interest, and struggles for influence or control. Character planning should consider politicians, leaders, activists, officials, and ordinary citizens with different beliefs, ambitions, compromises, and personal consequences caused by political decisions. Story structure should consider strategic conflicts, alliances, betrayals, public and private struggles, rising political tension, and a resolution that reveals the impact of the power struggle. When combined with other genres, integrate these political and power-dynamics elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
 
             (object) [
                 'name'               => 'War',
@@ -173,92 +132,9 @@ class SeederHelper
             ],
 
             (object) [
-                'name'               => 'Young Adult',
-                'brief'              => 'Stories for young adult readers',
-                'prompt_instruction' => 'Focus on exploring identity, personal growth, relationships, independence, and challenges connected to adolescence or early adulthood. Planning should consider the characters’ stage of life, personal struggles, social pressures, friendships, family relationships, and questions of belonging or self-discovery. Character planning should create relatable protagonists with authentic emotions, weaknesses, dreams, and evolving understanding of themselves and the world. Story structure should consider meaningful challenges, emotional growth, consequences of choices, and a resolution that reflects earned maturity and personal development. When combined with other genres, integrate these coming-of-age and identity-development elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Children',
-                'brief'              => 'Books for children',
-                'prompt_instruction' => 'Focus on creating age-appropriate stories with clear language, engaging characters, imagination, and meaningful emotional experiences for young readers. Planning should consider the target age group, reading ability, suitable themes, simple conflicts, curiosity, learning opportunities, and emotional understanding. Character planning should consider memorable child-friendly characters, relatable experiences, imagination, friendships, and positive growth. Story structure should maintain an engaging pace, understandable challenges, creative situations, and a satisfying resolution that provides emotional value without becoming overly complex. When combined with other genres, integrate these child-focused and age-appropriate elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Poetry',
-                'brief'              => 'Poetry and verses',
-                'prompt_instruction' => 'Focus on expressing emotions, ideas, experiences, and imagery through carefully chosen language, rhythm, structure, and poetic techniques. Planning should consider the central theme, emotional purpose, tone, imagery, symbolism, metaphor, sound, rhythm, and the poetic form best suited to the subject. Content planning should prioritize meaningful word choices, emotional depth, sensory experiences, and the relationship between form and meaning. Structure should consider line arrangement, stanza development, pacing, and how each element contributes to the overall poetic experience. When combined with other genres, integrate these poetic and expressive-language elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Short Story',
-                'brief'              => 'Short fiction stories',
-                'prompt_instruction' => 'Focus on creating a concentrated narrative built around a strong central idea, limited scope, meaningful characters, and an impactful moment or transformation. Planning should consider the core premise, central conflict, essential characters, important details, and how every element contributes to the intended effect. Character planning should focus on creating depth quickly, showing meaningful motivations, and revealing change through limited but significant events. Story structure should consider efficient pacing, entering the story at the most important moment, developing tension within a limited space, and creating an ending that leaves a lasting emotional or intellectual impact. When combined with other genres, integrate these focused storytelling and economical narrative elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-            (object) [
-                'name'               => 'Epic Fantasy',
-                'brief'              => 'Large-scale fantasy adventures with kingdoms and heroes',
-                'prompt_instruction' => 'Focus on creating a vast fantasy world with multiple kingdoms, civilizations, ancient histories, powerful forces, and conflicts that affect entire societies. World planning should consider continents, cultures, political systems, legendary events, magical powers, ancient secrets, and large-scale conflicts. Character planning should consider heroes with significant destinies, companions, rivals, mentors, and enemies whose choices influence the fate of the world. Story structure should build from personal struggles toward larger conflicts, escalating threats, major battles, sacrifices, and a resolution that reflects the scale of the journey. When combined with other genres, integrate these epic-scale world-building elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Urban Fantasy',
-                'brief'              => 'Fantasy stories set in modern cities',
-                'prompt_instruction' => 'Focus on blending supernatural or magical elements with a modern-world setting. Planning should consider how hidden magical societies, supernatural beings, secret organizations, and ordinary humans coexist within urban environments. World planning should define supernatural rules, hidden communities, conflicts between normal and magical worlds, and the impact of modern technology. Character planning should consider characters balancing ordinary lives with extraordinary responsibilities, personal struggles, hidden identities, and relationships between different worlds. Story structure should explore discovery, conflict between realities, supernatural threats, and consequences of revealing hidden truths. When combined with other genres, integrate these urban fantasy elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Historical Romance',
-                'brief'              => 'Romantic stories set in historical periods',
-                'prompt_instruction' => 'Focus on developing a meaningful romantic relationship within an authentic historical setting. Planning should consider the social rules, traditions, class systems, cultural expectations, and historical limitations affecting relationships. Character planning should consider personal desires versus social obligations, emotional conflicts, family expectations, and growth through love. Story structure should combine romantic development with historical events, social challenges, emotional turning points, and a satisfying relationship resolution consistent with the period. When combined with other genres, integrate these historical and romantic elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Dystopian',
-                'brief'              => 'Stories about oppressive future societies',
-                'prompt_instruction' => 'Focus on creating a future society where political, technological, environmental, or social systems create oppression, inequality, or loss of freedom. World planning should consider government structures, surveillance systems, social classes, resource control, technology, propaganda, and resistance movements. Character planning should consider individuals challenging the system, personal conflicts, moral choices, survival strategies, and transformation through opposition. Story structure should develop tension between control and freedom, reveal hidden truths, escalate resistance, and resolve conflicts involving societal change. When combined with other genres, integrate these dystopian and social-conflict elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
                 'name'               => 'Post-Apocalyptic',
                 'brief'              => 'Stories after civilization collapse',
                 'prompt_instruction' => 'Focus on exploring human survival and rebuilding after a catastrophic event. Planning should consider the cause of collapse, remaining resources, changed environments, new societies, dangers, and survival challenges. Character planning should consider survivors with different backgrounds, skills, beliefs, trauma, hopes, and conflicts about rebuilding the future. Story structure should balance survival challenges with emotional development, discoveries about the past, conflicts between groups, and decisions that shape humanity’s future. When combined with other genres, integrate these survival and rebuilding elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Steampunk',
-                'brief'              => 'Victorian-inspired science fantasy stories',
-                'prompt_instruction' => 'Focus on creating an alternative historical world combining advanced mechanical technology with Victorian-era aesthetics and social structures. World planning should consider inventions, engineering systems, transportation, class divisions, political conflicts, and technological consequences. Character planning should consider inventors, explorers, revolutionaries, nobles, and workers affected by technological change. Story structure should explore discovery, innovation, social conflict, adventure, and the consequences of powerful inventions. When combined with other genres, integrate these steampunk and technological fantasy elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Cyberpunk',
-                'brief'              => 'High technology and low-life futuristic stories',
-                'prompt_instruction' => 'Focus on exploring advanced technology, artificial intelligence, corporations, cybernetics, and social inequality in futuristic environments. World planning should consider technology systems, digital networks, corporate power, surveillance, human-machine relationships, and social divisions. Character planning should consider hackers, rebels, artificial intelligence entities, corporate agents, and individuals struggling with identity and control. Story structure should explore conflicts between individuals and powerful systems, ethical consequences of technology, technological threats, and personal resistance. When combined with other genres, integrate these cyberpunk and technological-conflict elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Detective Fiction',
-                'brief'              => 'Stories focused on detectives solving cases',
-                'prompt_instruction' => 'Focus on creating a detective-driven narrative where observation, reasoning, investigation, and deduction solve complex cases. Planning should consider the detective’s methods, case structure, evidence, suspects, motives, and investigative challenges. Character planning should consider detective personality, expertise, weaknesses, relationships, and conflicts with criminals or institutions. Story structure should carefully reveal information through investigation, discoveries, false leads, and a final logical solution. When combined with other genres, integrate these detective and deduction elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Legal Drama',
-                'brief'              => 'Stories involving courts, law, and justice',
-                'prompt_instruction' => 'Focus on conflicts involving legal systems, justice, morality, and human consequences. Planning should consider laws, legal procedures, evidence, ethical dilemmas, opposing arguments, and institutional challenges. Character planning should consider lawyers, judges, clients, witnesses, and opponents with different motivations and beliefs about justice. Story structure should develop through investigations, legal battles, revelations, courtroom conflicts, and meaningful resolutions. When combined with other genres, integrate these legal and justice-focused elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Medical Drama',
-                'brief'              => 'Stories about healthcare and medical challenges',
-                'prompt_instruction' => 'Focus on human stories involving medicine, healthcare decisions, ethical dilemmas, and emotional challenges. Planning should consider medical environments, professional responsibilities, patient experiences, ethical conflicts, and personal sacrifices. Character planning should consider doctors, nurses, patients, families, and healthcare workers with personal motivations and emotional struggles. Story structure should balance medical challenges with human relationships, difficult decisions, discoveries, and emotional resolutions. When combined with other genres, integrate these medical and human-centered elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Coming of Age',
-                'brief'              => 'Stories about growing up and personal transformation',
-                'prompt_instruction' => 'Focus on characters experiencing personal growth, identity formation, independence, and emotional transformation. Planning should consider life transitions, personal challenges, relationships, social expectations, and important choices. Character planning should create realistic individuals discovering themselves through successes, failures, conflicts, and meaningful experiences. Story structure should show gradual transformation, emotional milestones, personal discoveries, and a resolution reflecting maturity. When combined with other genres, integrate these growth and transformation elements with the requirements of the additional genres while avoiding duplicate planning elements.',
             ],
 
             (object) [
@@ -271,18 +147,6 @@ class SeederHelper
                 'name'               => 'Mythology',
                 'brief'              => 'Stories based on myths, legends, and ancient beliefs',
                 'prompt_instruction' => 'Focus on creating narratives inspired by myths, legends, gods, heroes, creatures, and ancient belief systems. World planning should consider mythology, creation stories, divine forces, rituals, cultures, and symbolic meanings. Character planning should consider heroes, gods, monsters, chosen figures, and conflicts between destiny and personal choice. Story structure should explore legendary quests, moral lessons, supernatural challenges, and transformations connected to mythological themes. When combined with other genres, integrate these mythological elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Satire',
-                'brief'              => 'Stories using humor to criticize society',
-                'prompt_instruction' => 'Focus on using irony, exaggeration, humor, and storytelling to examine social, political, cultural, or human weaknesses. Planning should consider the target of criticism, social issues, symbolic characters, and exaggerated situations. Character planning should create memorable figures representing different ideas, flaws, or contradictions. Story structure should balance entertainment with meaningful commentary, escalating absurdity, and a conclusion that highlights the underlying message. When combined with other genres, integrate these satirical and critical elements with the requirements of the additional genres while avoiding duplicate planning elements.',
-            ],
-
-            (object) [
-                'name'               => 'Erotic Romance',
-                'brief'              => 'Adult romantic stories focused on intimacy and relationships',
-                'prompt_instruction' => 'Focus on developing adult relationships through emotional connection, attraction, intimacy, trust, and personal vulnerability. Planning should consider relationship dynamics, consent, emotional needs, personal boundaries, conflicts, and character development. Character planning should create mature characters with individual personalities, desires, fears, and relationship goals. Story structure should emphasize emotional progression, relationship challenges, intimacy, and meaningful resolution. When combined with other genres, integrate these adult relationship elements with the requirements of the additional genres while avoiding duplicate planning elements.',
             ],
         ]);
     }
