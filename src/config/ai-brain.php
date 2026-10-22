@@ -1,11 +1,7 @@
 <?php
 
-$generationTimeout = (int) env('AI_BRAIN_TIMEOUT_SECONDS', 600);
-
 return [
 
-    // Seed definitions for the ai_brains table. These only populate the
-    // database; at runtime the persisted per-brain values are authoritative.
     'ai-brains' => [
 
         'qwen3:4b' => [
@@ -28,21 +24,10 @@ return [
             'average_latency' => 12.00,
             'minimum_wait_time' => 0,
             'max_output_tokens' => (int) env('AI_BRAIN_MAX_OUTPUT_TOKENS', 8192),
-            'timeout_seconds' => $generationTimeout,
+            'timeout_seconds' => (int) env('AI_BRAIN_TIMEOUT_SECONDS', 600),
         ],
 
     ],
 
-    // HTTP transport shared by every AI Brain, independent of the provider.
-    'request' => [
-        'connect_timeout' => (int) env('AI_BRAIN_CONNECT_TIMEOUT_SECONDS', 10),
-        'timeout' => $generationTimeout,
-    ],
-
-    // Local Ollama runtime options.
-    'ollama' => [
-        'keep_alive' => env('OLLAMA_KEEP_ALIVE', '5m'),
-        'think' => (bool) env('OLLAMA_THINKING', false),
-    ],
 
 ];

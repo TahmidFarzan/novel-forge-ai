@@ -14,9 +14,13 @@ use Illuminate\Support\Facades\Log;
 
 class AiService
 {
-    protected int $defaultTimeout = 600;
+    public const DEFAULT_TIMEOUT_SECONDS = 600;
 
-    protected int $connectTimeout = 10;
+    public const DEFAULT_CONNECT_TIMEOUT_SECONDS = 10;
+
+    protected int $defaultTimeout = self::DEFAULT_TIMEOUT_SECONDS;
+
+    protected int $connectTimeout = self::DEFAULT_CONNECT_TIMEOUT_SECONDS;
 
     protected bool $think = false;
 
@@ -27,16 +31,6 @@ class AiService
     protected const MAX_FENCE_UNWRAP_DEPTH = 2;
 
     protected const EXECUTION_TIME_MARGIN = 30;
-
-    public function __construct()
-    {
-        $request = (array) config('ai-brain.request', []);
-
-        $this->connectTimeout = (int) ($request['connect_timeout'] ?? $this->connectTimeout);
-        $this->defaultTimeout = (int) ($request['timeout'] ?? $this->defaultTimeout);
-        $this->think = (bool) config('ai-brain.ollama.think', $this->think);
-        $this->keepAlive = (string) config('ai-brain.ollama.keep_alive', $this->keepAlive);
-    }
 
     public function generate(string $stepName, string $url, ?string $apiKey, string $model, string $partialPrompt, array $inputs, ?int $maxOutputTokens = null, ?int $timeout = null): array
     {

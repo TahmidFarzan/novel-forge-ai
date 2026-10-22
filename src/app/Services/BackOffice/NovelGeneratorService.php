@@ -449,7 +449,7 @@ class NovelGeneratorService
         $timeout = (int) ($novel->aiBrain?->timeout_seconds ?? 0);
 
         if ($timeout <= 0) {
-            $timeout = (int) config('ai-brain.request.timeout', 600);
+            $timeout = AiService::DEFAULT_TIMEOUT_SECONDS;
         }
 
         return $timeout + self::GENERATION_LOCK_BUFFER_SECONDS;
