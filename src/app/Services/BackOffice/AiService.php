@@ -7,30 +7,24 @@ use App\Models\Novel;
 use App\Models\NovelChapter;
 use App\Support\PromptContextEncoder;
 use Exception;
-use Throwable;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class AiService
 {
-    public const DEFAULT_TIMEOUT_SECONDS = 600;
+    private const int DEFAULT_HTTP_TIMEOUT_SECONDS = 600;
 
-    public const DEFAULT_CONNECT_TIMEOUT_SECONDS = 10;
+    private const int DEFAULT_API_CONNECT_TIMEOUT_SECONDS = 10;
 
-    protected int $defaultTimeout = self::DEFAULT_TIMEOUT_SECONDS;
+    private const bool AI_RUNNER_THINK = false;
 
-    protected int $connectTimeout = self::DEFAULT_CONNECT_TIMEOUT_SECONDS;
+    private const string AI_RUNNER_KEEP_ALIVE = '5m';
 
-    protected bool $think = false;
+    private const int PREVIEW_LENGTH = 200;
 
-    protected string $keepAlive = '5m';
+    private const int MAX_FENCE_UNWRAP_DEPTH = 2;
 
-    protected const PREVIEW_LENGTH = 200;
-
-    protected const MAX_FENCE_UNWRAP_DEPTH = 2;
-
-    protected const EXECUTION_TIME_MARGIN = 30;
+    private const int EXECUTION_TIME_MARGIN = 30;
 
     public function generate(string $stepName, string $url, ?string $apiKey, string $model, string $partialPrompt, array $inputs, ?int $maxOutputTokens = null, ?int $timeout = null): array
     {
@@ -83,13 +77,13 @@ class AiService
 
     public function resolveTimeout(?int $timeout): int
     {
-        return max(1, $timeout ?? $this->defaultTimeout);
+        return max(1, $timeout ?? self::DEFAULT_HTTP_TIMEOUT_SECONDS);
     }
 
     public function sendGetRequest(string $url, string $apiKey, array $params = [], ?int $timeout = null): array
     {
         $response = Http::timeout(
-            $timeout ?? $this->defaultTimeout
+            $timeout ?? self::DEFAULT_HTTP_TIMEOUT_SECONDS
         )
             ->withToken($apiKey)
             ->acceptJson()
@@ -214,8 +208,7 @@ class AiService
             Log::error('AI response was truncated by the provider.', [
                 'step' => $stepName,
                 'finish_reason' => $finishReason,
-                'content_length' => strlen($content),
-                'content_preview' => $this->preview($content),
+                'content' => $content,
             ]);
 
             throw new Exception('The AI response was cut off before it was complete. Retry.');
@@ -230,19 +223,12 @@ class AiService
         $decoded = json_decode($normalized, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            Log::error('AI response was not valid JSON.', array_merge(
-                ['step' => $stepName, 'error' => json_last_error_msg()],
-                $this->responseDiagnostics($normalized),
-            ));
-
+            Log::error('AI response was not valid JSON.', ['step' => $stepName, 'error' => json_last_error_msg(), "content" => $normalized]);
             throw new Exception('The AI response was not valid JSON. '.json_last_error_msg());
         }
 
         if (! is_array($decoded)) {
-            Log::error('AI response was not a JSON object or array.', array_merge(
-                ['step' => $stepName, 'type' => get_debug_type($decoded)],
-                $this->responseDiagnostics($normalized),
-            ));
+            Log::error('AI response was not a JSON object or array.', ['step' => $stepName, 'type' => get_debug_type($decoded), "content" => $normalized]);
 
             throw new Exception(sprintf('The AI response was not valid JSON. Expected a JSON object or array, got %s.', get_debug_type($decoded)));
         }
@@ -372,27 +358,6 @@ class AiService
         return null;
     }
 
-    private function responseDiagnostics(string $content): array
-    {
-        return [
-            'content_length' => strlen($content),
-            'starts_with' => substr($content, 0, 40),
-            'ends_with' => substr($content, -40),
-            'content_preview' => $this->preview($content),
-        ];
-    }
-
-    private function preview(string $content): string
-    {
-        $collapsed = preg_replace('/\s+/', ' ', trim($content)) ?? trim($content);
-
-        if (mb_strlen($collapsed) <= self::PREVIEW_LENGTH * 2) {
-            return $collapsed;
-        }
-
-        return mb_substr($collapsed, 0, self::PREVIEW_LENGTH).' … '.mb_substr($collapsed, -self::PREVIEW_LENGTH);
-    }
-
     private function post(string $stepName, string $endpoint, string $apiKey, array $payload, int $timeout): mixed
     {
         $requestEndpoint = rtrim($endpoint, '/');
@@ -401,7 +366,7 @@ class AiService
             $requestEndpoint = rtrim($requestEndpoint, '/').'/api/generate';
         }
 
-        $http = Http::connectTimeout($this->connectTimeout)
+        $http = Http::connectTimeout(self::DEFAULT_API_CONNECT_TIMEOUT_SECONDS)
             ->timeout($timeout)
             ->acceptJson();
 
@@ -467,8 +432,8 @@ class AiService
                 ],
             ],
             'stream' => false,
-            'think' => $this->think,
-            'keep_alive' => $this->keepAlive,
+            'think' => self::AI_RUNNER_THINK,
+            'keep_alive' => self::AI_RUNNER_KEEP_ALIVE,
         ];
 
         if ($maxOutputTokens !== null && $maxOutputTokens > 0) {
