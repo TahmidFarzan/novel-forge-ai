@@ -12,19 +12,17 @@ use Illuminate\Support\Facades\Log;
 
 class AiService
 {
-    private const int DEFAULT_HTTP_TIMEOUT_SECONDS = 600;
+    public const int DEFAULT_HTTP_TIMEOUT_SECONDS = 600;
 
-    private const int DEFAULT_API_CONNECT_TIMEOUT_SECONDS = 10;
+    public const int DEFAULT_API_CONNECT_TIMEOUT_SECONDS = 10;
 
-    private const bool AI_RUNNER_THINK = false;
+    public const bool AI_RUNNER_THINK = false;
 
-    private const string AI_RUNNER_KEEP_ALIVE = '5m';
+    public const string AI_RUNNER_KEEP_ALIVE = '5m';
 
-    private const int PREVIEW_LENGTH = 200;
+    public const int MAX_FENCE_UNWRAP_DEPTH = 2;
 
-    private const int MAX_FENCE_UNWRAP_DEPTH = 2;
-
-    private const int EXECUTION_TIME_MARGIN = 30;
+    public const int EXECUTION_TIME_MARGIN = 30;
 
     public function generate(string $stepName, string $url, ?string $apiKey, string $model, string $partialPrompt, array $inputs, ?int $maxOutputTokens = null, ?int $timeout = null): array
     {
