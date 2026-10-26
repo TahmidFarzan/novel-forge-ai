@@ -75,7 +75,7 @@ The generation pipeline is driven by three named steps (constants in
 3. `chapter_content` — writes the chapter prose.
 
 `NovelGeneratorService` and `NovelChapterService` orchestrate these steps and call
-`App\Services\BackOffice\AiService`, which:
+`App\Services\BackOffice\OllamaService`, which:
 
 - merges the partial prompt with the step inputs,
 - validates that no placeholder is left unresolved,
@@ -85,7 +85,7 @@ The generation pipeline is driven by three named steps (constants in
 
 ### Endpoint resolution
 
-`AiService` posts to the AI Brain's `api_url`. If the URL does not already end
+`OllamaService` posts to the AI Brain's `api_url`. If the URL does not already end
 with `/api/generate` or `/v1/chat/completions`, it appends `/api/generate`, the
 native Ollama generation endpoint. Responses in Ollama's native shape
 (`{ "response": ..., "done": ... }`) are normalised to the OpenAI

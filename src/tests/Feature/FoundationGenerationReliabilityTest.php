@@ -7,8 +7,8 @@ use App\Helpers\NovelHelper;
 use App\Models\Novel;
 use App\Models\NovelGeneratorStep;
 use App\Models\User;
-use App\Services\BackOffice\AiService;
 use App\Services\BackOffice\NovelGeneratorStepService;
+use App\Services\BackOffice\OllamaService;
 use Database\Seeders\AiBrainAiBrainOutputTypeSeeder;
 use Database\Seeders\AiBrainOutputTypeSeeder;
 use Database\Seeders\AiBrainSeeder;
@@ -462,9 +462,9 @@ class FoundationGenerationReliabilityTest extends TestCase
         }
     }
 
-    private function service(): AiService
+    private function service(): OllamaService
     {
-        return app(AiService::class);
+        return app(OllamaService::class);
     }
 
     private function fakeSuccessfulGeneration(): void

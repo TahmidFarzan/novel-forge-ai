@@ -34,7 +34,7 @@ class NovelGeneratorService
 
     protected NovelTypeService $novelTypeService;
 
-    protected AiService $aiService;
+    protected OllamaService $ollamaService;
 
     protected LanguageService $languageService;
 
@@ -42,13 +42,13 @@ class NovelGeneratorService
 
     protected NovelGeneratorStepService $novelGeneratorStepService;
 
-    public function __construct(AiBrainService $aiBrainService, AudienceService $audienceService, GenreService $genreService, NovelTypeService $novelTypeService, AiService $aiService, LanguageService $languageService, NovelChapterService $novelChapterService, NovelGeneratorStepService $novelGeneratorStepService)
+    public function __construct(AiBrainService $aiBrainService, AudienceService $audienceService, GenreService $genreService, NovelTypeService $novelTypeService, OllamaService $ollamaService, LanguageService $languageService, NovelChapterService $novelChapterService, NovelGeneratorStepService $novelGeneratorStepService)
     {
         $this->aiBrainService = $aiBrainService;
         $this->audienceService = $audienceService;
         $this->genreService = $genreService;
         $this->novelTypeService = $novelTypeService;
-        $this->aiService = $aiService;
+        $this->ollamaService = $ollamaService;
         $this->languageService = $languageService;
         $this->novelChapterService = $novelChapterService;
         $this->novelGeneratorStepService = $novelGeneratorStepService;
@@ -295,12 +295,12 @@ class NovelGeneratorService
 
     private function runPlanChapterStep(Novel $novel, NovelGeneratorStep $step, AiBrain $aiBrain): string
     {
-        $plan = $this->aiService->generate(
+        $plan = $this->ollamaService->generate(
             $step->name,
             $aiBrain->api_url,
             $aiBrain->model,
             $step->aiPrompt->prompt,
-            $this->aiService->planChapterInputs($novel),
+            $this->ollamaService->planChapterInputs($novel),
             $aiBrain->max_output_tokens,
             $aiBrain->timeout_seconds,
         );
@@ -340,12 +340,12 @@ class NovelGeneratorService
             throw new Exception('The Foundation AI prompt is not configured.');
         }
 
-        return $this->aiService->generate(
+        return $this->ollamaService->generate(
             $step->name,
             $aiBrain->api_url,
             $aiBrain->model,
             $step->aiPrompt->prompt,
-            $this->aiService->foundationInputs($context),
+            $this->ollamaService->foundationInputs($context),
             $aiBrain->max_output_tokens,
             $aiBrain->timeout_seconds,
         );
@@ -492,7 +492,7 @@ class NovelGeneratorService
         $timeout = (int) ($novel->aiBrain?->timeout_seconds ?? 0);
 
         if ($timeout <= 0) {
-            $timeout = AiService::DEFAULT_HTTP_TIMEOUT_SECONDS;
+            $timeout = OllamaService::DEFAULT_HTTP_TIMEOUT_SECONDS;
         }
 
         return $timeout + self::GENERATION_LOCK_BUFFER_SECONDS;

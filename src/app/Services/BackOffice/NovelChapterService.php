@@ -14,11 +14,11 @@ use Illuminate\Support\Facades\Log;
 
 class NovelChapterService
 {
-    protected AiService $aiService;
+    protected OllamaService $ollamaService;
 
-    public function __construct(AiService $aiService)
+    public function __construct(OllamaService $ollamaService)
     {
-        $this->aiService = $aiService;
+        $this->ollamaService = $ollamaService;
     }
 
     public function new(): NovelChapter
@@ -145,12 +145,12 @@ class NovelChapterService
 
     public function generateChapterContent(Novel $novel, NovelChapter $novelChapter, string $stepName, AiPrompt $aiPrompt, AiBrain $aiBrain): void
     {
-        $stepData = $this->aiService->generate(
+        $stepData = $this->ollamaService->generate(
             $stepName,
             $aiBrain->api_url,
             $aiBrain->model,
             $aiPrompt->prompt,
-            $this->aiService->chapterContentInputs($novel, $novelChapter),
+            $this->ollamaService->chapterContentInputs($novel, $novelChapter),
             $aiBrain->max_output_tokens,
             $aiBrain->timeout_seconds,
         );

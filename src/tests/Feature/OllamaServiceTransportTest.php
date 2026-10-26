@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Services\BackOffice\AiService;
+use App\Services\BackOffice\OllamaService;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
-class AiServiceOllamaTransportTest extends TestCase
+class OllamaServiceTransportTest extends TestCase
 {
     public function test_ollama_generate_requests_are_not_forced_to_stream(): void
     {
@@ -17,7 +17,7 @@ class AiServiceOllamaTransportTest extends TestCase
             ], 200),
         ]);
 
-        app(AiService::class)->generate(
+        app(OllamaService::class)->generate(
             'Foundation',
             'http://ollama:11434',
             'qwen3:4b',
