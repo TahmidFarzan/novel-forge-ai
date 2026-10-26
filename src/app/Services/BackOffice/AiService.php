@@ -88,7 +88,7 @@ class AiService
                 'excerpt' => (string) $response->body(),
             ]);
 
-            throw new Exception($this->providerErrorMessage($response->status()), $response->status());
+            throw new Exception($response->body(), $response->status());
         }
 
         return $response->json();
@@ -372,7 +372,7 @@ class AiService
                 'detail' => (string) $exception->getMessage(),
             ]);
 
-            throw new Exception($this->transportErrorMessage($exception), (int) $exception->getCode(), $exception);
+            throw new Exception($exception->getMessage(), (int) $exception->getCode(), $exception);
         }
 
         if (! $response->successful()) {
@@ -382,31 +382,10 @@ class AiService
                 'excerpt' => (string) $response->body(),
             ]);
 
-            throw new Exception($this->providerErrorMessage($response->status()), $response->status());
+            return new Exception($response->body(), $response->status());
         }
 
         return $this->normalizeProviderResponse($response->json());
-    }
-
-    private function transportErrorMessage(Exception $exception): string
-    {
-        $detail = strtolower($exception->getMessage());
-
-        if ($exception->getCode() === 28 || str_contains($detail, 'timed out') || str_contains($detail, 'timeout')) {
-            return 'The AI provider did not finish in time. Retry.';
-        }
-
-        return 'The AI provider could not be reached. Check that Ollama is running and retry.';
-    }
-
-    private function providerErrorMessage(int $status): string
-    {
-        return match (true) {
-            in_array($status, [401, 403], true) => sprintf('The AI provider rejected the request (HTTP %d).', $status),
-            $status === 429 => 'The AI provider rate limit was reached (HTTP 429).',
-            $status >= 500 => sprintf('The AI provider returned a server error (HTTP %d).', $status),
-            default => sprintf('The AI provider returned an error (HTTP %d).', $status),
-        };
     }
 
     private function normalizeProviderResponse(mixed $json): mixed
