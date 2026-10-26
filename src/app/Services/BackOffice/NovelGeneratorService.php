@@ -59,6 +59,7 @@ class NovelGeneratorService
         try {
             $step = $this->stepByName(AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION);
             $aiBrain = $this->aiBrainService->findById($request->input('ai_brain_id'));
+            Log::info($aiBrain);
             $foundation = $this->generateFoundation($step, $aiBrain, $this->foundationContext($request->only([
                 'language_id',
                 'audience_id',
@@ -92,7 +93,13 @@ class NovelGeneratorService
                 return $novel;
             });
 
-            return $this->result(self::STATUS_SUCCESS, 'Foundation generated successfully.', $novel);
+
+
+            return [
+                'status' => self::STATUS_SUCCESS,
+                'message' => 'Foundation generated successfully.',
+                'novel' => $novel,
+            ];
         } catch (Exception $exception) {
             Log::error('Failed to generate novel foundation.', [
                 'step' => AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
@@ -100,16 +107,24 @@ class NovelGeneratorService
                 'reason' => $exception->getMessage(),
             ]);
 
-            return $this->result(self::STATUS_ERROR, 'Failed to generate novel foundation. Please try again.', null);
+            return [
+                'status' => self::STATUS_ERROR,
+                'message' => 'Failed to generate novel foundation. Please try again.',
+                'novel' => null,
+            ];
         }
     }
 
     public function continueGeneration(Novel $novel): array
     {
-        $lock = Cache::lock($this->generationLockKey($novel), $this->generationLockSeconds($novel));
+        $lock = Cache::lock(sprintf('novel:%s:generation', $novel->getKey()), $this->generationLockSeconds($novel));
 
         if (! $lock->get()) {
-            return $this->result(self::STATUS_BUSY, 'Generation is already running for this novel.', $novel);
+            return [
+                'status' => self::STATUS_BUSY,
+                'message' => 'Generation is already running for this novel.',
+                'novel' => $novel,
+            ];
         }
 
         try {
@@ -125,15 +140,28 @@ class NovelGeneratorService
 
         try {
             if ($novel->status === NovelHelper::STATUS_COMPLETE) {
-                return $this->result(self::STATUS_SUCCESS, 'This novel is already completed.', $novel);
+                return [
+                    'status' => self::STATUS_SUCCESS,
+                    'message' => 'This novel is already completed.',
+                    'novel' => $novel,
+                ];
             }
 
             if (! in_array($novel->status, [NovelHelper::STATUS_ONGOING, NovelHelper::STATUS_PENDING, NovelHelper::STATUS_FAILED, NovelHelper::STATUS_STOPPED, NovelHelper::STATUS_DRAFT], true)) {
-                return $this->result(self::STATUS_ERROR, 'This novel cannot be generated in its current state.', $novel);
+
+                return [
+                    'status' => self::STATUS_ERROR,
+                    'message' => 'This novel cannot be generated in its current state.',
+                    'novel' => $novel,
+                ];
             }
 
             if (! $novel->ai_brain_id) {
-                return $this->result(self::STATUS_ERROR, 'No AI Brain is configured for this novel. Generate the foundation first.', $novel);
+                return [
+                    'status' => self::STATUS_ERROR,
+                    'message' => 'No AI Brain is configured for this novel. Generate the foundation first.',
+                    'novel' => $novel,
+                ];
             }
 
             $activeStep = $this->novelGeneratorStepService->nextPendingStep($novel);
@@ -141,7 +169,11 @@ class NovelGeneratorService
             if (! $activeStep) {
                 $this->finalizeNovel($novel);
 
-                return $this->result(self::STATUS_SUCCESS, 'Novel completed successfully.', $novel);
+                return [
+                    'status' => self::STATUS_SUCCESS,
+                    'message' => 'Novel completed successfully.',
+                    'novel' => $novel,
+                ];
             }
 
             if (in_array($novel->status, [NovelHelper::STATUS_FAILED, NovelHelper::STATUS_STOPPED], true)) {
@@ -159,18 +191,31 @@ class NovelGeneratorService
             if (! $this->isChapterContentStep($activeStep)) {
                 $this->novelGeneratorStepService->markCompleted($novel, $activeStep);
 
-                return $this->result(self::STATUS_SUCCESS, $message, $novel);
+                return [
+                    'status' => self::STATUS_SUCCESS,
+                    'message' => $message,
+                    'novel' => $novel,
+                ];
             }
 
             if ($this->chaptersMissingContent($novel)->isNotEmpty()) {
-                return $this->result(self::STATUS_SUCCESS, $message, $novel);
+
+                return [
+                    'status' => self::STATUS_SUCCESS,
+                    'message' => $message,
+                    'novel' => $novel,
+                ];
             }
 
             $this->novelGeneratorStepService->markCompleted($novel, $activeStep);
 
             $this->finalizeNovel($novel);
 
-            return $this->result(self::STATUS_SUCCESS, $message, $novel);
+            return [
+                'status' => self::STATUS_SUCCESS,
+                'message' => $message,
+                'novel' => $novel,
+            ];
         } catch (Exception $exception) {
             Log::error('Novel generation failed.', [
                 'step' => $activeStep?->name,
@@ -179,26 +224,39 @@ class NovelGeneratorService
             ]);
 
             if ($activeStep) {
-                $this->novelGeneratorStepService->markFailed($novel, $activeStep, $this->userFacingStepError($exception));
+                $this->novelGeneratorStepService->markFailed($novel, $activeStep, $exception->getMessage());
             }
 
             $novel->status = NovelHelper::STATUS_FAILED;
             $novel->save();
 
-            return $this->result(self::STATUS_ERROR, $this->generationFailureMessage($activeStep), $novel);
+            $errorMessage = $activeStep ? sprintf('Generation failed during "%s". Review the step and retry.', $activeStep->name) : 'Novel generation failed. Please try again.';
+            return [
+                'status' => self::STATUS_ERROR,
+                'message' => $errorMessage,
+                'novel' => $novel,
+            ];
         }
     }
 
     public function stop(Novel $novel): array
     {
         if ($novel->status === NovelHelper::STATUS_COMPLETE) {
-            return $this->result(self::STATUS_ERROR, 'This novel is already completed.', $novel);
+            return [
+                'status' => self::STATUS_ERROR,
+                'message' => 'This novel is already completed.',
+                'novel' => $novel,
+            ];
         }
 
         $novel->status = NovelHelper::STATUS_STOPPED;
         $novel->save();
 
-        return $this->result(self::STATUS_SUCCESS, 'Novel generation stopped. You can resume it later.', $novel);
+        return [
+            'status' => self::STATUS_SUCCESS,
+            'message' => 'Novel generation stopped. You can resume it later.',
+            'novel' => $novel,
+        ];
     }
 
     private function runStep(Novel $novel, NovelGeneratorStep $step): string
@@ -326,7 +384,7 @@ class NovelGeneratorService
         return $novel->novelChapters()
             ->orderByRaw('CAST(no AS UNSIGNED) ASC')
             ->get()
-            ->reject(fn (NovelChapter $chapter) => $this->novelChapterService->hasContent($chapter))
+            ->reject(fn(NovelChapter $chapter) => $this->novelChapterService->hasContent($chapter))
             ->values();
     }
 
@@ -346,7 +404,7 @@ class NovelGeneratorService
         $findings = $this->reviewFindings($novel);
 
         if ($findings !== []) {
-            throw new Exception('Novel review incomplete. '.implode(' ', $findings));
+            throw new Exception('Novel review incomplete. ' . implode(' ', $findings));
         }
 
         $novel->status = NovelHelper::STATUS_COMPLETE;
@@ -370,17 +428,17 @@ class NovelGeneratorService
         }
 
         $expectedNumbers = collect($chapterPlan)
-            ->map(fn ($entry) => (string) ($entry['chapter_number'] ?? ''))
-            ->filter(fn ($no) => $no !== '')
+            ->map(fn($entry) => (string) ($entry['chapter_number'] ?? ''))
+            ->filter(fn($no) => $no !== '')
             ->values();
 
         $orderedExpectedNumbers = $expectedNumbers->implode(',');
         $sortedExpectedNumbers = $expectedNumbers
-            ->sortBy(fn ($no) => (int) $no, SORT_REGULAR)
+            ->sortBy(fn($no) => (int) $no, SORT_REGULAR)
             ->values()
             ->implode(',');
 
-        $actualNumbers = $chapters->map(fn ($chapter) => (string) $chapter->no)->values();
+        $actualNumbers = $chapters->map(fn($chapter) => (string) $chapter->no)->values();
 
         $missingChapters = $expectedNumbers
             ->diff($actualNumbers)
@@ -389,9 +447,9 @@ class NovelGeneratorService
 
         $duplicateChapters = $chapters
             ->groupBy('no')
-            ->filter(fn ($group) => $group->count() > 1)
+            ->filter(fn($group) => $group->count() > 1)
             ->keys()
-            ->map(fn ($no) => (string) $no)
+            ->map(fn($no) => (string) $no)
             ->values();
 
         $extraChapters = $actualNumbers
@@ -414,34 +472,22 @@ class NovelGeneratorService
         }
 
         if ($missingChapters->isNotEmpty()) {
-            $findings[] = 'Missing chapters: '.$missingChapters->implode(', ').'.';
+            $findings[] = 'Missing chapters: ' . $missingChapters->implode(', ') . '.';
         }
 
         if ($missingContents->isNotEmpty()) {
-            $findings[] = 'Missing contents: '.$missingContents->implode(', ').'.';
+            $findings[] = 'Missing contents: ' . $missingContents->implode(', ') . '.';
         }
 
         if ($duplicateChapters->isNotEmpty()) {
-            $findings[] = 'Duplicate chapters: '.$duplicateChapters->implode(', ').'.';
+            $findings[] = 'Duplicate chapters: ' . $duplicateChapters->implode(', ') . '.';
         }
 
         if ($extraChapters->isNotEmpty()) {
-            $findings[] = 'Unexpected chapters: '.$extraChapters->implode(', ').'.';
+            $findings[] = 'Unexpected chapters: ' . $extraChapters->implode(', ') . '.';
         }
 
         return $findings;
-    }
-
-    private function generationFailureMessage(?NovelGeneratorStep $step): string
-    {
-        return $step
-            ? sprintf('Generation failed during "%s". Review the step and retry.', $step->name)
-            : 'Novel generation failed. Please try again.';
-    }
-
-    private function generationLockKey(Novel $novel): string
-    {
-        return sprintf('novel:%s:generation', $novel->getKey());
     }
 
     private function generationLockSeconds(Novel $novel): int
@@ -455,17 +501,4 @@ class NovelGeneratorService
         return $timeout + self::GENERATION_LOCK_BUFFER_SECONDS;
     }
 
-    private function userFacingStepError(Exception $exception): string
-    {
-        return $exception->getMessage();
-    }
-
-    private function result(string $status, string $message, ?Novel $novel): array
-    {
-        return [
-            'status' => $status,
-            'message' => $message,
-            'novel' => $novel,
-        ];
-    }
 }
