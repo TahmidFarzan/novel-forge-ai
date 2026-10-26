@@ -16,7 +16,7 @@ import {
 import { formatDateTime } from '@/composables/useDateTime'
 import { itemListFilterParameters } from '@/composables/useDataTable'
 
-import { canCreateAiBrain, canUpdateAiBrain, canDeleteAiBrain } from '@/composables/useUserPermissions'
+import { canUpdateAiBrain, canDeleteAiBrain } from '@/composables/useUserPermissions'
 
 FontAwesomeLibrary.add(faTrash, faFilter, faInfo, faPlus, faPen, faSpinner)
 
@@ -69,7 +69,6 @@ const closeDeleteModal = () => {
     deletingRow.value = null
 }
 
-const canCreate = () => canCreateAiBrain(authUser?.value)
 const canUpdate = (aiBrain) => canUpdateAiBrain(authUser?.value, aiBrain)
 const canDelete = (aiBrain) => canDeleteAiBrain(authUser?.value, aiBrain)
 
@@ -116,12 +115,6 @@ onMounted(async () => {
             <h2 class="text-lg font-semibold">
                 Ai Brains
             </h2>
-
-            <a v-if="canCreate()" :href="route('back-office.ai-brains.create')"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition">
-                <FontAwesomeIcon icon="plus" />
-                Create
-            </a>
         </div>
 
         <form @submit.prevent="applyFilter" class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">

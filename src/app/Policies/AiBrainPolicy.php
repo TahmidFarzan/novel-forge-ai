@@ -36,10 +36,7 @@ class AiBrainPolicy
 
     public function create(User $authUser): Response
     {
-        $module = UserPermissionHelper::MODULE_AI_BRAIN;
-        $access = UserPermissionHelper::ACCESS_CREATE;
-
-        return $authUser->hasUserPermission($module, $access) ? Response::allow() : Response::deny();
+        return Response::deny();
     }
 
     public function update(User $authUser, AiBrain $aiBrain): Response

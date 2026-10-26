@@ -32,7 +32,7 @@ class FoundationGenerationReliabilityTest extends TestCase
     use InteractsWithPromptSkeleton;
     use RefreshDatabase;
 
-    private const URL = 'https://router.huggingface.co/v1/chat/completions';
+    private const URL = 'http://ollama:11434/api/generate';
 
     private const CHAPTER_CONTENT = 'The rain had not stopped for nine days.';
 
@@ -58,7 +58,7 @@ class FoundationGenerationReliabilityTest extends TestCase
             NovelGeneratorStepSeeder::class,
         ]);
 
-        DB::table('ai_brains')->update(['api_key' => 'test-key', 'api_url' => self::URL]);
+        DB::table('ai_brains')->update(['api_url' => self::URL]);
 
         $this->primeAiBrainAvailability();
     }
@@ -198,7 +198,7 @@ class FoundationGenerationReliabilityTest extends TestCase
         $this->assertSame($existingFoundation, $novel->foundation);
         $this->assertStringNotContainsString('cURL', $error);
         $this->assertStringNotContainsString('60009', $error);
-        $this->assertStringNotContainsString('router.huggingface.co', $error);
+        $this->assertStringNotContainsString('ollama:11434', $error);
         $this->assertStringContainsString('did not finish in time', $error);
     }
 
@@ -241,7 +241,6 @@ class FoundationGenerationReliabilityTest extends TestCase
             $this->service()->sendPostRequest(
                 AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
                 self::URL,
-                'test-key',
                 'test-model',
                 'prompt',
             );
@@ -264,14 +263,13 @@ class FoundationGenerationReliabilityTest extends TestCase
             $this->service()->sendPostRequest(
                 AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
                 self::URL,
-                'bad-key',
                 'test-model',
                 'prompt',
             );
 
             $this->fail('Expected an Exception.');
         } catch (Exception $exception) {
-            $this->assertStringContainsString('rejected the API key (HTTP 401)', $exception->getMessage());
+            $this->assertStringContainsString('rejected the request (HTTP 401)', $exception->getMessage());
         }
 
         Http::assertSentCount(1);
@@ -289,7 +287,6 @@ class FoundationGenerationReliabilityTest extends TestCase
             $this->service()->sendPostRequest(
                 AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION,
                 self::URL,
-                'test-key',
                 'test-model',
                 'prompt',
             );
@@ -461,8 +458,7 @@ class FoundationGenerationReliabilityTest extends TestCase
             ->assertOk();
 
         foreach (Http::recorded() as $pair) {
-            $this->assertStringNotContainsString('router.huggingface.co', $pair[0]->url());
-            $this->assertStringNotContainsString('huggingface.co', $pair[0]->url());
+            $this->assertStringNotContainsString('ollama:11434', $pair[0]->url());
         }
     }
 
@@ -599,9 +595,9 @@ class FoundationGenerationReliabilityTest extends TestCase
     private function completion(string $content, string $finishReason = 'stop'): array
     {
         return [
-            'choices' => [
-                ['message' => ['content' => $content], 'finish_reason' => $finishReason],
-            ],
+            'response' => $content,
+            'done' => true,
+            'done_reason' => $finishReason,
         ];
     }
 

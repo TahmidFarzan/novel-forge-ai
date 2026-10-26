@@ -148,7 +148,6 @@ class NovelChapterService
         $stepData = $this->aiService->generate(
             $stepName,
             $aiBrain->api_url,
-            $aiBrain->api_key,
             $aiBrain->model,
             $aiPrompt->prompt,
             $this->aiService->chapterContentInputs($novel, $novelChapter),

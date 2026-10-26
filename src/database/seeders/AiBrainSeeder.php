@@ -32,7 +32,6 @@ class AiBrainSeeder extends Seeder
                 'name'              => $aiBrain->name,
                 'model'             => $aiBrain->model,
                 'api_url'           => $aiBrain->api_url,
-                'api_key'           => $aiBrain->api_key,
                 'brief'             => $aiBrain->brief ?? null,
                 'focus'             => $aiBrain->focus ?? null,
                 'context_window'    => $aiBrain->context_window,

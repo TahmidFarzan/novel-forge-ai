@@ -26,7 +26,6 @@ class AiBrainFactory extends Factory
             'name'              => $name,
             'model'              => $name,
             'api_url'           => $this->faker->url(),
-            'api_key'           => 'sk-' . $this->faker->sha256(),
             'brief'             => $brief,
             'focus'             => $this->faker->sentence(),
             'context_window'    => $this->faker->randomElement([8192, 16384, 32768, 65536, 131072, 262000]),

@@ -24,14 +24,8 @@ class AiService
 
     public const int EXECUTION_TIME_MARGIN = 30;
 
-    public function generate(string $stepName, string $url, ?string $apiKey, string $model, string $partialPrompt, array $inputs, ?int $maxOutputTokens = null, ?int $timeout = null): array
+    public function generate(string $stepName, string $url, string $model, string $partialPrompt, array $inputs, ?int $maxOutputTokens = null, ?int $timeout = null): array
     {
-        if (! is_string($apiKey) || trim($apiKey) === '') {
-            throw new Exception(
-                sprintf('The AI Brain used for "%s" has no API key configured.', $stepName)
-            );
-        }
-
         $fullPrompt = AiPromptGeneratorHelper::applyMaxOutputTokenInstruction(
             AiPromptGeneratorHelper::generateFullPrompt($partialPrompt, $inputs),
             $maxOutputTokens,
@@ -45,10 +39,10 @@ class AiService
             );
         }
 
-        return $this->sendPostRequest($stepName, $url, $apiKey, $model, $fullPrompt, $maxOutputTokens, $timeout);
+        return $this->sendPostRequest($stepName, $url, $model, $fullPrompt, $maxOutputTokens, $timeout);
     }
 
-    public function sendPostRequest(string $stepName, string $url, string $apiKey, string $model, mixed $data = null, ?int $maxOutputTokens = null, ?int $timeout = null): array
+    public function sendPostRequest(string $stepName, string $url, string $model, mixed $data = null, ?int $maxOutputTokens = null, ?int $timeout = null): array
     {
         $requestTimeout = $this->resolveTimeout($timeout);
 
@@ -57,7 +51,7 @@ class AiService
         $payload = $this->buildPayload($model, $data, $maxOutputTokens);
 
         try {
-            $response = $this->post($stepName, rtrim($url, '/'), $apiKey, $payload, $requestTimeout);
+            $response = $this->post($stepName, rtrim($url, '/'), $payload, $requestTimeout);
         } catch (Exception $exception) {
             Log::error('AI generation request failed.', [
                 'step' => $stepName,
@@ -78,12 +72,10 @@ class AiService
         return max(1, $timeout ?? self::DEFAULT_HTTP_TIMEOUT_SECONDS);
     }
 
-    public function sendGetRequest(string $url, string $apiKey, array $params = [], ?int $timeout = null): array
+    public function sendGetRequest(string $url, array $params = [], ?int $timeout = null): array
     {
-        $response = Http::timeout(
-            $timeout ?? self::DEFAULT_HTTP_TIMEOUT_SECONDS
-        )
-            ->withToken($apiKey)
+        $response = Http::connectTimeout(self::DEFAULT_API_CONNECT_TIMEOUT_SECONDS)
+            ->timeout($timeout ?? self::DEFAULT_HTTP_TIMEOUT_SECONDS)
             ->acceptJson()
             ->get(
                 rtrim($url, '/'),
@@ -91,9 +83,12 @@ class AiService
             );
 
         if (! $response->successful()) {
-            throw new Exception(
-                $response->body()
-            );
+            Log::error('AI provider responded with an error.', [
+                'status' => $response->status(),
+                'excerpt' => (string) $response->body(),
+            ]);
+
+            throw new Exception($this->providerErrorMessage($response->status()), $response->status());
         }
 
         return $response->json();
@@ -356,7 +351,7 @@ class AiService
         return null;
     }
 
-    private function post(string $stepName, string $endpoint, string $apiKey, array $payload, int $timeout): mixed
+    private function post(string $stepName, string $endpoint, array $payload, int $timeout): mixed
     {
         $requestEndpoint = rtrim($endpoint, '/');
 
@@ -368,46 +363,67 @@ class AiService
             ->timeout($timeout)
             ->acceptJson();
 
-        if ($apiKey && trim($apiKey) !== '') {
-            $http->withToken($apiKey);
-        }
-
         try {
             $response = $http->post($requestEndpoint, $payload);
-        }catch (Exception $exception) {
-             Log::error('AI transport failure.', [
-               'step' => $stepName,
-               'status' =>  $exception->getCode(),
-               'excerpt' => (string) $exception->getMessage(),
+        } catch (Exception $exception) {
+            Log::error('AI transport failure.', [
+                'step' => $stepName,
+                'status' => $exception->getCode(),
+                'detail' => (string) $exception->getMessage(),
             ]);
-           throw $exception;
+
+            throw new Exception($this->transportErrorMessage($exception), (int) $exception->getCode(), $exception);
         }
 
         if (! $response->successful()) {
-
-           Log::error('AI provider responded with an error.', [
-               'step' => $stepName,
-               'status' =>  $response->status(),
-               'excerpt' => (string) $response->body(),
+            Log::error('AI provider responded with an error.', [
+                'step' => $stepName,
+                'status' => $response->status(),
+                'excerpt' => (string) $response->body(),
             ]);
 
-            return new Exception("{$stepName}. {$response->body()}",$response->status());
+            throw new Exception($this->providerErrorMessage($response->status()), $response->status());
         }
 
         return $this->normalizeProviderResponse($response->json());
     }
 
+    private function transportErrorMessage(Exception $exception): string
+    {
+        $detail = strtolower($exception->getMessage());
+
+        if ($exception->getCode() === 28 || str_contains($detail, 'timed out') || str_contains($detail, 'timeout')) {
+            return 'The AI provider did not finish in time. Retry.';
+        }
+
+        return 'The AI provider could not be reached. Check that Ollama is running and retry.';
+    }
+
+    private function providerErrorMessage(int $status): string
+    {
+        return match (true) {
+            in_array($status, [401, 403], true) => sprintf('The AI provider rejected the request (HTTP %d).', $status),
+            $status === 429 => 'The AI provider rate limit was reached (HTTP 429).',
+            $status >= 500 => sprintf('The AI provider returned a server error (HTTP %d).', $status),
+            default => sprintf('The AI provider returned an error (HTTP %d).', $status),
+        };
+    }
 
     private function normalizeProviderResponse(mixed $json): mixed
     {
         if (is_array($json) && array_key_exists('response', $json) && ! array_key_exists('choices', $json)) {
             $content = (string) ($json['response'] ?? '');
+            $finishReason = $json['done_reason'] ?? null;
+
+            if ($finishReason === null && ($json['done'] ?? false)) {
+                $finishReason = 'stop';
+            }
 
             return [
                 'choices' => [
                     [
                         'message' => ['content' => $content],
-                        'finish_reason' => ($json['done'] ?? false) ? 'stop' : null,
+                        'finish_reason' => $finishReason,
                     ],
                 ],
             ];

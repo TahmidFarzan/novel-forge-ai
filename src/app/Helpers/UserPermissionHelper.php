@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Helpers;
 
 use Illuminate\Support\Collection;
@@ -100,6 +101,15 @@ class UserPermissionHelper
             ]);
         }
 
+        if ($moduleName == self::MODULE_AI_BRAIN) {
+            return SystemHelper::toOptions([
+                self::ACCESS_VIEW_ANY,
+                self::ACCESS_VIEW,
+                self::ACCESS_UPDATE,
+                self::ACCESS_DELETE,
+            ]);
+        }
+
         return SystemHelper::toOptions([
             self::ACCESS_VIEW_ANY,
             self::ACCESS_VIEW,
@@ -113,5 +123,4 @@ class UserPermissionHelper
     {
         return $moduleName . self::SEPARATOR . $accessName;
     }
-
 }

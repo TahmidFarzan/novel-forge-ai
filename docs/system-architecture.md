@@ -92,9 +92,8 @@ native Ollama generation endpoint. Responses in Ollama's native shape
 `choices[].message.content` shape, so both Ollama native and
 OpenAI-compatible providers work through the same code path.
 
-Every AI Brain must have a non-empty `api_key`; `AiService` rejects requests
-without one. Ollama ignores the key, so a placeholder value such as `ollama` is
-used for local development.
+AI requests are sent without an API key because the local Ollama endpoint does
+not require authentication.
 
 ### Model catalog
 

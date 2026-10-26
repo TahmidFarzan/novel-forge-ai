@@ -29,7 +29,7 @@ class NovelGenerationStateTest extends TestCase
     use InteractsWithPromptSkeleton;
     use RefreshDatabase;
 
-    private const URL = 'https://router.huggingface.co/v1/chat/completions';
+    private const URL = 'http://ollama:11434/api/generate';
 
     private const CHAPTER_CONTENT = 'The bells of the drowned archive rang once.';
 
@@ -53,7 +53,7 @@ class NovelGenerationStateTest extends TestCase
             NovelGeneratorStepSeeder::class,
         ]);
 
-        DB::table('ai_brains')->update(['api_key' => 'test-key', 'api_url' => self::URL]);
+        DB::table('ai_brains')->update(['api_url' => self::URL]);
 
         $this->primeAiBrainAvailability();
     }
@@ -355,9 +355,9 @@ class NovelGenerationStateTest extends TestCase
     private function completion(string $content, string $finishReason = 'stop'): array
     {
         return [
-            'choices' => [
-                ['message' => ['content' => $content], 'finish_reason' => $finishReason],
-            ],
+            'response' => $content,
+            'done' => true,
+            'done_reason' => $finishReason,
         ];
     }
 

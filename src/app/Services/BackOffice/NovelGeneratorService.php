@@ -59,7 +59,6 @@ class NovelGeneratorService
         try {
             $step = $this->stepByName(AiPromptGeneratorHelper::AI_PROMPT_NAME_FOUNDATION);
             $aiBrain = $this->aiBrainService->findById($request->input('ai_brain_id'));
-            Log::info($aiBrain);
             $foundation = $this->generateFoundation($step, $aiBrain, $this->foundationContext($request->only([
                 'language_id',
                 'audience_id',
@@ -299,7 +298,6 @@ class NovelGeneratorService
         $plan = $this->aiService->generate(
             $step->name,
             $aiBrain->api_url,
-            $aiBrain->api_key,
             $aiBrain->model,
             $step->aiPrompt->prompt,
             $this->aiService->planChapterInputs($novel),
@@ -345,7 +343,6 @@ class NovelGeneratorService
         return $this->aiService->generate(
             $step->name,
             $aiBrain->api_url,
-            $aiBrain->api_key,
             $aiBrain->model,
             $step->aiPrompt->prompt,
             $this->aiService->foundationInputs($context),

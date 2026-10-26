@@ -20,7 +20,6 @@ class AiServiceOllamaTransportTest extends TestCase
         app(AiService::class)->generate(
             'Foundation',
             'http://ollama:11434',
-            'ollama',
             'qwen3:4b',
             'Return only JSON.',
             [],
@@ -29,6 +28,8 @@ class AiServiceOllamaTransportTest extends TestCase
         );
 
         Http::assertSent(fn ($request) => $request->url() === 'http://ollama:11434/api/generate'
-            && $request['stream'] === false);
+            && $request['model'] === 'qwen3:4b'
+            && $request['stream'] === false
+            && ! $request->hasHeader('Authorization'));
     }
 }

@@ -28,7 +28,6 @@ const saveForm = useForm({
     model: aiBrain?.model || null,
     provider: aiBrain?.provider || 'Ollama',
     api_url: aiBrain?.api_url || null,
-    api_key: aiBrain?.api_key || null,
     brief: aiBrain?.brief || null,
     focus: aiBrain?.focus || null,
     context_window: aiBrain?.context_window,
@@ -60,8 +59,6 @@ function validateForm() {
         saveForm.setError("api_url", "API URL is required");
         valid = false;
     }
-
-    // API key is optional for local Ollama
 
     if (!saveForm.context_window) {
         saveForm.setError("context_window", "Context window is required");
@@ -237,31 +234,6 @@ onMounted(async () => {
                                 class="text-red-500 text-sm mt-1"
                             >
                                 {{ saveForm.errors.api_url }}
-                            </p>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium mb-1">
-                                API Key
-                            </label>
-
-                            <input
-                                v-model="saveForm.api_key"
-                                type="password"
-                                placeholder="Enter API key (optional)"
-                                class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                :class="
-                                    saveForm.errors.api_key
-                                        ? 'border-red-500'
-                                        : 'border-gray-300'
-                                "
-                            />
-
-                            <p
-                                v-if="saveForm.errors.api_key"
-                                class="text-red-500 text-sm mt-1"
-                            >
-                                {{ saveForm.errors.api_key }}
                             </p>
                         </div>
 

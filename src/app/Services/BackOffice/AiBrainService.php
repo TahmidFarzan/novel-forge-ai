@@ -96,7 +96,6 @@ class AiBrainService
                 $aiBrain->model              = $request->input('model');
                 $aiBrain->provider           = $request->input('provider');
                 $aiBrain->api_url           = $request->input('api_url');
-                $aiBrain->api_key           = $request->input('api_key');
                 $aiBrain->brief             = $request->input('brief');
                 $aiBrain->focus             = $request->input('focus');
                 $aiBrain->context_window    = $request->input('context_window');

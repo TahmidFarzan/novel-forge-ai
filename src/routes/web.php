@@ -172,8 +172,6 @@ Route::prefix('back-office')->name('back-office.')->middleware(['auth'])->group(
 
     Route::prefix('ai-brains')->name('ai-brains.')->group(function () {
         Route::get('/', [AiBrainController::class, 'index'])->name('index');
-        Route::get('create', [AiBrainController::class, 'create'])->name('create');
-        Route::post('save', [AiBrainController::class, 'save'])->name('save');
 
         Route::prefix('{slug}')->group(function () {
             Route::get('edit', [AiBrainController::class, 'edit'])->name('edit');

@@ -110,7 +110,6 @@ Every value in `.env.example` has a default in `docker-compose.yml`, so
 | `NGINX_HTTP_PORT` | `80` | Host port for the web entrypoint |
 | `APP_URL` | `http://novel-forge-ai.localhost/` | Public application URL (trailing slash, optional sub-folder) |
 | `AI_BRAIN_URL` | `http://ollama:11434` | App-to-Ollama endpoint (service name) |
-| `AI_BRAIN_API_KEY` | `ollama` | Placeholder key (Ollama ignores it) |
 | `OLLAMA_URL` / `OLLAMA_HOST` | `http://ollama:11434` | Fallback Ollama endpoints |
 | `OLLAMA_MODEL` | `qwen3:4b` | Model pulled and used by the app |
 

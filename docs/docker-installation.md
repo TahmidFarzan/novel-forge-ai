@@ -117,7 +117,6 @@ sets the values it owns:
 | --- | --- |
 | `APP_URL` | `http://novel-forge-ai.localhost/` |
 | `AI_BRAIN_URL` | `http://ollama:11434` |
-| `AI_BRAIN_API_KEY` | `ollama` |
 | `OLLAMA_URL` / `OLLAMA_HOST` | `http://ollama:11434` |
 
 `APP_URL` always resolves to a trailing slash. It may include a sub-folder path
@@ -130,8 +129,7 @@ Everything else (environment, key, mail, database) is read from `src/.env`. The
 database is SQLite at `src/database/database.sqlite`, which persists through the
 source bind mount.
 
-The application requires every AI Brain to carry a non-empty API key value.
-Ollama does not check it, so `AI_BRAIN_API_KEY=ollama` is used as a placeholder.
+AI requests go to the local Ollama endpoint without an API key.
 
 ## Updating the application
 

@@ -174,7 +174,6 @@ class SeederHelper
                 'provider'          => $brain['provider'] ?? null,
                 'output_type'       => $brain['output_type'] ?? [],
                 'api_url'           => $brain['api_url'] ?? null,
-                'api_key'           => $brain['api_key'] ?? null,
                 'brief'             => $brain['brief'] ?? null,
                 'focus'             => $brain['focus'] ?? null,
                 'context_window'    => $brain['context_window'] ?? null,

@@ -34,18 +34,6 @@ const pageTitle = computed(() => `Details of ${aiBrain?.name}`);
 const canUpdate = (aiBrain) => canUpdateAiBrain(authUser?.value, aiBrain);
 const canDelete = (aiBrain) => canDeleteAiBrain(authUser?.value, aiBrain);
 
-const maskedApiKey = computed(() => {
-    return "••••••••••••••••••••••••";
-});
-
-const copyApiKey = async () => {
-    try {
-        await navigator.clipboard.writeText(aiBrain?.api_key || "");
-        toast.success("API key copied successfully");
-    } catch {
-        toast.error("Failed to copy API key");
-    }
-};
 
 const handleDelete = () => {
     if (deleteProcessing.value) return;
@@ -140,16 +128,6 @@ onMounted(async () => {
                         </span>
                     </div>
 
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-500">API Key</span>
-                        <span
-                            @click="copyApiKey"
-                            class="font-mono text-sm cursor-pointer hover:bg-gray-100 px-2 py-1 rounded transition select-none"
-                            title="Click to copy"
-                        >
-                            {{ maskedApiKey }}
-                        </span>
-                    </div>
                 </div>
 
                 <div class="border border-gray-200 rounded-lg p-4 space-y-3">

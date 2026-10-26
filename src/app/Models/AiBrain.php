@@ -23,7 +23,7 @@ use Spatie\Sluggable\SlugOptions;
 
 #[Table('ai_brains')]
 #[Fillable([
-        'name', 'model', 'provider', 'api_url', 'api_key', 'brief', 'focus', 'slug',
+        'name', 'model', 'provider', 'api_url', 'brief', 'focus', 'slug',
         'context_window', 'average_latency', 'minimum_wait_time',
         'timeout_seconds', 'max_output_tokens',
         'created_by_id',
