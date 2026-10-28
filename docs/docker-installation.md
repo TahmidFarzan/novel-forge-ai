@@ -169,14 +169,22 @@ The bind-mounted `src/storage` is left untouched.
 
 ## Switching models
 
-1. Set `OLLAMA_MODEL` in `docker/.env` (for example `qwen3:8b`).
-2. Update the catalog entry in `src/config/ai-brain.php`, then reseed:
+1. Set `OLLAMA_MODEL` in `docker/.env` (for example `qwen3:8b`). The app reads
+   the new model as `AI_BRAIN_MODEL` on the next container start; set
+   `AI_BRAIN_MODEL` explicitly only when it must differ from the pulled model.
+2. Recreate the services so the new model is pulled and the app receives it:
+
+   ```sh
+   docker compose up -d --build ollama app queue
+   ```
+
+3. Update the catalog entry in `src/config/ai-brain.php`, then reseed:
 
    ```sh
    docker compose exec app php artisan db:seed --class=AiBrainSeeder --force
    ```
 
-3. Pull the model into the volume:
+4. If the model is already in the volume, pull it manually:
 
    ```sh
    docker compose exec ollama ollama pull qwen3:8b
