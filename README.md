@@ -7,12 +7,12 @@ machine.
 
 ## Tech stack
 
-| Layer | Technology |
-| --- | --- |
-| Backend | PHP 8.4, Laravel 13 |
-| Frontend | Vue 3, Inertia.js, Ziggy, Tailwind CSS 4, Vite 8 |
-| Database | SQLite |
-| AI runtime | Ollama (`qwen3:4b`) |
+| Layer      | Technology                                            |
+| ---------- | ----------------------------------------------------- |
+| Backend    | PHP 8.4, Laravel 13                                   |
+| Frontend   | Vue 3, Inertia.js, Ziggy, Tailwind CSS 4, Vite 8      |
+| Database   | SQLite                                                |
+| AI runtime | Ollama (`qwen3:4b`)                                 |
 | Deployment | Docker Compose (Nginx, PHP-FPM, queue worker, Ollama) |
 
 ## Architecture
@@ -52,7 +52,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Open <http://novel-forge-ai.localhost/> (or <http://localhost/>). On the first
+Open [http://novel-forge-ai.localhost/](http://novel-forge-ai.localhost/) (or [http://localhost/](http://localhost/)). On the first
 boot the stack pulls the model, installs dependencies, builds the frontend,
 migrates and seeds the database, and caches the framework. Later boots are
 idempotent.

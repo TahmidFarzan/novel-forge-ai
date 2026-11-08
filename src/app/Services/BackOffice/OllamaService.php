@@ -418,12 +418,6 @@ class OllamaService
         $payload = [
             'model' => $model,
             'prompt' => $content,
-            'messages' => [
-                [
-                    'role' => 'user',
-                    'content' => $content,
-                ],
-            ],
             'stream' => false,
             'think' => self::AI_RUNNER_THINK,
             'keep_alive' => self::AI_RUNNER_KEEP_ALIVE,
@@ -433,7 +427,6 @@ class OllamaService
             $payload['options'] = [
                 'num_predict' => $maxOutputTokens,
             ];
-            $payload['max_tokens'] = $maxOutputTokens;
         }
 
         return $payload;

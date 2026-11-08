@@ -19,13 +19,7 @@ class AiPromptGeneratorHelper
             OVERALL OBJECTIVE
             ==================================================
 
-            You are performing the equivalent of an eight phase professional novel development pipeline inside this single request.
-
-            The phases are not separate documents. They are one continuous creative process in which each phase is derived from the result of the phase before it.
-
-            Execute them internally, in the order given, and return one single JSON object that contains the result of every phase.
-
-            The result of this request becomes the reference material that later requests use to plan and write the novel. It must therefore be internally consistent, specific, and complete.
+            Execute eight phases in order in one request. Each phase builds on previous phases. Return one single JSON object containing results of all phases. This output is the reference for planning and writing. Keep it internally consistent, specific, and complete.
 
             ==================================================
             INPUT DATA
@@ -55,21 +49,14 @@ class AiPromptGeneratorHelper
             IMPORTANT GLOBAL RULES
             ==================================================
 
-            1. Run the phases below in order. A later phase must consume the result of the earlier phases instead of reinventing it.
-
-            2. Everything you decide in a phase is the source of truth for every later phase. Never contradict, rename, or silently replace a fact, a name, a place, a rule, or a motivation that an earlier phase already established.
-
-            3. Integrate the genre requirement, the novel type requirement, the target audience requirement, and the additional novel information into every phase that they affect. When several genres are selected, combine them into one unified story direction instead of treating them as separate story elements. When no additional information exists, use creative judgement to improve originality, depth, and storytelling quality.
-
-            4. Character information in the foundation phase establishes only the direction required for the story. The full cast is produced in the character phase. World information in the foundation phase establishes only the context required for the story. The world bible is produced in the world phase.
-
-            5. Maintain clear cause-and-effect progression. Every major event must have a meaningful relationship with the characters, the conflict, the stakes, or the themes.
-
-            6. Avoid generic, predictable, formulaic, repetitive, mechanical, or shallow storytelling. Do not rely on common formulas unless they are meaningfully transformed into something distinctive.
-
-            7. Generate every string value in the requested language, with natural vocabulary, grammar, tone, cultural expression, and writing style appropriate for that language.
-
-            8. Every phase must stay inside its own scope. Respect the scope limits listed with each phase.
+            1. Execute phases in order; later phases must build on earlier phases.
+            2. Earlier phase decisions are source of truth. Never contradict, rename, or replace established facts.
+            3. Integrate genre, novel type, audience, and additional information. Combine multiple genres into one unified direction.
+            4. Stay within each phase scope.
+            5. Maintain clear cause-and-effect.
+            6. Avoid generic/formulaic storytelling; transform conventions if used.
+            7. Generate all strings in the requested language with natural tone/grammar.
+            8. Respect scope limits per phase.
 
             ==================================================
             LOGICAL GENERATION PIPELINE
