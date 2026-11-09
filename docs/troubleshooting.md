@@ -27,25 +27,27 @@ docker compose exec app php -r 'exit(@fsockopen("127.0.0.1", 9000) ? 0 : 1);'
 
 ## The site does not load
 
-- Confirm the hosts entry `127.0.0.1 novel-forge-ai.localhost` exists, or open
-  <http://localhost/> instead.
+- Use <http://novel-forge-ai.localhost/> as the canonical URL. If the name does
+  not resolve, add the hosts entry `127.0.0.1 novel-forge-ai.localhost`.
 - Check container health: `docker compose ps`. Nginx starts only once the
   application container is healthy and PHP-FPM is accepting connections.
 - Watch the boot log: `docker compose logs -f app`.
 
 ## Port 80 is already in use
 
-Set a different host port in `docker/.env` and recreate the Nginx container:
-
-```env
-NGINX_HTTP_PORT=8080
-```
+The stack publishes Nginx on host port `80` so the application is reachable
+without a port number. If another process already owns port `80`, Docker cannot
+start the Nginx container. Stop the conflicting service, then recreate Nginx:
 
 ```sh
-docker compose up -d nginx
+docker compose up -d --force-recreate nginx
 ```
 
-Then open <http://localhost:8080/>.
+To use another host port instead, change the `nginx.ports` entry in
+`docker-compose.yml` from `80:80` to `8080:80`, set `APP_URL` to
+`http://novel-forge-ai.localhost:8080/` in `docker/.env`, and update the Vite HMR
+client port in `src/vite.config.js` to match. The application URL then includes
+the port.
 
 ## The app container stays unhealthy for a long time
 
@@ -197,8 +199,8 @@ the best performance:
 - Use the development override for HMR. It runs Vite in the dedicated `vite`
   service; the production stack builds assets with `npm run build` during
   provisioning and serves them statically.
-- Only the Nginx and Ollama service ports are published, and Nginx mounts the
-  project read-only.
+- Only the Nginx service port is published, and Nginx mounts the project
+  read-only.
 
 ## Development stack issues
 

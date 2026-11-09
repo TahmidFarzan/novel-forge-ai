@@ -52,7 +52,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Open [http://novel-forge-ai.localhost/](http://novel-forge-ai.localhost/) (or [http://localhost/](http://localhost/)). On the first
+Open [http://novel-forge-ai.localhost/](http://novel-forge-ai.localhost/). On the first
 boot the stack pulls the model, installs dependencies, builds the frontend,
 migrates and seeds the database, and caches the framework. Later boots are
 idempotent.

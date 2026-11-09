@@ -39,7 +39,7 @@ Defines the `novel-forge-ai` project with four services on the
 | --- | --- | --- | --- |
 | `app` | `novel-forge-ai-app` | `novel-forge-ai/app` | PHP-FPM running Laravel; bind-mounts `../src` |
 | `queue` | `novel-forge-ai-queue` | `novel-forge-ai/app` | Queue worker; bind-mounts `../src` |
-| `nginx` | `novel-forge-ai-nginx` | `novel-forge-ai/nginx` | Publishes `${NGINX_HTTP_PORT:-80}`; serves `../src/public` |
+| `nginx` | `novel-forge-ai-nginx` | `novel-forge-ai/nginx` | Publishes host port `80`; serves `../src/public` |
 | `ollama` | `novel-forge-ai-ollama` | `novel-forge-ai/ollama` | Ollama server and model download |
 
 It declares four named volumes: the two persistent data volumes

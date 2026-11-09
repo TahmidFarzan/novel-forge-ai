@@ -40,8 +40,9 @@ cp .env.example .env
 ```
 
 `docker/.env` is optional because every variable has a default in
-`docker-compose.yml`. The most commonly changed values are `NGINX_HTTP_PORT`
-(change from `80` if that port is taken) and `APP_URL`.
+`docker-compose.yml`. The most commonly changed value is `APP_URL`. Nginx
+publishes host port `80` directly so the application is available without a port
+number; make sure nothing else is using port `80` before starting the stack.
 
 Application settings live in `src/.env`. On the first boot the entrypoint copies
 `src/.env.example` to `src/.env` and generates an application key if none is set.
@@ -99,7 +100,7 @@ reports every container as `healthy`.
 - Windows: `C:\Windows\System32\drivers\etc\hosts`
 - macOS / Linux: `/etc/hosts`
 
-You can always use <http://localhost/> instead.
+Use this hostname for the application; `APP_URL` must use the same origin.
 
 ## 4. Open the application
 

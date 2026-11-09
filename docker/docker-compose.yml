@@ -25,6 +25,7 @@ services:
       AI_BRAIN_MODEL: "${AI_BRAIN_MODEL:-${OLLAMA_MODEL:-qwen3:4b}}"
       OLLAMA_URL: "${OLLAMA_URL:-http://ollama:11434}"
       OLLAMA_HOST: "${OLLAMA_HOST:-http://ollama:11434}"
+      DB_QUEUE_RETRY_AFTER: "${DB_QUEUE_RETRY_AFTER:-1800}"
     volumes:
       - ../src:/var/www/html/novel-forge-ai
       - novel-forge-ai-vendor:/var/www/html/novel-forge-ai/vendor
@@ -65,6 +66,7 @@ services:
       AI_BRAIN_MODEL: "${AI_BRAIN_MODEL:-${OLLAMA_MODEL:-qwen3:4b}}"
       OLLAMA_URL: "${OLLAMA_URL:-http://ollama:11434}"
       OLLAMA_HOST: "${OLLAMA_HOST:-http://ollama:11434}"
+      DB_QUEUE_RETRY_AFTER: "${DB_QUEUE_RETRY_AFTER:-1800}"
     volumes:
       - ../src:/var/www/html/novel-forge-ai
       - novel-forge-ai-vendor:/var/www/html/novel-forge-ai/vendor
@@ -91,7 +93,7 @@ services:
     restart: unless-stopped
     stop_grace_period: 30s
     ports:
-      - "${NGINX_HTTP_PORT:-80}:80"
+      - "80:80"
     volumes:
       - ../src:/var/www/html/novel-forge-ai:ro
       - novel-forge-ai-storage:/var/www/html/novel-forge-ai/storage:ro

@@ -28,7 +28,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Open <http://novel-forge-ai.localhost/> (or <http://localhost/>).
+Open <http://novel-forge-ai.localhost/>.
 
 For development (Compose Watch, Vite HMR, queue worker, host-visible logs),
 layer the development override instead:
@@ -107,12 +107,15 @@ Every value in `.env.example` has a default in `docker-compose.yml`, so
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `NGINX_HTTP_PORT` | `80` | Host port for the web entrypoint |
 | `APP_URL` | `http://novel-forge-ai.localhost/` | Public application URL (trailing slash, optional sub-folder) |
 | `AI_BRAIN_URL` | `http://ollama:11434` | App-to-Ollama endpoint (service name) |
 | `AI_BRAIN_MODEL` | `$OLLAMA_MODEL` | Model requested by the app; follows the pulled model by default |
 | `OLLAMA_URL` / `OLLAMA_HOST` | `http://ollama:11434` | Fallback Ollama endpoints |
 | `OLLAMA_MODEL` | `qwen3:4b` | Model pulled by the bundled Ollama service |
+
+Nginx publishes host port `80` directly, so the application is available at
+`http://novel-forge-ai.localhost/` without a port number. Port `80` must be free
+on the host.
 
 Application settings (environment, key, database, mail) live in `src/.env`.
 Container values only override the variables listed above.
