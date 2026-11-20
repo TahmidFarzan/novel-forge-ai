@@ -1,0 +1,49 @@
+# DDEV service: Ollama AI inference server for the Qwen3 brain.
+#
+# Lifecycle: fully integrated with DDEV. `ddev start` starts this service, and
+# the post-start hook in .ddev/config.yaml runs .ddev/ollama-provision.sh,
+# which waits for the service and pulls the configured Qwen3 model when it is
+# missing. Existing models are reused.
+#
+# Model storage reuses the standalone stack's volume (novel-forge-ai-ollama-models),
+# so models downloaded by ollama/scripts/start.ps1 / pull-qwen3.ps1 are reused,
+# and the standalone stack must not run at the same time.
+#
+# Image and tuning match the independent standalone stack (ollama/compose.yaml).
+
+services:
+  ollama:
+    image: "ollama/ollama:0.40.16"
+    hostname: ollama
+    expose:
+      - 11434
+    # Loopback only: Ollama's API has no authentication; same security
+    # posture as the standalone stack.
+    ports:
+      - "127.0.0.1:11434:11434"
+    environment:
+      OLLAMA_HOST: "0.0.0.0:11434"
+      OLLAMA_KEEP_ALIVE: "10m"
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_FLASH_ATTENTION: "1"
+      # 8192 matches AI_BRAIN_CONTEXT_WINDOW in the DDEV web environment below
+      # and keeps the KV cache within the host's RAM budget.
+      OLLAMA_CONTEXT_LENGTH: "8192"
+    volumes:
+      - novel-forge-ai-ollama-models:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  novel-forge-ai-ollama-models:
+    name: novel-forge-ai-ollama-models

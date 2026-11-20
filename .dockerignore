@@ -1,6 +1,7 @@
 .git
 .github
 docs
+archive
 docker/.env
 src/.env
 src/node_modules

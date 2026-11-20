@@ -104,12 +104,16 @@ class LayoutService
         }
 
         try {
+            // Probe the Ollama service through GET /api/version, the canonical
+            // Ollama endpoint that answers 200 whenever the server is up. A GET
+            // on the bare api_url root is not a reliable up-probe across Ollama
+            // versions, so the check must not depend on it.
             $responses = Http::pool(fn (Pool $pool) => collect($checkable)->map(
                 fn (AiBrain $aiBrain) => $pool
                     ->connectTimeout(self::AVAILABILITY_CONNECT_TIMEOUT)
                     ->timeout(self::AVAILABILITY_TIMEOUT)
                     ->acceptJson()
-                    ->get(rtrim((string) $aiBrain->api_url, '/'))
+                    ->get(rtrim((string) $aiBrain->api_url, '/') . '/api/version')
             )->all());
 
             foreach ($checkable as $key => $aiBrain) {

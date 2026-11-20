@@ -216,3 +216,44 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ---------------------------------------------------------------------------
+# Temporary AI development tracking files (Step 1 migration tracking system)
+# These files hold session context and must never be committed.
+# ---------------------------------------------------------------------------
+/docs/temp-development-requirement.md
+/docs/temp-development-requirement-task.md
+/docs/temp-development-ai-development-process.md
+/docs/temp-development-source-baseline.sha256
+
+# ---------------------------------------------------------------------------
+# DDEV runtime and generated artifacts
+# Patterns are intentionally unanchored: DDEV will be initialized in the
+# Laravel application root (src/.ddev), while these rules also cover a
+# repository-root .ddev/ project.
+#
+# Only artifacts that DDEV generates or rebuilds are listed here. Custom
+# project configuration MUST stay tracked: .ddev/config.yaml, .ddev/php/,
+# .ddev/nginx/, .ddev/apache/, .ddev/mysql/, .ddev/web-build/,
+# .ddev/web-entrypoint.d/, .ddev/homeadditions/, .ddev/commands/,
+# .ddev/providers/, .ddev/share-providers/, .ddev/addon-metadata/ and
+# .ddev/docker-compose.*.yaml.
+# DDEV's own generated .ddev/.gitignore remains authoritative.
+# ---------------------------------------------------------------------------
+.ddev/xhprof/
+.ddev/mutagen/
+.ddev/db-build/
+.ddev/db_snapshots/
+.ddev/traefik/
+.ddev/.ddev-docker-compose-*.yaml
+.ddev/.dbimageBuild/
+.ddev/.homeadditions/
+.ddev/.webimageBuild/
+
+# ---------------------------------------------------------------------------
+# Independent Ollama AI infrastructure (Step 4)
+# Keep ollama/compose.yaml, ollama/.env.example, ollama/README.md and
+# ollama/scripts/ tracked. Only local overrides are ignored; downloaded models
+# live in the Docker volume "novel-forge-ai-ollama-models", never in the repo.
+# ---------------------------------------------------------------------------
+/ollama/.env

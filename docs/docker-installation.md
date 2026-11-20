@@ -1,5 +1,13 @@
 # Docker Deployment
 
+> **Legacy development documentation; production packaging preserved.** The
+> development workflow described here has been replaced by DDEV. Development
+> setup is documented in [installation.md](installation.md) and
+> [development-environment.md](development-environment.md). The production
+> Docker packaging in `docker/` remains a rollback/production reference and will
+> be reviewed during the cleanup step. The AI runtime is now the independent
+> stack in [../ollama/README.md](../ollama/README.md).
+
 This guide covers deploying and updating Novel Forge AI with Docker. The stack
 follows a standard Laravel production layout: Nginx serves the `public/`
 directory and proxies PHP requests to a PHP-FPM application container, and a
@@ -8,29 +16,33 @@ separate Ollama container provides local AI inference.
 ## Requirements
 
 - Docker Engine 24+ with the Compose v2 plugin (`docker compose version`)
-- Compose 2.24.4+ for the development override (`volumes: !override`)
 - On Windows and macOS: Docker Desktop
 - At least 8 GB RAM free (16 GB+ recommended for AI generation)
 - ~6 GB free disk for the container images and the `qwen3:4b` model
 
+> **Step 6 update:** the development override described below was removed from
+> `docker/` and archived at
+> [`archive/legacy-docker/docker/`](../archive/legacy-docker/README.md). DDEV is
+> the development environment now; production deployment with `docker/` remains
+> supported.
+
 ## Local development
 
-For day-to-day development use the development override instead of the plain
-production compose file. It runs `app` from the image's source snapshot, syncs
-host edits with one Compose Watch rule, serves assets with Vite HMR, runs a queue
-worker, and makes `storage/` visible on the host:
+This section is historical. The former development override ran `app` from the
+image's source snapshot, synced host edits with one Compose Watch rule, served
+assets with Vite HMR, ran a queue worker, and made `storage/` visible on the
+host. It is no longer present in `docker/`. Use
+[development-environment.md](development-environment.md) instead.
 
 ```sh
 cd docker
-[ -f ../src/.env ] || cp ../src/.env.example ../src/.env   # required before the first dev start
+[ -f ../src/.env ] || cp ../src/.env.example ../src/.env   # historical
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build --watch
 ```
 
-Watch must run in the foreground; `up -d --watch` is not supported. For a
-detached stack, run `up -d --build` and then
-`docker compose -f docker-compose.yml -f docker-compose.dev.yml watch`.
-
-See [docker-development.md](docker-development.md) for the full workflow.
+The command only works after restoring `docker-compose.dev.yml` from the
+archive. Do not restore it while DDEV is in use. See
+[docker-development.md](docker-development.md) for the historical workflow.
 
 ## 1. Configure the environment
 

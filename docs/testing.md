@@ -1,33 +1,36 @@
 # Testing
 
-Novel Forge AI uses PHPUnit (via `php artisan test`) with two test suites, Unit
-and Feature. The suite is configured in `src/phpunit.xml`.
+Novel Forge AI uses PHPUnit via `php artisan test`, with Unit and Feature
+suites configured in `src/phpunit.xml`. Tests run inside the DDEV web container.
+
+> **USER MUST EXECUTE MANUALLY.** The migration agent did not run the test
+> suite.
 
 ## Running tests
 
-Locally, from `src/`:
+From `src/` with DDEV:
 
 ```sh
-php artisan test
+ddev artisan test
 ```
 
-Or inside the Docker stack:
+Target a suite or a single test:
 
 ```sh
-docker compose exec app php artisan test
+ddev artisan test --testsuite=Unit
+ddev artisan test --testsuite=Feature
+ddev artisan test --filter=NovelGenerationPipelineTest
+ddev artisan test tests/Unit/PromptContextEncoderTest.php
 ```
 
-Filter and target specific suites:
+The Composer alias clears the config cache first and then runs the suite:
 
 ```sh
-php artisan test --testsuite=Unit
-php artisan test --testsuite=Feature
-php artisan test --filter=NovelGenerationPipelineTest
-php artisan test src/tests/Unit/PromptContextEncoderTest.php
+ddev composer test
 ```
 
-The Composer alias `composer test` clears the config cache first and then runs
-the suite.
+If you use the optional [manual installation](manual-installation.md), run the
+same commands directly with `php artisan test`.
 
 ## Test environment
 
@@ -43,7 +46,8 @@ the suite.
 | `QUEUE_CONNECTION` | `sync` |
 | `MAIL_MAILER` | `array` |
 
-No external database, Redis instance, or running Ollama server is required.
+No external database, Redis instance, Memcached instance, or running Ollama
+server is required.
 
 ## Test layout
 
@@ -73,12 +77,18 @@ network access or a loaded model. Feature tests that touch the database use the
 `RefreshDatabase` trait against the in-memory SQLite database and seed only the
 records they need.
 
-## What to check before committing
+## Before committing
 
 ```sh
-php artisan test
-vendor/bin/pint --test
+ddev artisan test
+ddev exec vendor/bin/pint --test
 ```
 
-`laravel/pint` is available as a dev dependency for code style; run
-`vendor/bin/pint` to fix style automatically.
+`laravel/pint` is a dev dependency; run `ddev exec vendor/bin/pint` to fix style
+automatically.
+
+## Related documentation
+
+- [Development environment](development-environment.md)
+- [Command reference](command-reference.md)
+- [Troubleshooting](troubleshooting.md)

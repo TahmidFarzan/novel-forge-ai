@@ -1,6 +1,17 @@
 # Docker Development
 
-This guide describes the local development workflow. It layers
+> **Legacy documentation — workflow retired.** This Compose Watch workflow has
+> been replaced by DDEV. Use [development-environment.md](development-environment.md)
+> and [command-reference.md](command-reference.md) for current development.
+>
+> **Step 6 update:** `docker/docker-compose.dev.yml` and
+> `docker/nginx/nginx.dev.conf` were removed from the active tree and archived at
+> [`archive/legacy-docker/docker/`](../archive/legacy-docker/README.md). The
+> commands below are historical and will not run unless the files are restored
+> from the archive. Do not restore them while DDEV is the development
+> environment, and never run both stacks at once.
+
+This guide described the former local development workflow. It layered
 `docker/docker-compose.dev.yml` on top of the production stack in
 `docker/docker-compose.yml`, so the production image and configuration are
 untouched while development gets live code, hot reload, logs, and a queue

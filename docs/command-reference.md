@@ -1,122 +1,181 @@
 # Command Reference
 
-Common commands for developing Novel Forge AI. Docker commands are run from the
-`docker/` directory; application commands are run through `docker compose exec`
-against the `app` service.
+Common commands for developing Novel Forge AI with DDEV. Run all commands from
+the DDEV project root:
 
-For the live-reload development workflow, prefix the Compose commands with the
-development override:
-
-```sh
-cd docker
-alias nfdocker='docker compose -f docker-compose.yml -f docker-compose.dev.yml'
-nfdocker up --build --watch
-nfdocker logs -f app
-nfdocker exec app php artisan test
+```text
+src/
 ```
 
-Watch runs in the foreground. To keep the stack detached, run
-`nfdocker up -d --build` and `nfdocker watch` in separate terminals; Compose
-rejects `up -d --watch`.
+> **USER MUST EXECUTE MANUALLY.** The migration agent did not run Docker, DDEV,
+> Composer, npm, Artisan, or Ollama commands.
 
-See [docker-development.md](docker-development.md).
-
-## Docker Compose
+## Project lifecycle
 
 | Command | Description |
 | --- | --- |
-| `docker compose up -d --build` | Build images and start the stack in the background |
-| `docker compose up` | Start the stack in the foreground (logs streamed) |
-| `docker compose up --build --watch` | Build, start, and sync source with Compose Watch (foreground) |
-| `docker compose watch` | Sync source into an already-running stack |
-| `docker compose ps` | Show container status and health |
-| `docker compose logs -f <service>` | Follow logs (`app`, `queue`, `nginx`, `vite`, `ollama`) |
-| `docker compose restart app` | Restart the application container |
-| `docker compose stop` | Stop containers, keep volumes |
-| `docker compose start` | Start previously stopped containers |
-| `docker compose down` | Stop and remove containers and the network |
-| `docker compose down -v` | Stop and remove containers, network, and volumes |
-| `docker compose build --no-cache` | Rebuild images without cache |
-| `docker compose exec <service> <cmd>` | Run a command inside a running container |
-| `docker compose run --rm <service> <cmd>` | Run a one-off command in a new container |
+| `ddev start` | Start the project containers |
+| `ddev stop` | Stop the project containers |
+| `ddev restart` | Recreate containers after configuration changes |
+| `ddev describe` | Show URLs, PHP/Node versions, services, and ports |
+| `ddev launch` | Open the project URL in a browser |
+| `ddev list` | List DDEV projects (read-only) |
+| `ddev poweroff` | Stop all running DDEV projects |
+| `ddev ssh` | Open a shell in the web container |
+| `ddev logs -s web` | Show web/nginx/PHP-FPM/queue logs |
+| `ddev logs -f` | Follow all project logs |
 
-## Application (inside `app`)
+The primary URL is <https://novel-forge-ai.ddev.site>; health is `/up`.
+
+## Application (Artisan)
 
 | Command | Description |
 | --- | --- |
-| `docker compose exec app php artisan migrate` | Run pending migrations |
-| `docker compose exec app php artisan migrate --force` | Run migrations without prompting |
-| `docker compose exec app php artisan migrate:status` | Show migration status |
-| `docker compose exec app php artisan migrate:fresh --seed` | Rebuild schema and reseed (destructive) |
-| `docker compose exec app php artisan db:seed --force` | Run all seeders |
-| `docker compose exec app php artisan db:seed --class=AiBrainSeeder --force` | Run one seeder |
-| `docker compose exec app php artisan optimize` | Cache config, routes, events, and views |
-| `docker compose exec app php artisan optimize:clear` | Clear all caches |
-| `docker compose exec app php artisan route:list` | List registered routes |
-| `docker compose exec app php artisan storage:link` | Recreate the storage symlink |
-| `docker compose exec app php artisan key:generate` | Generate an application key |
-| `docker compose exec app php artisan tinker` | Open an interactive REPL |
-| `docker compose exec app sh` | Open a shell in the container |
+| `ddev artisan migrate` | Run pending migrations |
+| `ddev artisan migrate:status` | Show migration status |
+| `ddev artisan migrate --seed` | Migrate and seed |
+| `ddev artisan db:seed --force` | Run all seeders |
+| `ddev artisan db:seed --class=AiBrainSeeder --force` | Run one seeder |
+| `ddev artisan optimize:clear` | Clear cached config, routes, events, views |
+| `ddev artisan route:list` | List registered routes |
+| `ddev artisan storage:link` | Recreate the storage symlink |
+| `ddev artisan key:generate` | Generate an application key (only when empty) |
+| `ddev artisan about` | Show the Laravel environment summary |
+| `ddev artisan tinker` | Open an interactive REPL |
+| `ddev artisan queue:failed` | List failed queue jobs |
+| `ddev artisan queue:retry all` | Retry failed queue jobs |
 
-## Frontend
+Do not run `migrate:fresh` against a database you need to keep.
 
-Production assets are built inside `app`. Development uses the dedicated `vite`
-service with HMR.
-
-| Command | Description |
-| --- | --- |
-| `docker compose exec app npm run build` | Build production assets into `public/build` |
-| `docker compose exec app npm install` | Install/refresh dependencies |
-| `nfdocker logs -f vite` | Follow the Vite dev server |
-| `nfdocker exec app cat public/hot` | Check the Vite dev server URL used by Laravel |
-
-## Composer (inside `app`)
+## Composer
 
 | Command | Description |
 | --- | --- |
-| `docker compose exec app composer install` | Install PHP dependencies |
-| `docker compose exec app composer dump-autoload` | Regenerate the autoloader |
-| `docker compose exec app composer test` | Run the test suite via Composer |
+| `ddev composer install` | Install PHP dependencies |
+| `ddev composer dump-autoload` | Regenerate the autoloader |
+| `ddev composer test` | Clear config cache and run the test suite |
 
-## Ollama
+## Frontend (npm)
+
+Node.js 24 is supplied by DDEV. The package manager is npm.
 
 | Command | Description |
 | --- | --- |
-| `docker compose exec ollama ollama list` | List installed models |
-| `docker compose exec ollama ollama pull qwen3:4b` | Download a model |
-| `docker compose exec ollama ollama show qwen3:4b` | Show model details |
-| `docker compose exec ollama wget -qO- http://127.0.0.1:11434/api/tags` | Query the Ollama API from inside the container |
+| `ddev npm install` | Install frontend dependencies |
+| `ddev npm run build` | Build production assets into `public/build` |
+| `ddev npm run dev` | Start the Vite dev server (foreground) |
+
+Vite is exposed at `https://novel-forge-ai.ddev.site:5173` and
+`http://novel-forge-ai.ddev.site:5172`. HMR may be blocked on the HTTPS origin
+because the frozen `vite.config.js` hardcodes `ws://`; use `npm run build` as the
+fallback. See [Development environment](development-environment.md#frontend).
+
+## Database (SQLite)
+
+The database container is omitted. The database is a file:
+
+```text
+src/database/database.sqlite
+```
+
+| Task | Command |
+| --- | --- |
+| Check the file | `ls -lh database/database.sqlite` (host or `ddev ssh`) |
+| Inspect migrations | `ddev artisan migrate:status` |
+| Back up | `ddev stop`, then copy `src/database/database.sqlite` |
+| Restore | `ddev stop`, copy the backup into place, then `ddev start` |
+
+`ddev snapshot`, `ddev export-db`, `ddev import-db`, and `ddev mysql` are not
+available with an omitted database container.
+
+## Tests and code style
+
+| Command | Description |
+| --- | --- |
+| `ddev artisan test` | Run the PHPUnit suite |
+| `ddev artisan test --testsuite=Unit` | Run the Unit suite |
+| `ddev artisan test --testsuite=Feature` | Run the Feature suite |
+| `ddev artisan test --filter=NovelGenerationPipelineTest` | Run one test class |
+| `ddev exec vendor/bin/pint --test` | Check code style |
+| `ddev exec vendor/bin/pint` | Fix code style |
+
+See [Testing](testing.md).
+
+## Cache services
+
+| Command | Description |
+| --- | --- |
+| `ddev logs -s redis` | Show Redis logs |
+| `ddev logs -s memcached` | Show Memcached logs |
+| `ddev exec php -m` | Confirm `redis` and `memcached` extensions |
+| `ddev artisan tinker` | Run cache probes (see below) |
+
+Cache probes inside Tinker:
+
+```php
+Cache::store('redis')->put('ddev-probe', 'ok', 60);
+Cache::store('redis')->get('ddev-probe');
+
+Cache::store('memcached')->put('ddev-probe', 'ok', 60);
+Cache::store('memcached')->get('ddev-probe');
+```
+
+See [Redis and Memcached](cache-services.md).
+
+## PHP diagnostics
+
+| Command | Description |
+| --- | --- |
+| `ddev exec php -v` | PHP version |
+| `ddev exec php --ini` | Loaded INI files |
+| `ddev exec php -m` | Loaded extensions |
+| `ddev exec php -i` | Full PHP configuration |
+| `ddev exec php -r "var_dump(opcache_get_status(false));"` | OPcache status |
+
+See [PHP and OPcache](php-configuration.md).
 
 ## Health checks
 
 | Command | Description |
 | --- | --- |
-| `docker compose exec app php -r 'exit(@fsockopen("127.0.0.1", 9000) ? 0 : 1);'` | Check PHP-FPM |
-| `curl http://127.0.0.1/up` | Check the app through Nginx |
-| `docker compose exec ollama ollama list` | Check the Ollama API |
+| `curl https://novel-forge-ai.ddev.site/up` | Application health endpoint |
+| `ddev describe` | Project status and URLs |
+| `ddev logs -s web` | Web and queue logs |
 
-## Tests
+## Ollama (independent stack)
 
-Run from `src/` locally or inside the container:
+These commands are **not** DDEV commands. Run them from `ollama/` in PowerShell
+on Windows:
 
-```sh
-docker compose exec app php artisan test
-docker compose exec app php artisan test --filter=NovelGenerationPipelineTest
-docker compose exec app php artisan test --testsuite=Unit
-docker compose exec app php artisan test --testsuite=Feature
+```powershell
+.\scripts\start.ps1
+.\scripts\stop.ps1
+.\scripts\list-models.ps1
+.\scripts\pull-qwen3.ps1
 ```
 
-See [testing.md](testing.md) for details.
+Removal and purge scripts require exact names or the typed confirmation phrase.
+See [ollama/README.md](../ollama/README.md). The AI stack is optional and is not
+started by DDEV.
 
 ## Useful one-liners
 
 ```sh
-# Clear all caches after editing src/.env
-docker compose exec app php artisan optimize:clear
+# Clear caches after editing src/.env
+ddev artisan optimize:clear
 
 # Rebuild assets after editing Vue/CSS
-docker compose exec app npm run build
+ddev npm run build
 
-# Tail today's Laravel log (visible on the host at src/storage/logs)
-docker compose exec app sh -c 'tail -f storage/logs/laravel-$(date +%F).log'
+# Tail today's Laravel log
+ddev exec sh -c 'tail -f storage/logs/laravel-$(date +%F).log'
+
+# Confirm the queue daemon is logging
+ddev logs -s web
 ```
+
+## Related documentation
+
+- [Installation](installation.md)
+- [Development environment](development-environment.md)
+- [Troubleshooting](troubleshooting.md)

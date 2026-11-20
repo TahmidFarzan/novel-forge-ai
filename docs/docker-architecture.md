@@ -1,5 +1,13 @@
 # Docker Architecture
 
+> **Legacy documentation.** This describes the previous Docker packaging. The
+> active development environment is DDEV; see
+> [system-architecture.md](system-architecture.md),
+> [installation.md](installation.md), and
+> [development-environment.md](development-environment.md). This file is kept
+> for production/rollback reference and is scheduled for review in the
+> legacy-cleanup step.
+
 This page explains how the Docker deployment is structured and what each file
 under `docker/` does.
 
@@ -109,7 +117,7 @@ The root entrypoint. It prepares writable paths before handing off to PHP-FPM:
    are owned by `www-data`, so PHP-FPM workers can write logs, cache, sessions,
    and the database.
 5. Runs `${STARTUP_SCRIPT:-/usr/local/bin/startup.sh}` as `www-data`; the
-   development override selects `startup.dev.sh`.
+   archived development override selected `startup.dev.sh`.
 6. `exec`s the container command (`php-fpm`), so the real process receives stop
    signals directly.
 
@@ -190,9 +198,15 @@ docker compose up
   -> nginx starts and proxies PHP to app:9000
 ```
 
-## Development override
+## Development override (archived)
 
-`docker/docker-compose.dev.yml` layers on top of this file for local
+> **Step 6:** `docker/docker-compose.dev.yml` and `docker/nginx/nginx.dev.conf`
+> were removed from the active tree and archived at
+> [`archive/legacy-docker/docker/`](../archive/legacy-docker/README.md). The
+> description below is historical. Use DDEV for development; see
+> [development-environment.md](development-environment.md).
+
+`docker/docker-compose.dev.yml` layered on top of this file for local
 development without changing the production services:
 
 - `app` runs `startup.dev.sh` instead of `startup.sh`, so it installs

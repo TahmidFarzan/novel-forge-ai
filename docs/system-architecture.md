@@ -8,20 +8,39 @@ single-page application delivered through Inertia.js.
 
 ```
 Browser
-   │  http://novel-forge-ai.localhost
+   │  https://novel-forge-ai.ddev.site
    ▼
-Nginx ─────────────► PHP-FPM (Laravel app)
-   │  public/ static          │  AI generation request
-   ▼                          ▼
-public/build assets       Ollama server (qwen3:4b)
+DDEV router
+   ▼
+web container (nginx-fpm)
+   ├── nginx ─────────► PHP-FPM (Laravel application)
+   ├── Vite dev server (exposed 5173/5172)
+   ├── queue daemon (queue:listen)
+   ├── Redis 8 sidecar      (redis:6379, internal)
+   └── Memcached 1.6 sidecar (memcached:11211, internal)
+
+src/database/database.sqlite  ── SQLite file on the host project
+Ollama DDEV service (ollama:11434, started by `ddev start`)
 ```
 
-The Docker environment runs four containers on the `novel-forge-ai-network`
-bridge network: Nginx, PHP-FPM, the queue worker, and Ollama. Development adds a
-Vite HMR container. Nginx is the only public HTTP entrypoint: it serves the
-application's `public/` directory (including the Vite production build in
-`public/build`) and forwards PHP requests to `app:9000`. The application and
-queue containers reach Ollama at `http://ollama:11434`.
+DDEV runs the web container and the optional Redis/Memcached sidecars. Nginx is
+the HTTP entrypoint inside the web container: it serves the application's
+`public/` directory (including the built assets in `public/build`) and forwards
+PHP requests to PHP-FPM. The queue daemon and Vite run in the same web
+container. The database is SQLite, stored in the project, so there is no
+database container.
+
+Ollama runs as a DDEV service (`.ddev/docker-compose.ollama.yaml`, service
+`ollama`, image `ollama/ollama:0.40.16`, model volume `novel-forge-ai-ollama-models`).
+`ddev start` starts it and the post-start hook (`.ddev/ollama-provision.sh`) pulls the
+configured Qwen3 model when it is missing; it is reached from the DDEV web container
+at `http://ollama:11434`. The application can run without it (AI generation will fail
+until it is started).
+
+The legacy standalone stack under `ollama/` shares the same model volume and is reached
+from the DDEV web container through `host.docker.internal:11434`; it is not started by
+`ddev start` and must not run at the same time as the DDEV-managed service.
+
 
 ## Request lifecycle
 
@@ -44,8 +63,11 @@ queue containers reach Ollama at `http://ollama:11434`.
 - Styling uses Tailwind CSS 4 via the `@tailwindcss/vite` plugin.
 - Vite is configured with the `@` alias pointing at `resources/js`.
 - The production asset build is written to `public/build` and served statically
-  by Nginx. In development, the `vite` Compose service runs `npm run dev`, serves
-  assets over HMR, and writes `public/hot`.
+  by nginx. In development, Vite runs inside the DDEV web container
+  (`ddev npm run dev`) and is exposed at `https://novel-forge-ai.ddev.site:5173`
+  with an HTTP fallback on port 5172. The frozen Vite config hardcodes `ws://`,
+  so HMR may be blocked on the HTTPS origin; `ddev npm run build` is the
+  reliable fallback.
 
 ## Domain model
 
@@ -98,12 +120,16 @@ not require authentication.
 ### Model catalog
 
 `src/config/ai-brain.php` defines the available brains. The default entry is
-`qwen3:4b` with a 32768-token context window, a 600-second timeout, and a maximum
-of 32000 output tokens. The endpoint is read from `AI_BRAIN_URL` (falling back to
-`OLLAMA_URL`). Seeder `AiBrainSeeder` copies the catalog into the database, and
+`qwen3:4b`; the local DDEV environment sets an 8192-token context window, an
+8192-token output limit, and a 1500-second request timeout through `src/.env`
+(`AI_BRAIN_CONTEXT_WINDOW`, `AI_BRAIN_MAX_OUTPUT_TOKENS`,
+`AI_BRAIN_TIMEOUT_SECONDS`). The endpoint is read from `AI_BRAIN_URL` (falling
+back to `OLLAMA_URL`), which points at `http://host.docker.internal:11434` in
+DDEV. Seeder `AiBrainSeeder` copies the catalog into the database, and
 `AiBrainAiBrainOutputTypeSeeder` links each brain to its supported output types.
 At runtime the database record is authoritative, with the config acting as a
 default.
+
 
 ## Back office
 
@@ -120,8 +146,9 @@ sections (users, queue monitor) are protected by the `IsSuperAdmin` middleware.
 - **Media**: `spatie/laravel-medialibrary` stores uploads on the `public` disk;
   media events are handled by listeners in `app/Listeners`.
 - **Queues**: `romanzipp/laravel-queue-monitor` provides a dashboard for
-  background jobs. The Docker stack runs synchronously by default; the manual
-  `php artisan dev` command runs a queue listener.
+  background jobs. DDEV runs a `queue:listen` daemon in the web container over
+  the `database` queue; the manual `php artisan dev` command runs a queue
+  listener outside DDEV.
 - **Permissions**: `UserPermission` records and the `UserPermissionHelper`
   drive authorization in addition to policies in `app/Policies`.
 

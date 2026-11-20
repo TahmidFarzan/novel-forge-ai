@@ -1,5 +1,14 @@
 # Docker Script Description
 
+> **Legacy documentation.** These entrypoint/startup scripts belong to the
+> previous Docker packaging, not to DDEV. See
+> [development-environment.md](development-environment.md) for the current
+> lifecycle. This file is retained for production/rollback reference.
+> **Step 6 update:** the development override was archived at
+> [`archive/legacy-docker/`](../archive/legacy-docker/README.md).
+> `startup.dev.sh` remains in `docker/php/` because the production Dockerfile
+> copies it into the image; DDEV does not use it.
+
 The application container is provisioned by two POSIX shell scripts that are
 copied into the image by `docker/php/Dockerfile`:
 
@@ -10,7 +19,7 @@ copied into the image by `docker/php/Dockerfile`:
 | `docker/php/startup.dev.sh` | `www-data` | Development provisioning without asset build or framework cache |
 
 `entrypoint.sh` selects the script from `${STARTUP_SCRIPT:-/usr/local/bin/startup.sh}`;
-the development override sets `STARTUP_SCRIPT=/usr/local/bin/startup.dev.sh`.
+the archived development override set `STARTUP_SCRIPT=/usr/local/bin/startup.dev.sh`.
 All scripts start with `set -eu`, so any unexpected command failure aborts the
 boot instead of silently starting a half-configured container.
 
@@ -30,8 +39,9 @@ Runs as PID 1 on every container start, before PHP-FPM:
    `database`, `public`, `vendor`, and `node_modules` that `www-data` cannot
    write to. This handles bind mounts created on Linux hosts and named volumes
    created by an older image.
-6. Runs the selected startup script (`startup.sh`, or `startup.dev.sh` in
-   development) as `www-data` via `su-exec`.
+6. Runs the selected startup script (`startup.sh`, or the archived
+   `startup.dev.sh` from the former development override) as `www-data` via
+   `su-exec`.
 7. `exec "$@"` replaces the shell with the container command (`php-fpm`), so
    `SIGTERM`/`SIGINT` from `docker stop` reach PHP-FPM directly. No supervisor or
    extra process manager is needed.
