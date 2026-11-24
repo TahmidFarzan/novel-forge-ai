@@ -1,85 +1,43 @@
-# Novel Forge AI — DDEV project configuration
-# Authoritative DDEV approot is the repository root (the directory containing this
-# file). The Laravel application physically lives in the tracked `src/` directory;
-# see `docroot` below. Keep this file minimal and tracked in Git; DDEV-generated
-# artifacts stay ignored.
-
 name: novel-forge-ai
 type: laravel
-# The Laravel public/ directory is at <approot>/src/public (verified: src/public/index.php
-# exists and there is no root-level public/). DDEV's docroot is relative to the approot.
+
 docroot: src/public
 php_version: "8.4"
 nodejs_version: "24"
 timezone: UTC
-
-# DDEV's default, set explicitly so the taken-over .ddev/nginx_full/nginx-site.conf
-# (128 MB uploads, 1800s FastCGI timeouts) can never be bypassed by a future
-# default change.
 webserver_type: nginx-fpm
-
-# Direct bind mount (CA-01): mutagen sync was unusable on this host after a
-# Docker-provider change (stale daemon lock; sync never completes) and the
-# observed cold flush of this tree takes ~24 minutes. A direct bind mount starts
-# the project immediately with no synchronization step. This is a DDEV
-# performance setting only - no application source or persistent data is changed.
 performance_mode: none
-
-# The application uses SQLite at src/database/database.sqlite, not a database server.
-# Omitting the db container saves resources on this 7.68 GB host. Trade-off:
-# DDEV database snapshots/import/describe-db features are unavailable.
 omit_containers:
   - db
 
-# Protect the user's local .env from DDEV's Laravel post-start rewrite of
-# APP_URL/MAIL_* values. The Laravel project type itself remains active.
 disable_settings_management: true
 
-# Vite dev server (frozen src/vite.config.js: container port 5173, ws + /vite-hmr).
-# https://novel-forge-ai.ddev.site:5173 is the primary Vite origin.
-# http://novel-forge-ai.ddev.site:5172 is the HTTP workaround for the hardcoded ws://
-# protocol; the browser blocks ws:// from an HTTPS page as mixed content.
 web_extra_exposed_ports:
   - name: vite
     container_port: 5173
     http_port: 5172
     https_port: 5173
 
-# Environment for the web container, queue daemon and ddev CLI commands.
-# APP_URL keeps Laravel on the DDEV hostname even if .env is copied from .env.example.
 web_environment:
   - APP_URL=https://novel-forge-ai.ddev.site
   - VITE_DEV_SERVER_ORIGIN=https://novel-forge-ai.ddev.site:5173
   - VITE_HMR_HOST=novel-forge-ai.ddev.site
   - VITE_HMR_CLIENT_PORT=5172
   - DB_QUEUE_RETRY_AFTER=1800
-  # Step 3 cache services. These override the 127.0.0.1 placeholders in
-  # .env/.env.example: Laravel's dotenv repository is immutable, so real
-  # container environment variables win over the .env file.
   - REDIS_CLIENT=phpredis
   - REDIS_HOST=redis
   - REDIS_PORT=6379
   - MEMCACHED_HOST=memcached
   - MEMCACHED_PORT=11211
-  # AI Brain (Ollama, DDEV service "ollama"). The endpoint must be the in-network
-  # service name; the queue daemon and ddev CLI commands inherit it too.
   - AI_BRAIN_URL=http://ollama:11434
   - AI_BRAIN_MODEL=qwen3:4b
-  # Matches OLLAMA_CONTEXT_LENGTH on the "ollama" service (8192) so generation
-  # and the model stay within the host's RAM budget.
   - AI_BRAIN_CONTEXT_WINDOW=8192
 
-# Database queue worker, matching the legacy development queue:listen behavior.
-# Logs: ddev logs -s web (supervisord daemon "queue").
 web_extra_daemons:
   - name: queue
     command: php artisan queue:listen --tries=1 --timeout=0
-    # Container path is relative to the DDEV approot; artisan lives in src/.
     directory: /var/www/html/src
 
-# Provision the configured Qwen3 model on every `ddev start`: the script waits
-# for the DDEV "ollama" service (docker-compose.ollama.yaml), checks whether the
-# model exists, and pulls it when missing. Idempotent — no repeated downloads.
 hooks:
   post-start:
     - exec: sh /var/www/html/.ddev/ollama-provision.sh
